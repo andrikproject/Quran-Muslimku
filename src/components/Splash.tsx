@@ -66,7 +66,16 @@ export const Splash: React.FC<SplashProps> = ({ onFinish }) => {
         </div>
       </div>
 
-      <div className="flex-1" />
+      <div className="flex-1 flex flex-col items-start justify-center relative z-10 pt-16">
+        <motion.img
+          initial={{ opacity: 0, y: 30, scale: 0.8 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 1.2, ease: "easeOut", type: "spring", bounce: 0.4 }}
+          src="/QuranSaku.png" 
+          alt="Quran Saku Logo" 
+          className="w-48 sm:w-56 h-auto drop-shadow-2xl self-center -mt-32"
+        />
+      </div>
 
       {/* Loading bar, indicator dots and skip button */}
       <div className="px-6 pb-10 pt-12 flex flex-col items-center justify-center gap-4 z-10">

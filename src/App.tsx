@@ -59,6 +59,18 @@ export default function App() {
     progressPercentage: 64
   });
 
+  // Daily Reading Target
+  const [dailyReadingTime, setDailyReadingTime] = useState(() => {
+    return parseInt(localStorage.getItem("qs_daily_time") || "0");
+  });
+  
+  const updateDailyReadingTime = (incrementMins: number) => {
+    const newVal = Math.min(dailyReadingTime + incrementMins, 15);
+    setDailyReadingTime(newVal);
+    localStorage.setItem("qs_daily_time", newVal.toString());
+    addToast("Waktu Berlalu", `Tercatat +${incrementMins} menit untuk target harian Anda.`, "success");
+  };
+
   // State: User profile parameters
   const [userName, setUserName] = useState("Ahlan");
   const [dailyGoalMinutes, setDailyGoalMinutes] = useState(15);
@@ -254,7 +266,11 @@ export default function App() {
                   { tag: "Tafsir", action: () => setActiveTab("quran"), bg: "bg-[#F3EEF8] text-purple-700", icon: <FileText className="w-5.5 h-5.5" /> },
                   { tag: "Doa Harian", action: () => setActiveTab("doa"), bg: "bg-[#FDF2EB] text-orange-700", icon: <PrayingHandsIcon className="w-5.5 h-5.5" /> },
                   { tag: "Jadwal Sholat", action: () => addToast("Jadwal Sholat", "Silakan atur kota sholat dan nyalakan notifikasi pada widget di bawah.", "info"), bg: "bg-[#EEF6FA] text-sky-700", icon: <Calendar className="w-5.5 h-5.5" /> },
-                  { tag: "Lainnya", action: () => { setActiveTab("doa"); addToast("Tasbih & Asmaul", "Tasbih digital dan Asmaul Husna tersedia di menu tab Doa.", "info"); }, bg: "bg-[#EDF5F1] text-slate-700", icon: <Sparkles className="w-5.5 h-5.5" /> }
+                  { tag: "Acak Surah", action: () => {
+                    const randomSurah = Math.floor(Math.random() * 114) + 1;
+                    handleJumpToSurah(randomSurah);
+                    addToast("Surah Acak", "Menampilkan surah pilihan acak untuk Anda baca hari ini.", "info");
+                  }, bg: "bg-[#EDF5F1] text-slate-700", icon: <Sparkles className="w-5.5 h-5.5" /> }
                 ].map((itm, i) => (
                   <button
                     key={i}
@@ -271,6 +287,43 @@ export default function App() {
                     </span>
                   </button>
                 ))}
+              </div>
+            </div>
+
+            {/* Target Membaca Harian */}
+            <div className="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-slate-100 flex flex-col gap-4">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 bg-emerald-50 rounded-xl text-emerald-700">
+                    <Clock className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs sm:text-sm font-bold text-slate-800">Target Harian</h4>
+                    <span className="text-[10px] sm:text-xs text-slate-500 font-semibold">{dailyReadingTime} dari 15 Menit hari ini</span>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => updateDailyReadingTime(5)}
+                  disabled={dailyReadingTime >= 15}
+                  className={`text-[10px] sm:text-xs font-bold px-3 py-1.5 rounded-xl transition ${
+                    dailyReadingTime >= 15 
+                      ? "bg-slate-100 text-slate-400 cursor-not-allowed" 
+                      : "bg-[#0F4C3A]/10 text-[#0F4C3A] hover:bg-[#0F4C3A]/20 active:scale-95 cursor-pointer"
+                  }`}
+                >
+                  {dailyReadingTime >= 15 ? "Selesai" : "+ 5 Menit"}
+                </button>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="flex-1 bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                  <div 
+                    style={{ width: `${Math.min((dailyReadingTime / 15) * 100, 100)}%` }} 
+                    className="h-full bg-[#ECC17A] rounded-full transition-all duration-500 ease-out"
+                  />
+                </div>
+                <span className="text-xs font-bold text-slate-700 font-mono">
+                  {Math.round(Math.min((dailyReadingTime / 15) * 100, 100))}%
+                </span>
               </div>
             </div>
 
@@ -429,16 +482,17 @@ export default function App() {
 
       {/* 1. TOP COVER DECORATION & COHESIVE SYSTEM HEADERS */}
       {activeTab === "beranda" && (
-        <div className="absolute top-0 inset-x-0 h-[40vh] sm:h-[45vh] z-0 pointer-events-none">
-          <div 
+        <div className="absolute top-0 inset-x-0 h-[40vh] sm:h-[45vh] z-0 pointer-events-none overflow-hidden">
+          <motion.div 
+            animate={{ scale: [1, 1.05], backgroundPosition: ["50% 0%", "50% 15%"] }}
+            transition={{ duration: 30, ease: "linear", repeat: Infinity, repeatType: "reverse" }}
             className="w-full h-full"
             style={{
               backgroundImage: `url(/${timeOfDay}.png)`,
               backgroundSize: 'cover',
-              backgroundPosition: 'top center',
               backgroundRepeat: 'no-repeat'
             }}
-          ></div>
+          />
           {/* Fading bottom gradient into the background color */}
           <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#FDFBF7] to-transparent"></div>
           {/* Add a subtle overlay so text is highly readable */}

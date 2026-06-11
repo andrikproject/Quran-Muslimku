@@ -6,6 +6,28 @@
   --font-serif: "Scheherazade New", "Amiri", Georgia, serif;
 }
 
+body {
+  background-color: #0d1117; /* Dark backdrop for desktop */
+  display: flex;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  min-height: 100vh;
+}
+
+#root {
+  width: 100%;
+  max-width: 480px; /* Mobile width constraint */
+  min-height: 100vh;
+  background-color: #FDFBF7;
+  position: relative;
+  overflow-x: hidden;
+  box-shadow: 0 0 60px rgba(0, 0, 0, 0.4); /* Nice shadow */
+  display: flex;
+  flex-direction: column;
+}
+
 /* Custom scrollbar remover helper class */
 .scrollbar-none::-webkit-scrollbar {
   display: none;
