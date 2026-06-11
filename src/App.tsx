@@ -223,48 +223,47 @@ export default function App() {
     switch (activeTab) {
       case "beranda":
         return (
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-6 -mt-[110px] sm:-mt-[130px] relative z-20">
             {/* Ayat Hari Ini (Verse of the day card) */}
-            <div className="bg-white rounded-3xl p-5 sm:p-6.5 shadow-sm border border-slate-100 flex flex-col gap-4 relative overflow-hidden select-none z-10">
+            <div className="bg-white/95 backdrop-blur-xl rounded-[28px] p-5 shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-white/60 flex flex-col gap-3 relative overflow-hidden select-none z-10 w-full mb-2 mx-auto max-w-2xl">
               {/* Corner label row */}
-              <div className="flex justify-between items-center text-slate-500 text-xs font-semibold">
+              <div className="flex justify-between items-center text-slate-500 text-[11px] font-semibold">
                 <div className="flex items-center gap-1.5 text-amber-600">
                   <Sparkles className="w-4 h-4 fill-amber-100/55" />
-                  <span className="text-xs font-extrabold text-slate-700 font-sans tracking-wide">Ayat Hari Ini</span>
+                  <span className="font-extrabold text-slate-800 font-sans tracking-wide">Ayat Hari Ini</span>
                 </div>
-                <span className="text-xs font-sans tracking-wide text-slate-400 font-bold uppercase">
+                <span className="font-sans tracking-wide text-slate-400 font-bold">
                   Al-Kahf · 18:24
                 </span>
               </div>
 
               {/* Quran script */}
-              <div className="py-2 text-right ml-auto">
-                <p className="font-serif text-2xl sm:text-3xl font-bold leading-normal text-slate-800 italic pr-1">
+              <div className="py-2.5 text-center mt-1">
+                <p className="font-serif text-2xl font-bold leading-relaxed text-slate-800 px-1" dir="rtl">
                   {ayatOfTheDay.arab}
                 </p>
               </div>
 
               {/* Translation */}
-              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-sans font-medium text-center italic">
+              <p className="text-[11px] sm:text-xs text-slate-600 leading-relaxed font-sans font-medium text-left px-1 mt-1 border-t border-slate-50 pt-3">
                 {ayatOfTheDay.indonesian}
               </p>
 
               {/* Tool row actions */}
-              <div className="flex justify-between items-center border-t border-slate-50 pt-4 mt-1">
+              <div className="flex justify-between items-center pt-3 mt-1 border-t border-slate-50">
                 {/* Square Share/Upload Button resembling the mockup */}
                 <button
                   onClick={shareAyatOfTheDay}
-                  className="p-2.5 bg-white hover:bg-slate-50 text-slate-500 hover:text-slate-800 border border-slate-100 rounded-xl transition cursor-pointer"
+                  className="p-2.5 bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-100 rounded-xl transition cursor-pointer"
                   title="Bagikan Ayat"
                 >
-                  <Share2 className="w-4.5 h-4.5" />
+                  <Share2 className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => handleJumpToSurah(ayatOfTheDay.surahId)}
-                  className="text-xs font-extrabold text-[#0F4C3A] hover:underline flex items-center gap-1 cursor-pointer transition"
+                  className="text-xs font-bold text-slate-800 hover:text-[#0F4C3A] flex items-center gap-1.5 cursor-pointer transition select-none pr-1"
                 >
-                  Baca Ayat 📖
-                  <ChevronRight className="w-4 h-4" />
+                  Baca Ayat <BookOpen className="w-3.5 h-3.5 text-slate-400" /> <ChevronRight className="w-4 h-4 text-slate-400" />
                 </button>
               </div>
             </div>
@@ -511,51 +510,49 @@ export default function App() {
       <ToastContainer toasts={toasts} removeToast={removeToast} />
 
       {/* 1. TOP COVER DECORATION & COHESIVE SYSTEM HEADERS */}
-      {activeTab === "beranda" && (
-        <div className="absolute top-0 inset-x-0 h-[40vh] sm:h-[45vh] z-0 pointer-events-none overflow-hidden">
-          <motion.div 
-            animate={{ scale: [1, 1.05], backgroundPosition: ["50% 0%", "50% 15%"] }}
-            transition={{ duration: 30, ease: "linear", repeat: Infinity, repeatType: "reverse" }}
-            className="w-full h-full"
-            style={{
-              backgroundImage: `url(/${timeOfDay}.png)`,
-              backgroundSize: 'cover',
-              backgroundRepeat: 'no-repeat'
-            }}
-          />
-          {/* Fading bottom gradient into the background color */}
-          <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#FDFBF7] to-transparent"></div>
-          {/* Add a subtle overlay so text is highly readable */}
-          <div className="absolute inset-0 bg-white/10 mix-blend-overlay"></div>
-        </div>
-      )}
-
       {activeTab === "beranda" ? (
-        <div className="relative z-10 pt-12 pb-3 px-5 max-w-7xl mx-auto w-full">
-          <div className="flex items-center justify-between">
-            <div className="flex flex-col drop-shadow-sm">
-              <span className="text-sm font-medium text-emerald-900 tracking-wide">
-                Assalamualaikum 👋
-              </span>
-              <h1 className="font-serif font-bold text-[#0F4C3A] text-3xl sm:text-4xl mt-0.5 tracking-tight leading-tight">
-                Selamat datang!
-              </h1>
-              <p className="text-xs text-emerald-900 font-medium mt-1">
-                Semoga hari ini penuh berkah.
-              </p>
-            </div>
+        <div className="relative w-full text-white">
+          <div className="absolute top-0 inset-x-0 h-[50vh] sm:h-[55vh] min-h-[400px] z-0 pointer-events-none overflow-hidden bg-slate-800">
+            <motion.div 
+              animate={{ backgroundPosition: ["50% 10%", "50% 20%"] }}
+              transition={{ duration: 40, ease: "linear", repeat: Infinity, repeatType: "reverse" }}
+              className="w-full h-full opacity-90"
+              style={{
+                backgroundImage: `url(/${timeOfDay}.png)`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat'
+              }}
+            />
+            <div className="absolute inset-0 bg-black/10 mix-blend-overlay"></div>
+          </div>
 
-            {/* Notification bell button */}
-            <div className="flex gap-2 flex-shrink-0 self-start mt-2">
-              <button
-                onClick={() => {
-                  setActiveTab("profil");
-                  addToast("Setelan Pengingat", "Silakan atur preferences profil & alarm sholat Anda.", "info");
-                }}
-                className="w-11 h-11 bg-white/70 backdrop-blur-md rounded-full flex items-center justify-center text-[#0F4C3A] hover:bg-white cursor-pointer shadow-sm relative focus:outline-none transition-transform active:scale-95"
-              >
-                <Bell className="w-5.5 h-5.5" />
-              </button>
+          <div className="relative z-10 pt-12 pb-[180px] sm:pb-[220px] px-5 max-w-7xl mx-auto w-full drop-shadow-md">
+            <div className="flex items-center justify-between">
+              <div className="flex flex-col drop-shadow-md">
+                <span className="text-sm font-medium tracking-wide">
+                  Assalamualaikum 👋
+                </span>
+                <h1 className="font-serif font-bold text-white text-3xl sm:text-4xl mt-0.5 tracking-tight leading-tight">
+                  Selamat datang!
+                </h1>
+                <p className="text-xs font-medium mt-1">
+                  Semoga hari ini penuh berkah.
+                </p>
+              </div>
+
+              {/* Notification bell button */}
+              <div className="flex gap-2 flex-shrink-0 self-start mt-2">
+                <button
+                  onClick={() => {
+                    setActiveTab("profil");
+                    addToast("Setelan Pengingat", "Silakan atur preferences profil & alarm sholat Anda.", "info");
+                  }}
+                  className="w-11 h-11 bg-white/20 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center text-white hover:bg-white/30 cursor-pointer shadow-sm relative focus:outline-none transition-transform active:scale-95"
+                >
+                  <Bell className="w-5.5 h-5.5" />
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -587,7 +584,7 @@ export default function App() {
       )}
 
       {/* 2. DYNAMIC WORK SPACE */}
-      <main className="flex-1 w-full max-w-7xl mx-auto px-5 py-4 relative z-10">
+      <main className={`flex-1 w-full mx-auto relative z-10 ${activeTab === 'beranda' ? 'bg-[#FDFBF7] rounded-t-[40px] sm:rounded-t-[48px] pt-6 px-4 sm:px-5 shadow-[0_-8px_30px_rgba(0,0,0,0.05)]' : 'px-5 py-4 max-w-7xl'}`}>
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
