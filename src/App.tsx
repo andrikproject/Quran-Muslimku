@@ -266,7 +266,13 @@ export default function App() {
                   { tag: "Catatan", action: () => { setActiveTab("profil"); addToast("Catatan Tadabbur", "Membuka riwayat kumpulan catatan pribadi.", "info"); }, bg: "bg-[#F7F2EC] text-amber-900", icon: <PenTool className="w-5.5 h-5.5" /> },
                   { tag: "Tafsir", action: () => setActiveTab("quran"), bg: "bg-[#F3EEF8] text-purple-700", icon: <FileText className="w-5.5 h-5.5" /> },
                   { tag: "Doa Harian", action: () => setActiveTab("doa"), bg: "bg-[#FDF2EB] text-orange-700", icon: <PrayingHandsIcon className="w-5.5 h-5.5" /> },
-                  { tag: "Jadwal Sholat", action: () => addToast("Jadwal Sholat", "Silakan atur kota sholat dan nyalakan notifikasi pada widget di bawah.", "info"), bg: "bg-[#EEF6FA] text-sky-700", icon: <Calendar className="w-5.5 h-5.5" /> },
+                  { tag: "Jadwal Sholat", action: () => {
+                    const el = document.getElementById("jadwal-sholat-widget-container");
+                    if (el) {
+                      el.scrollIntoView({ behavior: "smooth", block: "center" });
+                      addToast("Jadwal Sholat", "Menampilkan panel jadwal sholat.", "info");
+                    }
+                  }, bg: "bg-[#EEF6FA] text-sky-700", icon: <Calendar className="w-5.5 h-5.5" /> },
                   { tag: "Acak Surah", action: () => {
                     const randomSurah = Math.floor(Math.random() * 114) + 1;
                     handleJumpToSurah(randomSurah);
@@ -424,7 +430,9 @@ export default function App() {
             </div>
 
             {/* Realtime prayer schedule display */}
-            <JadwalSholatWidget addToast={addToast} />
+            <div id="jadwal-sholat-widget-container">
+              <JadwalSholatWidget addToast={addToast} />
+            </div>
           </div>
         );
 
@@ -610,14 +618,14 @@ export default function App() {
               onClick={() => setActiveTab(item.id as any)}
               className="flex flex-col items-center justify-center p-1.5 cursor-pointer focus:outline-none transition-colors group select-none flex-1 pb-1"
             >
-              <div className={`transition-all duration-300 ${
+              <div className={`transition-all duration-500 ease-out ${
                 isAct 
-                  ? "text-[#0F4C3A] scale-110" 
-                  : "text-slate-400 group-hover:text-slate-700"
+                  ? "text-[#0F4C3A] scale-110 drop-shadow-md translate-y-[-2px]" 
+                  : "text-slate-400 group-hover:text-slate-700 group-hover:-translate-y-1"
               }`}>
                 {item.icon}
               </div>
-              <span className={`text-[10px] font-bold tracking-tight mt-1 transition-colors duration-300 ${
+              <span className={`text-[10px] font-bold tracking-tight mt-1 transition-colors duration-500 ${
                 isAct 
                   ? "text-[#0F4C3A]" 
                   : "text-slate-400 group-hover:text-slate-700"

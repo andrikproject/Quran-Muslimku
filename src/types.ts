@@ -16,6 +16,7 @@ export interface Ayat {
   teksArab: string;
   teksLatin: string;
   teksIndonesia: string;
+  tafsir?: string;
   audio: {
     [key: string]: string;
   };

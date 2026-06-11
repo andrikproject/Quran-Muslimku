@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "motion/react";
+import { get, set } from 'idb-keyval';
 import { 
   BookOpen, Search, Clock, ArrowLeft, Play, Pause, Bookmark, 
   BookmarkCheck, MessageSquare, BookOpenCheck, Volume2, VolumeX, 
-  Sparkles, Check, ChevronRight, HelpCircle, FileText
+  Sparkles, Check, ChevronRight, HelpCircle, FileText, WifiOff
 } from "lucide-react";
 import { Surah, SurahDetail, Ayat, Bookmark as BookmarkType, Note } from "../types";
 import { STATIC_SURAHS } from "../data";
@@ -58,6 +60,19 @@ export const QuranReader: React.FC<QuranReaderProps> = ({
   const [activeNoteForm, setActiveNoteForm] = useState<{ surahNo: number; surahName: string; ayatNo: number } | null>(null);
   const [noteInputText, setNoteInputText] = useState("");
 
+  const [isOffline, setIsOffline] = useState(!navigator.onLine);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOffline(false);
+    const handleOffline = () => setIsOffline(true);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
   // Refs for auto scrolling to a verse
   const itemRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
 
@@ -65,21 +80,29 @@ export const QuranReader: React.FC<QuranReaderProps> = ({
   useEffect(() => {
     const fetchSurahs = async () => {
       try {
-        const response = await fetch("https://api.quran.gading.dev/surah");
-        if (!response.ok) throw new Error();
-        const payload = await response.json();
-        if (payload.code === 200 && Array.isArray(payload.data)) {
-          const transformedData = payload.data.map((s: any) => ({
-            nomor: s.number,
-            nama: s.name.short,
-            namaLatin: s.name.transliteration.id,
-            jumlahAyat: s.numberOfVerses,
-            tempatTurun: s.revelation.id,
-            arti: s.name.translation.id,
-            deskripsi: s.tafsir.id,
-            audioFull: { "05": "https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/" + s.number + ".mp3" }
-          }));
-          setSurahs(transformedData);
+        const cachedSurahs = await get('surahs_list');
+        if (cachedSurahs) {
+          setSurahs(cachedSurahs);
+        }
+
+        if (navigator.onLine) {
+          const response = await fetch("https://api.quran.gading.dev/surah");
+          if (!response.ok) throw new Error();
+          const payload = await response.json();
+          if (payload.code === 200 && Array.isArray(payload.data)) {
+            const transformedData = payload.data.map((s: any) => ({
+              nomor: s.number,
+              nama: s.name.short,
+              namaLatin: s.name.transliteration.id,
+              jumlahAyat: s.numberOfVerses,
+              tempatTurun: s.revelation.id,
+              arti: s.name.translation.id,
+              deskripsi: s.tafsir.id,
+              audioFull: { "05": "https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/" + s.number + ".mp3" }
+            }));
+            setSurahs(transformedData);
+            set('surahs_list', transformedData).catch(console.error);
+          }
         }
       } catch (err) {
         // Fallback is static data which is already loaded
@@ -115,32 +138,42 @@ export const QuranReader: React.FC<QuranReaderProps> = ({
     setIsLoadingDetail(true);
     setSurahDetail(null);
     try {
-      const response = await fetch(`https://api.quran.gading.dev/surah/${surah.nomor}`);
-      if (!response.ok) throw new Error();
-      const payload = await response.json();
-      if (payload.code === 200 && payload.data) {
-        const s = payload.data;
-        const detailData = {
-          nomor: s.number,
-          nama: s.name.short,
-          namaLatin: s.name.transliteration.id,
-          jumlahAyat: s.numberOfVerses,
-          tempatTurun: s.revelation.id,
-          arti: s.name.translation.id,
-          deskripsi: s.tafsir.id,
-          audioFull: { "05": "https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/" + s.number + ".mp3" },
-          ayat: s.verses.map((v: any) => ({
-            nomorAyat: v.number.inSurah,
-            teksArab: v.text.arab,
-            teksLatin: v.text.transliteration?.en || "",
-            teksIndonesia: v.translation.id,
-            audio: { "05": v.audio.primary }
-          }))
-        };
-        setSurahDetail(detailData);
-        
-        // Check if there is fullAudio url constructed
-        setFullAudioUrl(detailData.audioFull["05"]);
+      const cacheKey = `surah_detail_${surah.nomor}`;
+      const cachedDetail = await get(cacheKey);
+      
+      if (cachedDetail) {
+        setSurahDetail(cachedDetail);
+        setFullAudioUrl(cachedDetail.audioFull["05"]);
+      }
+
+      if (navigator.onLine || !cachedDetail) {
+        const response = await fetch(`https://api.quran.gading.dev/surah/${surah.nomor}`);
+        if (!response.ok) throw new Error();
+        const payload = await response.json();
+        if (payload.code === 200 && payload.data) {
+          const s = payload.data;
+          const detailData = {
+            nomor: s.number,
+            nama: s.name.short,
+            namaLatin: s.name.transliteration.id,
+            jumlahAyat: s.numberOfVerses,
+            tempatTurun: s.revelation.id,
+            arti: s.name.translation.id,
+            deskripsi: s.tafsir.id,
+            audioFull: { "05": "https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/" + s.number + ".mp3" },
+            ayat: s.verses.map((v: any) => ({
+              nomorAyat: v.number.inSurah,
+              teksArab: v.text.arab,
+              teksLatin: v.text.transliteration?.en || "",
+              teksIndonesia: v.translation.id,
+              tafsir: v.tafsir?.id?.long || "Tafsir belum tersedia.",
+              audio: { "05": v.audio.primary }
+            }))
+          };
+          setSurahDetail(detailData);
+          setFullAudioUrl(detailData.audioFull["05"]);
+          set(cacheKey, detailData).catch(console.error);
+        }
       }
     } catch {
       // If API fails (e.g. CORS or offline), show an error toast 
@@ -259,36 +292,22 @@ export const QuranReader: React.FC<QuranReaderProps> = ({
     }
   };
 
-  // Fetch verse Tafsir from API
+  // Read verse Tafsir from cached surah detail without refetching
   const handleTafsirClick = async (ayatNo: number) => {
-    if (!selectedSurah) return;
-    setIsLoadingTafsir(true);
-    try {
-      const response = await fetch(`https://api.quran.gading.dev/surah/${selectedSurah.nomor}`);
-      if (!response.ok) throw new Error();
-      const payload = await response.json();
-      if (payload.code === 200 && payload.data?.verses) {
-        // Find matching verse tafsir inside gading API structure
-        const targetVerse = payload.data.verses.find((v: any) => v.number.inSurah === ayatNo);
-        if (targetVerse && targetVerse.tafsir?.id?.long) {
-          setActiveTafsirAyat({
-            ayatNo,
-            teks: targetVerse.tafsir.id.long
-          });
-        } else {
-          setActiveTafsirAyat({
-            ayatNo,
-            teks: "Tafsir ayat belum tersedia di server pusat."
-          });
-        }
-      }
-    } catch {
+    if (!selectedSurah || !surahDetail) return;
+    
+    const targetVerse = surahDetail.ayat.find(v => v.nomorAyat === ayatNo);
+    
+    if (targetVerse && targetVerse.tafsir) {
       setActiveTafsirAyat({
         ayatNo,
-        teks: "Gagal memuat tafsir dari MyQuran API. Pastikan Anda terhubung ke internet."
+        teks: targetVerse.tafsir
       });
-    } finally {
-      setIsLoadingTafsir(false);
+    } else {
+      setActiveTafsirAyat({
+        ayatNo,
+        teks: "Tafsir ayat belum diunduh dengan sempurna. Coba muat ulang surah ini saat online."
+      });
     }
   };
 
@@ -342,6 +361,14 @@ export const QuranReader: React.FC<QuranReaderProps> = ({
 
   return (
     <div className="flex flex-col gap-6">
+      {/* Offline Indicator */}
+      {isOffline && (
+        <div className="bg-amber-50 border border-amber-200 text-amber-700 px-4 py-2.5 rounded-2xl flex items-center gap-3 text-sm font-semibold shadow-sm animate-in fade-in slide-in-from-top-4">
+          <WifiOff className="w-5 h-5 flex-shrink-0" />
+          <span>Anda sedang offline. Menampilkan data dari cache memori perangkat. Fitur audio dan tafsir mungkin terbatas.</span>
+        </div>
+      )}
+
       {/* Search and listings section */}
       {!selectedSurah ? (
         <div className="flex flex-col gap-5">
@@ -614,104 +641,110 @@ export const QuranReader: React.FC<QuranReaderProps> = ({
       )}
 
       {/* Global Interactive Modal: Note Creator form */}
-      <AnimatePresence>
-        {activeNoteForm && (
-          <div className="fixed inset-0 bg-black/65 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white rounded-3xl w-full max-w-md p-6 overflow-hidden shadow-2xl flex flex-col gap-4"
-            >
-              <div>
-                <h3 className="text-lg font-serif font-bold text-[#0F4C3A]">
-                  Tulis Catatan / Tadabbur
-                </h3>
-                <p className="text-xs text-slate-400 font-medium mt-1">
-                  Mencatatkan refleksi spiritual untuk Surat {activeNoteForm.surahName} Ayat {activeNoteForm.ayatNo}
-                </p>
-              </div>
-
-              <form onSubmit={handleNoteSubmit} className="flex flex-col gap-4">
-                <textarea
-                  value={noteInputText}
-                  onChange={(e) => setNoteInputText(e.target.value)}
-                  placeholder="Ketik refleksi spiritual, nasehat, atau pelajaran tadabbur yang Anda dapatkan dari ayat ini di sini..."
-                  rows={4}
-                  required
-                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#0F4C3A]/20 leading-relaxed"
-                ></textarea>
-
-                <div className="flex gap-2 justify-end">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setActiveNoteForm(null);
-                      setNoteInputText("");
-                    }}
-                    className="px-4 py-2 bg-slate-100 hover:bg-slate-200 cursor-pointer text-slate-600 rounded-xl text-xs font-bold transition-all"
-                  >
-                    Batal
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 bg-[#0F4C3A] hover:bg-emerald-900 cursor-pointer text-white rounded-xl text-xs font-bold transition-all shadow"
-                  >
-                    Simpan Catatan
-                  </button>
-                </div>
-              </form>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-
-      {/* Global Interactive Modal: Detailed Tafsir view */}
-      <AnimatePresence>
-        {activeTafsirAyat && (
-          <div className="fixed inset-0 bg-black/65 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[85vh]"
-            >
-              {/* Header */}
-              <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+      {typeof document !== 'undefined' && createPortal(
+        <AnimatePresence>
+          {activeNoteForm && (
+            <div className="fixed inset-0 bg-black/65 backdrop-blur-sm flex items-center justify-center p-4 z-[90]">
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.95, opacity: 0 }}
+                className="bg-white rounded-3xl w-full max-w-md p-6 overflow-hidden shadow-2xl flex flex-col gap-4"
+              >
                 <div>
                   <h3 className="text-lg font-serif font-bold text-[#0F4C3A]">
-                    Tafsir Al-Qur'an Digital
+                    Tulis Catatan / Tadabbur
                   </h3>
-                  <p className="text-xs text-slate-500 font-semibold mt-0.5">
-                    Surat {selectedSurah?.namaLatin} • Ayat {activeTafsirAyat.ayatNo}
+                  <p className="text-xs text-slate-400 font-medium mt-1">
+                    Mencatatkan refleksi spiritual untuk Surat {activeNoteForm.surahName} Ayat {activeNoteForm.ayatNo}
                   </p>
                 </div>
-                <button
-                  onClick={() => setActiveTafsirAyat(null)}
-                  className="text-slate-400 hover:text-slate-600 font-bold p-1 hover:bg-slate-50 rounded-lg text-sm cursor-pointer"
-                >
-                  ✕
-                </button>
-              </div>
 
-              {/* Scrollable text area */}
-              <div className="flex-1 overflow-y-auto p-6 leading-relaxed text-sm text-slate-700 whitespace-pre-wrap select-text">
-                {activeTafsirAyat.teks}
-              </div>
+                <form onSubmit={handleNoteSubmit} className="flex flex-col gap-4">
+                  <textarea
+                    value={noteInputText}
+                    onChange={(e) => setNoteInputText(e.target.value)}
+                    placeholder="Ketik refleksi spiritual, nasehat, atau pelajaran tadabbur yang Anda dapatkan dari ayat ini di sini..."
+                    rows={4}
+                    required
+                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#0F4C3A]/20 leading-relaxed"
+                  ></textarea>
 
-              {/* Footer */}
-              <div className="p-4 border-t border-slate-100 bg-slate-50 flex justify-end">
-                <button
-                  onClick={() => setActiveTafsirAyat(null)}
-                  className="px-5 py-2 bg-[#0F4C3A] hover:bg-emerald-900 text-white rounded-xl text-xs font-bold cursor-pointer transition-colors"
-                >
-                  Tutup Tafsir
-                </button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
+                  <div className="flex gap-2 justify-end">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveNoteForm(null);
+                        setNoteInputText("");
+                      }}
+                      className="px-4 py-2 bg-slate-100 hover:bg-slate-200 cursor-pointer text-slate-600 rounded-xl text-xs font-bold transition-all"
+                    >
+                      Batal
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-4 py-2 bg-[#0F4C3A] hover:bg-emerald-900 cursor-pointer text-white rounded-xl text-xs font-bold transition-all shadow"
+                    >
+                      Simpan Catatan
+                    </button>
+                  </div>
+                </form>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
+
+      {/* Global Interactive Modal: Detailed Tafsir view */}
+      {typeof document !== 'undefined' && createPortal(
+        <AnimatePresence>
+          {activeTafsirAyat && (
+            <div className="fixed inset-0 bg-black/65 backdrop-blur-sm flex items-center justify-center p-4 z-[90]">
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.95, opacity: 0 }}
+                className="bg-white rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[85vh]"
+              >
+                {/* Header */}
+                <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                  <div>
+                    <h3 className="text-lg font-serif font-bold text-[#0F4C3A]">
+                      Tafsir Al-Qur'an Digital
+                    </h3>
+                    <p className="text-xs text-slate-500 font-semibold mt-0.5">
+                      Surat {selectedSurah?.namaLatin} • Ayat {activeTafsirAyat.ayatNo}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setActiveTafsirAyat(null)}
+                    className="text-slate-400 hover:text-slate-600 font-bold p-1 hover:bg-slate-50 rounded-lg text-sm cursor-pointer"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                {/* Scrollable text area */}
+                <div className="flex-1 overflow-y-auto p-6 leading-relaxed text-sm text-slate-700 whitespace-pre-wrap select-text">
+                  {activeTafsirAyat.teks}
+                </div>
+
+                {/* Footer */}
+                <div className="p-4 border-t border-slate-100 bg-slate-50 flex justify-end">
+                  <button
+                    onClick={() => setActiveTafsirAyat(null)}
+                    className="px-5 py-2 bg-[#0F4C3A] hover:bg-emerald-900 text-white rounded-xl text-xs font-bold cursor-pointer transition-colors"
+                  >
+                    Tutup Tafsir
+                  </button>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
     </div>
   );
 };

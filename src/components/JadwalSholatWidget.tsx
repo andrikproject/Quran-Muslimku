@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "motion/react";
 import { Search, MapPin, Map, Clock, Bell, BellOff, Volume2, VolumeX, Check, ChevronRight } from "lucide-react";
 import { SholatCity, PrayerSchedule } from "../types";
@@ -274,12 +275,36 @@ export const JadwalSholatWidget: React.FC<SholatWidgetProps> = ({ addToast }) =>
 
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
-        // Reverse geolocation mockup for Indonesian capitals or using search directly
-        // Generally GPS is mapped to closest capital in real-world
-        // We will default to KOTA JAKARTA or suggest user selection
-        addToast("GPS Terkunci!", "Berhasil mengambil koordinat. Menyelaraskan dengan kota terdekat...", "success");
-        // For premium presentation we randomly align or set to capital
-        setSelectedCity({ id: "1301", lokasi: "KOTA JAKARTA (GPS)" });
+        try {
+          // fetch accurate locality/city from bigdatacloud open api
+          const r = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${pos.coords.latitude}&longitude=${pos.coords.longitude}&localityLanguage=id`);
+          if (!r.ok) throw new Error();
+          const data = await r.json();
+          let cityName = data.city || data.locality || data.principalSubdivision || "Jakarta";
+          
+          cityName = cityName.replace(/Kabupaten|Kota|Kab\./gi, "").trim();
+
+          // Search MyQuran API with that string
+          const s = await fetch(`https://api.myquran.com/v3/sholat/kota/cari/${encodeURIComponent(cityName)}`);
+          if (!s.ok) throw new Error();
+          const sData = await s.json();
+          
+          if (sData.status && Array.isArray(sData.data) && sData.data.length > 0) {
+            const result = sData.data[0];
+            setSelectedCity({
+              id: result.id,
+              lokasi: result.lokasi || result.kabko
+            });
+            addToast("GPS Terkunci!", `Berhasil menemukan wilayah GPS: ${result.lokasi || result.kabko}.`, "success");
+          } else {
+             // Fallback
+             setSelectedCity({ id: "1301", lokasi: "KOTA JAKARTA (GPS)" });
+             addToast("Lokasi Default", "Kota spesifik tidak ditemukan di database jadwal sholat, menggunakan Jakarta.", "info");
+          }
+        } catch (err) {
+          addToast("GPS Terkunci", "Menggunakan koordinat tapi gagal menentukan kota, fallback ke Jakarta.", "success");
+          setSelectedCity({ id: "1301", lokasi: "KOTA JAKARTA (GPS)" });
+        }
       },
       (err) => {
         addToast("GPS Gagal", "Harap izinkan hak akses peta atau tulis kota secara manual.", "warning");
@@ -435,94 +460,97 @@ export const JadwalSholatWidget: React.FC<SholatWidgetProps> = ({ addToast }) =>
       </div>
 
       {/* Elegant Modal: Change City Search */}
-      <AnimatePresence>
-        {showSearchModal && (
-          <div className="fixed inset-0 bg-black/65 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl flex flex-col max-h-[85vh]"
-            >
-              <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-                <h3 className="text-lg font-serif font-bold text-[#0F4C3A]">Pilih Kota & Waktu</h3>
-                <button
-                  onClick={() => {
-                    setShowSearchModal(false);
-                    setSearchQuery("");
-                    setSearchResults([]);
-                  }}
-                  className="text-slate-400 hover:text-slate-600 font-bold p-1 hover:bg-slate-50 rounded-lg text-sm"
-                >
-                  ✕
-                </button>
-              </div>
+      {typeof document !== 'undefined' && createPortal(
+        <AnimatePresence>
+          {showSearchModal && (
+            <div className="fixed inset-0 bg-black/65 backdrop-blur-sm flex items-center justify-center p-4 z-[90]">
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl flex flex-col max-h-[85vh]"
+              >
+                <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+                  <h3 className="text-lg font-serif font-bold text-[#0F4C3A]">Pilih Kota & Waktu</h3>
+                  <button
+                    onClick={() => {
+                      setShowSearchModal(false);
+                      setSearchQuery("");
+                      setSearchResults([]);
+                    }}
+                    className="text-slate-400 hover:text-slate-600 font-bold p-1 hover:bg-slate-50 rounded-lg text-sm"
+                  >
+                    ✕
+                  </button>
+                </div>
 
-              {/* Form Search */}
-              <form onSubmit={handleSearch} className="p-6 pb-4 flex gap-2">
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Contoh: Jakarta, Surabaya, Bandung..."
-                  className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#0F4C3A]/20"
-                />
-                <button
-                  type="submit"
-                  disabled={isSearching}
-                  className="px-4 py-2.5 bg-[#0F4C3A] hover:bg-emerald-900 transition-colors text-white rounded-xl text-sm font-bold flex items-center"
-                >
-                  {isSearching ? "Cari..." : "Cari"}
-                </button>
-              </form>
+                {/* Form Search */}
+                <form onSubmit={handleSearch} className="p-6 pb-4 flex gap-2">
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Contoh: Jakarta, Surabaya, Bandung..."
+                    className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#0F4C3A]/20"
+                  />
+                  <button
+                    type="submit"
+                    disabled={isSearching}
+                    className="px-4 py-2.5 bg-[#0F4C3A] hover:bg-emerald-900 transition-colors text-white rounded-xl text-sm font-bold flex items-center"
+                  >
+                    {isSearching ? "Cari..." : "Cari"}
+                  </button>
+                </form>
 
-              {/* Scrollable listing of cities */}
-              <div className="flex-1 overflow-y-auto p-6 pt-0 flex flex-col gap-2">
-                {searchResults.length > 0 ? (
-                  <div>
-                    <h4 className="text-xs font-bold text-slate-400 tracking-wider mb-2">HASIL PENCARIAN</h4>
-                    <div className="flex flex-col gap-1.5/2">
-                      {searchResults.map((city) => (
-                        <button
-                          key={city.id}
-                          onClick={() => selectCityHandler(city)}
-                          className="w-full text-left px-4 py-3 rounded-xl border border-slate-100 bg-slate-50 hover:bg-emerald-50 hover:border-emerald-200 text-slate-700 text-sm font-medium transition-all flex items-center justify-between"
-                        >
-                          <span>{city.lokasi}</span>
-                          <ChevronRight className="w-4 h-4 text-emerald-800" />
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <div>
-                    <h4 className="text-xs font-bold text-slate-400 tracking-wider mb-2.5">KOTA TERPOPULER</h4>
-                    <div className="grid grid-cols-2 gap-2">
-                      {DEFAULT_CITIES.map((city) => {
-                        const isCurrent = city.id === selectedCity.id;
-                        return (
+                {/* Scrollable listing of cities */}
+                <div className="flex-1 overflow-y-auto p-6 pt-0 flex flex-col gap-2">
+                  {searchResults.length > 0 ? (
+                    <div>
+                      <h4 className="text-xs font-bold text-slate-400 tracking-wider mb-2">HASIL PENCARIAN</h4>
+                      <div className="flex flex-col gap-1.5/2">
+                        {searchResults.map((city) => (
                           <button
                             key={city.id}
                             onClick={() => selectCityHandler(city)}
-                            className={`text-left p-3 rounded-xl border transition-all text-xs font-bold flex items-center justify-between ${
-                              isCurrent
-                                ? "bg-emerald-100/60 border-emerald-300 text-[#0F4C3A]"
-                                : "bg-slate-50 border-slate-100 hover:bg-slate-100 text-slate-600"
-                            }`}
+                            className="w-full text-left px-4 py-3 rounded-xl border border-slate-100 bg-slate-50 hover:bg-emerald-50 hover:border-emerald-200 text-slate-700 text-sm font-medium transition-all flex items-center justify-between"
                           >
-                            <span className="truncate">{city.lokasi.replace("KOTA ", "")}</span>
-                            {isCurrent && <Check className="w-3.5 h-3.5" />}
+                            <span>{city.lokasi}</span>
+                            <ChevronRight className="w-4 h-4 text-emerald-800" />
                           </button>
-                        );
-                      })}
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
+                  ) : (
+                    <div>
+                      <h4 className="text-xs font-bold text-slate-400 tracking-wider mb-2.5">KOTA TERPOPULER</h4>
+                      <div className="grid grid-cols-2 gap-2">
+                        {DEFAULT_CITIES.map((city) => {
+                          const isCurrent = city.id === selectedCity.id;
+                          return (
+                            <button
+                              key={city.id}
+                              onClick={() => selectCityHandler(city)}
+                              className={`text-left p-3 rounded-xl border transition-all text-xs font-bold flex items-center justify-between ${
+                                isCurrent
+                                  ? "bg-emerald-100/60 border-emerald-300 text-[#0F4C3A]"
+                                  : "bg-slate-50 border-slate-100 hover:bg-slate-100 text-slate-600"
+                              }`}
+                            >
+                              <span className="truncate">{city.lokasi.replace("KOTA ", "")}</span>
+                              {isCurrent && <Check className="w-3.5 h-3.5" />}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
     </div>
   );
 };
