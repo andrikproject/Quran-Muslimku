@@ -126,7 +126,7 @@ export const KalenderView: React.FC<KalenderViewProps> = ({ addToast }) => {
   }, [holidays, currentDate]);
 
   return (
-    <div className="flex flex-col gap-6 items-center px-4 py-8 max-w-2xl mx-auto">
+    <div className="flex flex-col gap-6 w-full py-8">
       <div className="flex flex-col items-center mb-2">
          <span className="text-[10px] font-extrabold text-slate-400 tracking-widest block uppercase mb-1">
           WAKTU & TANGGAL
