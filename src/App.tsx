@@ -14,6 +14,7 @@ import { QuranReader } from "./components/QuranReader";
 import { DoaHarianView } from "./components/DoaHarianView";
 import { CariView } from "./components/CariView";
 import { SettingsView } from "./components/SettingsView";
+import { InstallPrompt } from "./components/InstallPrompt";
 
 // Typings and Data
 import { Bookmark, Note, TilawahProgress } from "./types";
@@ -570,6 +571,8 @@ export default function App() {
           </motion.div>
         </AnimatePresence>
       </main>
+
+      <InstallPrompt />
 
       {/* 3. PREMIUM FLOATING BOTTOM NAVIGATION BAR */}
       <nav className="fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-slate-100 rounded-t-[32px] px-6 py-2 pb-6 flex justify-between items-end shadow-2xl shadow-slate-900/10 z-40 max-w-md mx-auto">
