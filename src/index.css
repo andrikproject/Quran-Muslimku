@@ -13,13 +13,13 @@ body {
   margin: 0;
   padding: 0;
   width: 100vw;
-  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 #root {
   width: 100%;
   max-width: 480px; /* Mobile width constraint */
-  min-height: 100vh;
+  min-height: 100dvh;
   background-color: #FDFBF7;
   position: relative;
   overflow-x: hidden;

@@ -47,7 +47,7 @@ export const Splash: React.FC<SplashProps> = ({ onFinish }) => {
   }, [onFinish]);
 
   return (
-    <div className="relative min-h-screen bg-[#FDFBF7] font-sans flex flex-col justify-between overflow-hidden">
+    <div className="relative h-[100dvh] w-full bg-[#FDFBF7] font-sans flex flex-col justify-between overflow-hidden">
       {/* Background Image provided by user */}
       <div 
         className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
@@ -66,14 +66,14 @@ export const Splash: React.FC<SplashProps> = ({ onFinish }) => {
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col items-start justify-center relative z-10 pt-16">
+      <div className="flex-1 flex flex-col items-center justify-center relative z-10">
         <motion.img
           initial={{ opacity: 0, y: 30, scale: 0.8 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 1.2, ease: "easeOut", type: "spring", bounce: 0.4 }}
           src="/QuranSaku.png" 
           alt="Quran Saku Logo" 
-          className="w-48 sm:w-56 h-auto drop-shadow-2xl self-center -mt-48"
+          className="w-48 sm:w-56 h-auto drop-shadow-2xl mb-32"
         />
       </div>
 

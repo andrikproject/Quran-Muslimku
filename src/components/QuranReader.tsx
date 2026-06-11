@@ -118,20 +118,9 @@ export const QuranReader: React.FC<QuranReaderProps> = ({
         }
       }
     } catch {
-      // Offline fallback: Mock a simple reader view if API has rate limits
-      // This increases robustness
-      const mockAyas: Ayat[] = Array.from({ length: surah.jumlahAyat }).map((_, idx) => ({
-        nomorAyat: idx + 1,
-        teksArab: "بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ",
-        teksLatin: "Bismillahir rahmanir rahim",
-        teksIndonesia: "Dengan nama Allah Yang Maha Pengasih lagi Maha Penyayang.",
-        audio: { "05": "https://storage.googleapis.com/hidayah-71407.appspot.com/bismillah.mp3" }
-      }));
-      setSurahDetail({
-        ...surah,
-        ayat: mockAyas
-      });
-      addToast("Mode Offline Sementara", `Menampilkan draf teks untuk Surat ${surah.namaLatin}`, "info");
+      // If API fails (e.g. CORS or offline), show an error toast 
+      addToast("Koneksi Error", `Gagal memuat Surat ${surah.namaLatin}. Gagal menghubungi server MyQuran API.`, "warning");
+      setSelectedSurah(null); // Return back to list so user not stuck in a dummy view
     } finally {
       setIsLoadingDetail(false);
     }
