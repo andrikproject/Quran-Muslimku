@@ -194,9 +194,7 @@ export const DoaHarianView: React.FC<DoaHarianViewProps> = ({ addToast }) => {
       <div className="flex bg-slate-100 p-1 rounded-2xl overflow-x-auto scrollbar-none">
         {[
           { tabId: "doa", name: "Doa Pilihan", icon: <HandHelping className="w-4 h-4" /> },
-          { tabId: "tasbih", name: "Tasbih", icon: <RotateCw className="w-4 h-4" /> },
-          { tabId: "asmaul", name: "Asmaul Husna", icon: <Sparkles className="w-4 h-4" /> },
-          { tabId: "kiblat", name: "Kiblat", icon: <Compass className="w-4 h-4" /> }
+          { tabId: "asmaul", name: "Asmaul Husna", icon: <Sparkles className="w-4 h-4" /> }
         ].map((tab) => {
           const isActive = activeTab === tab.tabId;
           return (
