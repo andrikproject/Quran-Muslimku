@@ -487,8 +487,8 @@ export const QuranReader: React.FC<QuranReaderProps> = ({
 
           {/* Arabic Bismillah (omit for Surah Al-Fatihah/At-Taubah in general layouts, or show beautifully) */}
           {selectedSurah.nomor !== 1 && selectedSurah.nomor !== 9 && (
-            <div className="bg-white border border-slate-100 p-8 rounded-2xl text-center shadow-sm select-none">
-              <span className="font-serif text-3xl font-bold text-slate-800 tracking-wider">
+            <div className="bg-white border border-slate-100 p-5 sm:p-8 rounded-2xl text-center shadow-sm select-none">
+              <span className="font-serif text-xl sm:text-3xl font-bold text-slate-800 tracking-wider leading-loose">
                 بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ
               </span>
               <p className="text-slate-400 text-xs mt-3.5 font-semibold">

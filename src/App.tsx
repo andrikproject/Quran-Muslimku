@@ -621,10 +621,10 @@ export default function App() {
                 onClick={() => setActiveTab("cari")}
                 className="flex flex-col items-center justify-center flex-1 focus:outline-none cursor-pointer group pb-1"
               >
-                <div className="relative -top-3 w-13 h-13 rounded-full bg-[#0F4C3A] text-white flex items-center justify-center shadow-lg shadow-emerald-950/30 transition-transform active:scale-95 hover:scale-105 border-4 border-white">
+                <div className="relative -top-6 w-14 h-14 rounded-full bg-[#0F4C3A] text-white flex items-center justify-center shadow-lg shadow-emerald-950/30 transition-transform active:scale-95 hover:scale-105 border-4 border-white">
                   {item.icon}
                 </div>
-                <span className={`text-[10px] font-bold tracking-tight -mt-2 transition-colors duration-300 ${
+                <span className={`text-[10px] font-bold tracking-tight -mt-4 mb-0.5 transition-colors duration-300 ${
                   isAct ? "text-[#0F4C3A]" : "text-slate-400 group-hover:text-slate-700"
                 }`}>
                   {item.label}
