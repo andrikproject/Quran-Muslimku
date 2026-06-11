@@ -142,7 +142,7 @@ async function startServer() {
   // API Route - Get all Quran Surahs (EQuran v2 API)
   app.get("/api/quran/surah", async (req, res) => {
     try {
-      const response = await fetch("https://equran.id/api/v2/surah");
+      const response = await fetch("https://api.quran.gading.dev/surah");
       if (!response.ok) throw new Error("Gagal mengambil daftar surah");
       const data = await response.json();
       res.json(data);
@@ -155,7 +155,7 @@ async function startServer() {
   app.get("/api/quran/surah/:nomor", async (req, res) => {
     try {
       const { nomor } = req.params;
-      const response = await fetch(`https://equran.id/api/v2/surah/${nomor}`);
+      const response = await fetch(`https://api.quran.gading.dev/surah/${nomor}`);
       if (!response.ok) throw new Error(`Gagal mengambil detail surah nomor ${nomor}`);
       const data = await response.json();
       res.json(data);
@@ -168,7 +168,7 @@ async function startServer() {
   app.get("/api/quran/tafsir/:nomor", async (req, res) => {
     try {
       const { nomor } = req.params;
-      const response = await fetch(`https://equran.id/api/v2/tafsir/${nomor}`);
+      const response = await fetch(`https://api.quran.gading.dev/surah/${nomor}`);
       if (!response.ok) throw new Error(`Gagal mengambil tafsir surah nomor ${nomor}`);
       const data = await response.json();
       res.json(data);

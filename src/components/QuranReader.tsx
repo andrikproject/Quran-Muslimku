@@ -65,11 +65,21 @@ export const QuranReader: React.FC<QuranReaderProps> = ({
   useEffect(() => {
     const fetchSurahs = async () => {
       try {
-        const response = await fetch("https://equran.id/api/v2/surah");
+        const response = await fetch("https://api.quran.gading.dev/surah");
         if (!response.ok) throw new Error();
         const payload = await response.json();
         if (payload.code === 200 && Array.isArray(payload.data)) {
-          setSurahs(payload.data);
+          const transformedData = payload.data.map((s: any) => ({
+            nomor: s.number,
+            nama: s.name.short,
+            namaLatin: s.name.transliteration.id,
+            jumlahAyat: s.numberOfVerses,
+            tempatTurun: s.revelation.id,
+            arti: s.name.translation.id,
+            deskripsi: s.tafsir.id,
+            audioFull: { "05": "https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/" + s.number + ".mp3" }
+          }));
+          setSurahs(transformedData);
         }
       } catch (err) {
         // Fallback is static data which is already loaded
@@ -105,17 +115,32 @@ export const QuranReader: React.FC<QuranReaderProps> = ({
     setIsLoadingDetail(true);
     setSurahDetail(null);
     try {
-      const response = await fetch(`https://equran.id/api/v2/surah/${surah.nomor}`);
+      const response = await fetch(`https://api.quran.gading.dev/surah/${surah.nomor}`);
       if (!response.ok) throw new Error();
       const payload = await response.json();
       if (payload.code === 200 && payload.data) {
-        setSurahDetail(payload.data);
-        // Extract 05 Qari or first available for full Audio
-        const audiosObj = payload.data.audioFull || surah.audioFull;
-        if (audiosObj) {
-          const firstKey = Object.keys(audiosObj)[0] || "05";
-          setFullAudioUrl(audiosObj[firstKey]);
-        }
+        const s = payload.data;
+        const detailData = {
+          nomor: s.number,
+          nama: s.name.short,
+          namaLatin: s.name.transliteration.id,
+          jumlahAyat: s.numberOfVerses,
+          tempatTurun: s.revelation.id,
+          arti: s.name.translation.id,
+          deskripsi: s.tafsir.id,
+          audioFull: { "05": "https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/" + s.number + ".mp3" },
+          ayat: s.verses.map((v: any) => ({
+            nomorAyat: v.number.inSurah,
+            teksArab: v.text.arab,
+            teksLatin: v.text.transliteration?.en || "",
+            teksIndonesia: v.translation.id,
+            audio: { "05": v.audio.primary }
+          }))
+        };
+        setSurahDetail(detailData);
+        
+        // Check if there is fullAudio url constructed
+        setFullAudioUrl(detailData.audioFull["05"]);
       }
     } catch {
       // If API fails (e.g. CORS or offline), show an error toast 
@@ -239,16 +264,16 @@ export const QuranReader: React.FC<QuranReaderProps> = ({
     if (!selectedSurah) return;
     setIsLoadingTafsir(true);
     try {
-      const response = await fetch(`https://equran.id/api/v2/tafsir/${selectedSurah.nomor}`);
+      const response = await fetch(`https://api.quran.gading.dev/surah/${selectedSurah.nomor}`);
       if (!response.ok) throw new Error();
       const payload = await response.json();
-      if (payload.code === 200 && payload.data?.tafsir) {
-        // Find matching verse tafsir
-        const tafsirObj = payload.data.tafsir.find((t: any) => t.ayat === ayatNo);
-        if (tafsirObj) {
+      if (payload.code === 200 && payload.data?.verses) {
+        // Find matching verse tafsir inside gading API structure
+        const targetVerse = payload.data.verses.find((v: any) => v.number.inSurah === ayatNo);
+        if (targetVerse && targetVerse.tafsir?.id?.long) {
           setActiveTafsirAyat({
             ayatNo,
-            teks: tafsirObj.teks
+            teks: targetVerse.tafsir.id.long
           });
         } else {
           setActiveTafsirAyat({
