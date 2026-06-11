@@ -33,6 +33,24 @@ export const JadwalSholatWidget: React.FC<SholatWidgetProps> = ({ addToast }) =>
   const [currentTime, setCurrentTime] = useState(new Date());
   const [nextSholat, setNextSholat] = useState<{ name: string; time: string; remaining: string } | null>(null);
 
+  // Resolving IDs mapping for MyQuran API v2 to v3
+  const resolveCityId = (id: string): string => {
+    const V2_TO_V3_MAP: Record<string, string> = {
+      "1301": "58a2fc6ed39fd083f55d4182bf88826d", // KOTA JAKARTA
+      "1210": "c1f71dfbc62b7ff017f7872f0dbb2247", // KOTA BANDUNG
+      "1638": "4734ba6f3de83d861c3176a6273cac6d", // KOTA SURABAYA
+      "1430": "577ef1154f3240ad5b9b413aa7346a1e", // KOTA YOGYAKARTA
+      "0115": "2838023a778dfaecdc212708f721b788", // KOTA MEDAN
+      "2212": "b7b16ecf8ca53723593894116071700c", // KOTA MAKASSAR
+      "1708": "6a9aeddfc689c1d0e3b9ccc3ab651bc5", // KOTA DENPASAR
+      "1505": "e96ed478dab8595a7dbda4cbcbee168f", // KAB. SEMARANG
+      "0814": "1afa34a7f984eeabdbb0a7d494132ee5", // KOTA PALEMBANG
+      "1810": "00411460f7c92d2124a67ea0f4cb5f85", // KOTA BALIKPAPAN
+      "2115": "550a141f12de6341fba65b0ad0433500"  // KOTA MANADO
+    };
+    return V2_TO_V3_MAP[id] || ( /^\d+$/.test(id) ? "58a2fc6ed39fd083f55d4182bf88826d" : id );
+  };
+
   // Fetch sholat schedule
   const fetchSchedule = async (cityId: string) => {
     setIsLoading(true);
@@ -41,13 +59,16 @@ export const JadwalSholatWidget: React.FC<SholatWidgetProps> = ({ addToast }) =>
       const yr = now.getFullYear();
       const mo = String(now.getMonth() + 1).padStart(2, "0");
       const dy = String(now.getDate()).padStart(2, "0");
+      const dateKey = `${yr}-${mo}-${dy}`;
 
-      const response = await fetch(`/api/sholat/jadwal/${cityId}/${yr}/${mo}/${dy}`);
+      const resolvedId = resolveCityId(cityId);
+      const response = await fetch(`https://api.myquran.com/v3/sholat/jadwal/${resolvedId}/${dateKey}`);
       if (!response.ok) throw new Error("Gagal mengunduh jadwal");
       
       const payload = await response.json();
       if (payload.status && payload.data?.jadwal) {
-        setSchedule(payload.data.jadwal);
+        // v3 wrapper returns objects by date key inside jadwal
+        setSchedule(payload.data.jadwal[dateKey] || Object.values(payload.data.jadwal)[0]);
       } else {
         // Fallback mocked schedule in case API is down for some reason
         const mock: PrayerSchedule = {
@@ -213,11 +234,16 @@ export const JadwalSholatWidget: React.FC<SholatWidgetProps> = ({ addToast }) =>
     if (!searchQuery.trim()) return;
     setIsSearching(true);
     try {
-      const response = await fetch(`/api/sholat/kota/cari/${encodeURIComponent(searchQuery)}`);
+      const response = await fetch(`https://api.myquran.com/v3/sholat/kota/cari/${encodeURIComponent(searchQuery)}`);
       if (!response.ok) throw new Error();
       const payload = await response.json();
       if (payload.status && Array.isArray(payload.data)) {
-        setSearchResults(payload.data);
+        // Adapt v3 format to our expected data array
+        const normalizedData = payload.data.map((c: any) => ({
+          id: c.id,
+          lokasi: c.lokasi || c.kabko // v3 sometimes uses kabko or lokasi
+        }));
+        setSearchResults(normalizedData);
       } else {
         setSearchResults([]);
         addToast("Kota Tidak Ditemukan", "Coba gunakan kata kunci kota lain di Indonesia.", "warning");

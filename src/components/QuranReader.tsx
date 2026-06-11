@@ -65,7 +65,7 @@ export const QuranReader: React.FC<QuranReaderProps> = ({
   useEffect(() => {
     const fetchSurahs = async () => {
       try {
-        const response = await fetch("/api/quran/surah");
+        const response = await fetch("https://equran.id/api/v2/surah");
         if (!response.ok) throw new Error();
         const payload = await response.json();
         if (payload.code === 200 && Array.isArray(payload.data)) {
@@ -105,7 +105,7 @@ export const QuranReader: React.FC<QuranReaderProps> = ({
     setIsLoadingDetail(true);
     setSurahDetail(null);
     try {
-      const response = await fetch(`/api/quran/surah/${surah.nomor}`);
+      const response = await fetch(`https://equran.id/api/v2/surah/${surah.nomor}`);
       if (!response.ok) throw new Error();
       const payload = await response.json();
       if (payload.code === 200 && payload.data) {
@@ -250,7 +250,7 @@ export const QuranReader: React.FC<QuranReaderProps> = ({
     if (!selectedSurah) return;
     setIsLoadingTafsir(true);
     try {
-      const response = await fetch(`/api/quran/tafsir/${selectedSurah.nomor}`);
+      const response = await fetch(`https://equran.id/api/v2/tafsir/${selectedSurah.nomor}`);
       if (!response.ok) throw new Error();
       const payload = await response.json();
       if (payload.code === 200 && payload.data?.tafsir) {
