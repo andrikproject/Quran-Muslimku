@@ -1,3 +1,7 @@
+/**
+ * @author Habib Ismail Al Qadri
+ * @app Quran Saku
+ */
 export interface Surah {
   nomor: number;
   nama: string;

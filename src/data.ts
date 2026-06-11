@@ -1,3 +1,7 @@
+/**
+ * @author Habib Ismail Al Qadri
+ * @app Quran Saku
+ */
 import { DoaItem, Surah } from "./types";
 
 export const DEFAULT_CITIES = [

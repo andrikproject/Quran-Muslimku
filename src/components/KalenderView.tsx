@@ -1,3 +1,7 @@
+/**
+ * @author Habib Ismail Al Qadri
+ * @app Quran Saku
+ */
 import React, { useState, useEffect, useMemo } from "react";
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Info } from "lucide-react";
 
@@ -112,7 +116,7 @@ export const KalenderView: React.FC<KalenderViewProps> = ({ addToast }) => {
     const month = currentDate.getMonth() + 1; // 1-12
     const prefix = `${year}-${String(month).padStart(2, '0')}`;
     
-    for (const [key, val] of Object.entries(holidays)) {
+    for (const [key, val] of Object.entries(holidays) as [string, { summary: string }][]) {
       if (key.startsWith(prefix)) {
         list.push({
           date: key,

@@ -1,3 +1,7 @@
+/**
+ * @author Habib Ismail Al Qadri
+ * @app Quran Saku
+ */
 import React, { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "motion/react";

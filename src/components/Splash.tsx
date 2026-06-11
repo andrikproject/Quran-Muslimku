@@ -1,3 +1,7 @@
+/**
+ * @author Habib Ismail Al Qadri
+ * @app Quran Saku
+ */
 import React, { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { ArrowRight } from "lucide-react";
