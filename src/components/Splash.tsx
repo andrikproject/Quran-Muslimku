@@ -73,7 +73,7 @@ export const Splash: React.FC<SplashProps> = ({ onFinish }) => {
           transition={{ duration: 1.2, ease: "easeOut", type: "spring", bounce: 0.4 }}
           src="/QuranSaku.png" 
           alt="Quran Saku Logo" 
-          className="w-48 sm:w-56 h-auto drop-shadow-2xl mb-32"
+          className="w-48 sm:w-56 h-auto drop-shadow-2xl mb-48 sm:mb-56"
         />
       </div>
 
