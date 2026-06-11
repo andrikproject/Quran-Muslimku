@@ -273,6 +273,7 @@ export const JadwalSholatWidget: React.FC<SholatWidgetProps> = ({ addToast }) =>
 
   const selectCityHandler = (city: SholatCity) => {
     setSelectedCity(city);
+    localStorage.setItem("qd_has_located", "1");
     setShowSearchModal(false);
     setSearchQuery("");
     setSearchResults([]);
@@ -309,15 +310,18 @@ export const JadwalSholatWidget: React.FC<SholatWidgetProps> = ({ addToast }) =>
               id: result.id,
               lokasi: result.lokasi || result.kabko
             });
+            localStorage.setItem("qd_has_located", "1");
             if (!silent) addToast("GPS Terkunci!", `Berhasil menemukan wilayah GPS: ${result.lokasi || result.kabko}.`, "success");
           } else {
              // Fallback
              setSelectedCity({ id: "1301", lokasi: "KOTA JAKARTA (GPS)" });
+             localStorage.setItem("qd_has_located", "1");
              if (!silent) addToast("Lokasi Default", "Kota spesifik tidak ditemukan di database jadwal sholat, menggunakan Jakarta.", "info");
           }
         } catch (err) {
           if (!silent) addToast("GPS Terkunci", "Menggunakan koordinat tapi gagal menentukan kota, fallback ke Jakarta.", "success");
           setSelectedCity({ id: "1301", lokasi: "KOTA JAKARTA (GPS)" });
+          localStorage.setItem("qd_has_located", "1");
         }
       },
       (err) => {
@@ -354,6 +358,7 @@ export const JadwalSholatWidget: React.FC<SholatWidgetProps> = ({ addToast }) =>
           id: foundCity.id,
           lokasi: foundCity.lokasi || foundCity.kabko
         });
+        localStorage.setItem("qd_has_located", "1");
         addToast("Lokasi Terdeteksi", `Menggunakan lokasi perkiraan: ${foundCity.lokasi || foundCity.kabko}`, "info");
       }
     } catch (e) {
@@ -362,7 +367,11 @@ export const JadwalSholatWidget: React.FC<SholatWidgetProps> = ({ addToast }) =>
   };
 
   useEffect(() => {
-    // Attempt Auto-Locate if permitted without annoying the user
+    // Attempt Auto-Locate if permitted, but ONLY if we haven't already located
+    // or if the user hasn't explicitly selected a city yet.
+    const hasLocated = localStorage.getItem("qd_has_located");
+    if (hasLocated === "1") return;
+
     if (navigator.permissions && navigator.geolocation) {
       navigator.permissions.query({ name: 'geolocation' }).then(result => {
         if (result.state === 'granted') {

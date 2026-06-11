@@ -3,6 +3,7 @@
  * @app Quran Saku
  */
 import React, { useState, useEffect, useRef } from "react";
+import ReactMarkdown from "react-markdown";
 import { motion, AnimatePresence } from "motion/react";
 import { 
   Sparkles, Send, Bot, User, Trash, ArrowRight, HelpCircle, 
@@ -204,21 +205,21 @@ export const CariView: React.FC<CariViewProps> = ({ onSelectSurah, addToast, gem
       <div className="lg:col-span-7 flex flex-col gap-4">
         <div className="bg-white border border-slate-100 rounded-3xl shadow-sm overflow-hidden flex flex-col h-[520px]">
           {/* Header panel */}
-          <div className="p-3 sm:p-4.5 bg-gradient-to-r from-[#0F4C3A] to-emerald-950 flex items-center justify-between gap-3">
-            <div className="flex items-center gap-3 flex-1 min-w-0">
-              <div className="p-2 sm:p-2.5 bg-white/10 rounded-2xl shrink-0">
+          <div className="p-3 sm:p-4.5 bg-gradient-to-r from-[#0F4C3A] to-emerald-950 flex sm:items-center justify-between gap-3">
+            <div className="flex items-start sm:items-center gap-3 flex-1 min-w-0">
+              <div className="p-2 sm:p-2.5 bg-white/10 rounded-2xl shrink-0 mt-0.5 sm:mt-0">
                 <Bot className="w-5 h-5 text-[#ECC17A]" />
               </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                  <h3 className="font-serif font-bold text-sm sm:text-base text-white leading-tight">
+              <div className="min-w-0 flex-1 flex flex-col justify-center">
+                <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 mb-1 sm:mb-0.5">
+                  <h3 className="font-serif font-bold text-sm sm:text-base text-white leading-none">
                     Tanya Ustadz AI
                   </h3>
-                  <span className="text-[9px] bg-[#ECC17A] text-[#0F4C3A] font-extrabold px-1.5 py-0.5 rounded-full shrink-0 leading-none">
+                  <span className="text-[8px] sm:text-[9px] bg-[#ECC17A] text-[#0F4C3A] font-extrabold px-1.5 py-0.5 rounded-full shrink-0 leading-none">
                     PEMBELAJARAN
                   </span>
                 </div>
-                <p className="text-[10px] text-teal-100/90 font-medium leading-none mt-1 truncate">
+                <p className="text-[9px] sm:text-[10px] text-teal-100/90 font-medium leading-tight line-clamp-1">
                   Didukung model Gemini 2.5 Flash
                 </p>
               </div>
@@ -227,7 +228,7 @@ export const CariView: React.FC<CariViewProps> = ({ onSelectSurah, addToast, gem
             {/* Clear btn */}
             <button
               onClick={handleClearChat}
-              className="shrink-0 text-[10px] sm:text-xs text-[#ECC17A] hover:text-white px-2 py-1.5 sm:px-3 sm:py-2 rounded-xl bg-white/5 hover:bg-white/10 font-bold transition-all cursor-pointer whitespace-nowrap"
+              className="mt-1 sm:mt-0 shrink-0 text-[9px] sm:text-xs text-[#ECC17A] hover:text-white px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl bg-white/5 hover:bg-white/10 font-bold transition-all cursor-pointer whitespace-nowrap self-start sm:self-auto"
             >
               Hapus Obrolan
             </button>
@@ -256,7 +257,11 @@ export const CariView: React.FC<CariViewProps> = ({ onSelectSurah, addToast, gem
                         ? "bg-white border-slate-100 text-slate-800" 
                         : "bg-[#0F4C3A] border-[#0F4C3A] text-white"
                     }`}>
-                      {msg.text}
+                      <div className="prose prose-sm prose-slate max-w-none prose-p:leading-relaxed prose-pre:bg-slate-800 prose-pre:text-slate-50 prose-a:text-[#0F4C3A]">
+                        <ReactMarkdown>
+                          {msg.text}
+                        </ReactMarkdown>
+                      </div>
                     </div>
                     {/* Clock stamp */}
                     <span className="text-[9px] text-slate-400 font-bold tracking-wider self-end px-1">
