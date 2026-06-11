@@ -84,39 +84,68 @@ export const CariView: React.FC<CariViewProps> = ({ onSelectSurah, addToast, gem
     setIsSending(true);
 
     try {
-      const response = await fetch("/api/ask-ai", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          prompt: textToSend,
-          apiKey: geminiApiKey // Pass custom API key if user has set it
-        })
-      });
+      let aiText = "";
 
-      const payload = await response.json();
-      if (payload.status && payload.answer) {
-        setMessages((prev) => [
-          ...prev,
-          {
-            sender: "ai",
-            text: payload.answer,
-            timestamp: new Date()
-          }
-        ]);
+      if (geminiApiKey && geminiApiKey.trim() !== "") {
+        // Direct call to Gemini from client to support static Vercel deployments!
+        const sysInstruct = "Anda adalah asisten AI 'Tanya Ustadz AI' di dalam aplikasi 'Quran Saku'. Anda adalah seorang Ulama Mufassir yang sangat berpengetahuan tentang Al-Qur'an, Tafsir, Asbabun Nuzul, dan hadits. Tugas Anda adalah memberikan jawaban dan bimbingan spiritual Islami secara komprehensif, akurat, dan merujuk *secara langsung* pada ayat-ayat Al-Qur'an. Wajib menyertakan teks Arab (jika relevan), terjemahan, serta referensi QS. Nama-Surah: Nomor-Ayat yang valid. Jika ditanya mengenai hukum atau nasihat, landaskan argumentasi selalu pada Al-Qur'an terlebih dahulu. Jangan pernah mengarang ayat Al-Qur'an.";
+        
+        const qp = `Pertanyaan Pengguna:\n${textToSend}\n\nBerikan tanggapan yang bijak, komprehensif, dan langsung menjawab pertanyaan pengguna berdasarkan referensi Al-Qur'an dan Sunnah yang shahih. Pastikan untuk mencantumkan nama Surah dan nomor ayat yang mendukung jawaban Anda. Tulislah dalam Bahasa Indonesia yang santun.`;
+        
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiApiKey.trim()}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            systemInstruction: { parts: [{ text: sysInstruct }] },
+            contents: [{ role: "user", parts: [{ text: qp }] }]
+          })
+        });
+
+        if (!response.ok) throw new Error(`Google API: ${response.status} ${response.statusText}`);
+        const payload = await response.json();
+        
+        aiText = payload.candidates?.[0]?.content?.parts?.[0]?.text || "Maaf, Ustadz AI tidak dapat menemukan jawaban referensi.";
+
       } else {
-        throw new Error(payload.message || "Gagal berkomunikasi dengan asisten.");
+        // Standard full-stack backend approach
+        const response = await fetch("/api/ask-ai", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt: textToSend })
+        });
+  
+        const contentType = response.headers.get("content-type");
+        if (!contentType || contentType.indexOf("application/json") === -1) {
+          throw new Error("API backend Express tidak ditemukan (Ini wajar jika Anda mendeploy di Vercel Static, karena Vercel bukan server Express). Solusi: Cukup tambahkan Kunci API Gemini Anda di menu Pengaturan Profil untuk langsung menggunakan koneksi tanpa server (Serverless).");
+        }
+  
+        const payload = await response.json();
+        if (payload.status && payload.answer) {
+          aiText = payload.answer;
+        } else {
+          throw new Error(payload.message || "Gagal berkomunikasi dengan asisten AI.");
+        }
       }
+
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: "ai",
+          text: aiText,
+          timestamp: new Date()
+        }
+      ]);
     } catch (err: any) {
       console.error(err);
       setMessages((prev) => [
         ...prev,
         {
           sender: "ai",
-          text: `Maaf, saya mengalami kendala teknis: ${err.message}. Pastikan koneksi internet stabil dan kunci API Gemini telah terpasang dengan benar di menu Pengaturan Profil.`,
+          text: `**Maaf, saya mengalami kendala interaksi:** ${err.message}`,
           timestamp: new Date()
         }
       ]);
-      addToast("AI Gagal Menjawab", "Harap periksa pengaturan credential Anda.", "warning");
+      addToast("AI Gagal Menjawab", "Harap periksa pengaturan Kunci API atau koneksi Anda.", "warning");
     } finally {
       setIsSending(false);
     }
@@ -257,11 +286,15 @@ export const CariView: React.FC<CariViewProps> = ({ onSelectSurah, addToast, gem
                         ? "bg-white border-slate-100 text-slate-800" 
                         : "bg-[#0F4C3A] border-[#0F4C3A] text-white"
                     }`}>
-                      <div className="prose prose-sm prose-slate max-w-none prose-p:leading-relaxed prose-pre:bg-slate-800 prose-pre:text-slate-50 prose-a:text-[#0F4C3A]">
-                        <ReactMarkdown>
-                          {msg.text}
-                        </ReactMarkdown>
-                      </div>
+                      {isAi ? (
+                        <div className="prose prose-sm prose-slate max-w-none prose-p:leading-relaxed prose-pre:bg-slate-800 prose-pre:text-slate-50 prose-a:text-[#0F4C3A]">
+                          <ReactMarkdown>
+                            {msg.text}
+                          </ReactMarkdown>
+                        </div>
+                      ) : (
+                        <span>{msg.text}</span>
+                      )}
                     </div>
                     {/* Clock stamp */}
                     <span className="text-[9px] text-slate-400 font-bold tracking-wider self-end px-1">

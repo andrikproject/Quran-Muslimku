@@ -367,24 +367,50 @@ export const JadwalSholatWidget: React.FC<SholatWidgetProps> = ({ addToast }) =>
   };
 
   useEffect(() => {
-    // Attempt Auto-Locate if permitted, but ONLY if we haven't already located
-    // or if the user hasn't explicitly selected a city yet.
     const hasLocated = localStorage.getItem("qd_has_located");
+    // If not yet located automatically or manually, we should try.
     if (hasLocated === "1") return;
 
-    if (navigator.permissions && navigator.geolocation) {
-      navigator.permissions.query({ name: 'geolocation' }).then(result => {
-        if (result.state === 'granted') {
-          getGPSLocation(true);
-        } else {
-          getIPLocation();
-        }
-      }).catch(() => {
-        getIPLocation();
-      });
-    } else {
-      getIPLocation();
-    }
+    // Call IP location first as a quick fallback if GPS takes time
+    getIPLocation().then(() => {
+      // Then ask for GPS (this triggers browser prompt)
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          async (pos) => {
+            try {
+              const r = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${pos.coords.latitude}&longitude=${pos.coords.longitude}&localityLanguage=id`);
+              if (!r.ok) throw new Error();
+              const data = await r.json();
+              let cityName = data.city || data.locality || data.principalSubdivision || "Jakarta";
+              cityName = cityName.replace(/Kabupaten|Kota|Kab\./gi, "").trim();
+
+              const s = await fetch(`https://api.myquran.com/v3/sholat/kota/cari/${encodeURIComponent(cityName)}`);
+              if (!s.ok) throw new Error();
+              const sData = await s.json();
+              
+              if (sData.status && Array.isArray(sData.data) && sData.data.length > 0) {
+                const result = sData.data[0];
+                setSelectedCity({
+                  id: result.id,
+                  lokasi: result.lokasi || result.kabko
+                });
+                localStorage.setItem("qd_has_located", "1");
+                addToast("GPS Terkunci!", `Berhasil menyesuaikan GPS otomatis: ${result.lokasi || result.kabko}.`, "success");
+              }
+            } catch (err) {
+              // Ignore silent errors for auto GPS
+            }
+          },
+          (err) => {
+            // User denied GPS or it failed, we already have IP fallback rendering hopefully
+          }
+        );
+      }
+    });
+
+    // We set hasLocated to '1' after the first mount to avoid spamming the user on every refresh
+    // if they denied it.
+    localStorage.setItem("qd_has_located", "1");
   }, []);
 
   const togglePrayerNotification = (prayer: string) => {
