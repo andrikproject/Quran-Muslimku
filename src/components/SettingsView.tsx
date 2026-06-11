@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { 
   User, Bookmark, Shield, Trash, Bell, Check, 
-  HelpCircle, Sparkles, BookOpen, AlertTriangle, ArrowRight, HeartHandshake, Copy 
+  HelpCircle, Sparkles, BookOpen, AlertTriangle, ArrowRight, HeartHandshake, Copy, Landmark
 } from "lucide-react";
 import { Bookmark as BookmarkType, Note } from "../types";
 
@@ -334,7 +334,12 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             <div className="mt-4 flex flex-col gap-5 border border-slate-100 p-5 rounded-2xl bg-slate-50">
               <div className="flex flex-col gap-1.5 text-center">
                 <span className="text-[11px] font-extrabold tracking-widest text-[#0F4C3A] uppercase">Rekening Infaq</span>
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Bank_Syariah_Indonesia.svg/512px-Bank_Syariah_Indonesia.svg.png" alt="BSI" className="h-8 object-contain mx-auto my-2" />
+                <div className="flex items-center justify-center gap-2 my-2 mt-3">
+                  <div className="w-10 h-10 bg-emerald-100/50 text-[#0F4C3A] rounded-full flex items-center justify-center">
+                    <Landmark className="w-5 h-5" strokeWidth={2} />
+                  </div>
+                  <span className="text-lg font-bold text-slate-700 tracking-tight">Bank BSI</span>
+                </div>
                 <span className="text-3xl font-serif font-bold tracking-wider text-slate-800">7335435332</span>
                 <span className="text-sm font-semibold text-slate-500">a.n. Habib Ismail Al Qadri</span>
               </div>
