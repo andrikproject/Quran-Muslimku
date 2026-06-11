@@ -223,7 +223,7 @@ export default function App() {
     switch (activeTab) {
       case "beranda":
         return (
-          <div className="flex flex-col gap-6 -mt-[110px] sm:-mt-[130px] relative z-20">
+          <div className="flex flex-col gap-6 -mt-[125px] sm:-mt-[145px] relative z-20">
             {/* Ayat Hari Ini (Verse of the day card) */}
             <div className="bg-white/95 backdrop-blur-xl rounded-[28px] p-5 shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-white/60 flex flex-col gap-3 relative overflow-hidden select-none z-10 w-full mb-2 mx-auto max-w-2xl">
               {/* Corner label row */}
@@ -514,13 +514,13 @@ export default function App() {
         <div className="relative w-full text-white">
           <div className="absolute top-0 inset-x-0 h-[50vh] sm:h-[55vh] min-h-[400px] z-0 pointer-events-none overflow-hidden bg-slate-800">
             <motion.div 
-              animate={{ backgroundPosition: ["50% 10%", "50% 20%"] }}
+              animate={{ scale: [1, 1.08] }}
               transition={{ duration: 40, ease: "linear", repeat: Infinity, repeatType: "reverse" }}
-              className="w-full h-full opacity-90"
+              className="w-full h-full opacity-90 origin-bottom"
               style={{
                 backgroundImage: `url(/${timeOfDay}.png)`,
                 backgroundSize: 'cover',
-                backgroundPosition: 'center',
+                backgroundPosition: 'center bottom',
                 backgroundRepeat: 'no-repeat'
               }}
             />
@@ -584,7 +584,7 @@ export default function App() {
       )}
 
       {/* 2. DYNAMIC WORK SPACE */}
-      <main className={`flex-1 w-full mx-auto relative z-10 ${activeTab === 'beranda' ? 'bg-[#FDFBF7] rounded-t-[40px] sm:rounded-t-[48px] pt-6 px-4 sm:px-5 shadow-[0_-8px_30px_rgba(0,0,0,0.05)]' : 'px-5 py-4 max-w-7xl'}`}>
+      <main className={`flex-1 w-full mx-auto relative z-10 ${activeTab === 'beranda' ? 'bg-[#FDFBF7] rounded-t-[40px] sm:rounded-t-[48px] pt-6 px-5 shadow-[0_-8px_30px_rgba(0,0,0,0.05)]' : 'px-5 py-4 max-w-7xl'}`}>
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}

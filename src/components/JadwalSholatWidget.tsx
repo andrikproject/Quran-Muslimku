@@ -11,11 +11,21 @@ interface SholatWidgetProps {
 
 export const JadwalSholatWidget: React.FC<SholatWidgetProps> = ({ addToast }) => {
   // Cities selection
-  const [selectedCity, setSelectedCity] = useState<SholatCity>({ id: "1301", lokasi: "KOTA JAKARTA" });
+  const [selectedCity, setSelectedCity] = useState<SholatCity>(() => {
+    try {
+      const saved = localStorage.getItem("qd_selectedCity");
+      if (saved) return JSON.parse(saved);
+    } catch(e) {}
+    return { id: "1301", lokasi: "KOTA JAKARTA" };
+  });
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SholatCity[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [showSearchModal, setShowSearchModal] = useState(false);
+
+  useEffect(() => {
+    localStorage.setItem("qd_selectedCity", JSON.stringify(selectedCity));
+  }, [selectedCity]);
 
   // Prayer schedules
   const [schedule, setSchedule] = useState<PrayerSchedule | null>(null);

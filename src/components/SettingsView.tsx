@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { 
   User, Bookmark, Shield, Trash, Bell, Check, 
-  HelpCircle, Sparkles, BookOpen, AlertTriangle, ArrowRight 
+  HelpCircle, Sparkles, BookOpen, AlertTriangle, ArrowRight, HeartHandshake, Copy 
 } from "lucide-react";
 import { Bookmark as BookmarkType, Note } from "../types";
 
@@ -31,7 +31,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   setDailyGoalMinutes,
   addToast
 }) => {
-  const [activeMenu, setActiveMenu] = useState<"profil" | "bookmarks" | "notes">("profil");
+  const [activeMenu, setActiveMenu] = useState<"profil" | "bookmarks" | "notes" | "support">("profil");
   const [editingName, setEditingName] = useState(userName);
 
   const saveProfileSettings = (e: React.FormEvent) => {
@@ -87,7 +87,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         {[
           { id: "profil", label: "Profil & Target Harian", icon: <User className="w-4.5 h-4.5" /> },
           { id: "bookmarks", label: `Markah Bacaan (${bookmarks.length})`, icon: <Bookmark className="w-4.5 h-4.5" /> },
-          { id: "notes", label: `Catatan Tadabbur (${notes.length})`, icon: <Shield className="w-4.5 h-4.5" /> }
+          { id: "notes", label: `Catatan Tadabbur (${notes.length})`, icon: <Shield className="w-4.5 h-4.5" /> },
+          { id: "support", label: "Dukungan / Gift", icon: <HeartHandshake className="w-4.5 h-4.5" /> }
         ].map((item) => {
           const isAct = activeMenu === item.id;
           return (
@@ -317,6 +318,41 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                 </div>
               )}
             </div>
+          </div>
+        )}
+
+        {/* VIEW 4: SUPPORT / GIFT */}
+        {activeMenu === "support" && (
+          <div className="flex flex-col gap-4">
+            <div>
+              <h3 className="font-serif font-bold text-[#0F4C3A] text-lg">Dukungan & Gift</h3>
+              <p className="text-xs text-slate-400 font-semibold mt-0.5">
+                Salurkan dukungan Anda untuk pengembangan Quran Saku App dan dakwah Islam.
+              </p>
+            </div>
+
+            <div className="mt-4 flex flex-col gap-5 border border-slate-100 p-5 rounded-2xl bg-slate-50">
+              <div className="flex flex-col gap-1.5 text-center">
+                <span className="text-[11px] font-extrabold tracking-widest text-[#0F4C3A] uppercase">Rekening Infaq</span>
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Bank_Syariah_Indonesia.svg/512px-Bank_Syariah_Indonesia.svg.png" alt="BSI" className="h-8 object-contain mx-auto my-2" />
+                <span className="text-3xl font-serif font-bold tracking-wider text-slate-800">7335435332</span>
+                <span className="text-sm font-semibold text-slate-500">a.n. Habib Ismail Al Qadri</span>
+              </div>
+              <button 
+                onClick={() => {
+                  navigator.clipboard.writeText("7335435332");
+                  addToast("Berhasil Disalin", "Nomor rekening berhasil disalin ke clipboard.", "success");
+                }}
+                className="w-full flex items-center justify-center gap-2 py-3 bg-white border border-slate-200 text-slate-700 text-sm font-bold rounded-xl shadow-sm hover:bg-slate-50 active:scale-[0.98] transition cursor-pointer"
+              >
+                <Copy className="w-4 h-4" />
+                Salin Nomor Rekening
+              </button>
+            </div>
+
+            <p className="text-xs text-center text-slate-400 font-medium px-4 leading-relaxed mt-2 italic">
+              "Perumpamaan orang yang menginfakkan hartanya di jalan Allah seperti sebutir biji yang menumbuhkan tujuh tangkai, pada setiap tangkai ada seratus biji..." <br/><span className="font-bold block mt-1">(Al-Baqarah: 261)</span>
+            </p>
           </div>
         )}
       </div>
