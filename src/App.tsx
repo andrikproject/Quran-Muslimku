@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { 
   Home, BookOpen, Search, Heart, User, Bell, ChevronRight, 
   BookMarked, HelpCircle, FileText, Calendar, Clock, Sparkles, 
-  Share2, Play, Volume2, History, RotateCcw, PenTool
+  Share2, Play, Volume2, History, RotateCcw, PenTool, HandHeart
 } from "lucide-react";
 
 // Components
@@ -18,15 +18,6 @@ import { InstallPrompt } from "./components/InstallPrompt";
 
 // Typings and Data
 import { Bookmark, Note, TilawahProgress } from "./types";
-
-// Custom premium Praying Hands icon for Doa
-const PrayingHandsIcon = ({ className }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M12 21c-1.2-2.3-3.2-5.5-3.2-8.5c0-3.5 2.2-6 2.2-6s1.8 2 1.8 4s-1 3.5-1.5 5.5m.7 5c1.2-2.3 3.2-5.5 3.2-8.5c0-3.5-2.2-6-2.2-6s-1.8 2-1.8 4s1 3.5 1.5 5.5" />
-    <path d="M7.5 11.5c-1-1-2.5 0-2.5 1.5c0 2 1.5 4 3 6.5" opacity="0.8" />
-    <path d="M16.5 11.5c1-1 2.5 0 2.5 1.5c0 2-1.5 4-3 6.5" opacity="0.8" />
-  </svg>
-);
 
 export default function App() {
   const [showSplash, setShowSplash] = useState(true);
@@ -265,7 +256,7 @@ export default function App() {
                   { tag: "Bookmark", action: () => { setActiveTab("profil"); addToast("Markah Koleksi", "Membuka daftar markah bacaan Al-Qur'an.", "info"); }, bg: "bg-[#EDF6F5] text-teal-700", icon: <BookMarked className="w-5.5 h-5.5" /> },
                   { tag: "Catatan", action: () => { setActiveTab("profil"); addToast("Catatan Tadabbur", "Membuka riwayat kumpulan catatan pribadi.", "info"); }, bg: "bg-[#F7F2EC] text-amber-900", icon: <PenTool className="w-5.5 h-5.5" /> },
                   { tag: "Tafsir", action: () => setActiveTab("quran"), bg: "bg-[#F3EEF8] text-purple-700", icon: <FileText className="w-5.5 h-5.5" /> },
-                  { tag: "Doa Harian", action: () => setActiveTab("doa"), bg: "bg-[#FDF2EB] text-orange-700", icon: <PrayingHandsIcon className="w-5.5 h-5.5" /> },
+                  { tag: "Doa Harian", action: () => setActiveTab("doa"), bg: "bg-[#FDF2EB] text-orange-700", icon: <HandHeart className="w-5.5 h-5.5" /> },
                   { tag: "Jadwal Sholat", action: () => {
                     const el = document.getElementById("jadwal-sholat-widget-container");
                     if (el) {
@@ -585,11 +576,11 @@ export default function App() {
       {/* 3. PREMIUM FLOATING BOTTOM NAVIGATION BAR */}
       <nav className="fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-slate-100 rounded-t-[32px] px-6 py-2 pb-6 flex justify-between items-end shadow-2xl shadow-slate-900/10 z-40 max-w-md mx-auto">
         {[
-          { id: "beranda", label: "Beranda", icon: <Home className="w-5.5 h-5.5" /> },
-          { id: "quran", label: "Al-Qur'an", icon: <BookOpen className="w-5.5 h-5.5" /> },
-          { id: "cari", label: "Cari", icon: <Search className="w-6 h-6 stroke-[2.3]" />, isCenter: true },
-          { id: "doa", label: "Doa", icon: <PrayingHandsIcon className="w-5.5 h-5.5" /> },
-          { id: "profil", label: "Profil", icon: <User className="w-5.5 h-5.5" /> }
+          { id: "beranda", label: "Beranda", icon: <Home className="w-[22px] h-[22px]" strokeWidth={1.5} /> },
+          { id: "quran", label: "Al-Qur'an", icon: <BookOpen className="w-[22px] h-[22px]" strokeWidth={1.5} /> },
+          { id: "cari", label: "Cari", icon: <Search className="w-5.5 h-5.5" strokeWidth={1.5} />, isCenter: true },
+          { id: "doa", label: "Doa", icon: <HandHeart className="w-[22px] h-[22px]" strokeWidth={1.5} /> },
+          { id: "profil", label: "Profil", icon: <User className="w-[22px] h-[22px]" strokeWidth={1.5} /> }
         ].map((item) => {
           const isAct = activeTab === item.id;
 

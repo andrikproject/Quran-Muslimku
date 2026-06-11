@@ -265,13 +265,13 @@ export const JadwalSholatWidget: React.FC<SholatWidgetProps> = ({ addToast }) =>
     addToast("Kota Diperbarui", `Menampilkan jadwal sholat untuk ${city.lokasi}`, "success");
   };
 
-  const getGPSLocation = () => {
+  const getGPSLocation = (silent: boolean = false) => {
     if (!navigator.geolocation) {
-      addToast("Tidak Didukung", "Fitur GPS tidak didukung browser Anda.", "warning");
+      if (!silent) addToast("Tidak Didukung", "Fitur GPS tidak didukung browser Anda.", "warning");
       return;
     }
 
-    addToast("Mencari Lokasi GPS...", "Mengakses koordinat satelit peranti Anda...", "info");
+    if (!silent) addToast("Mencari Lokasi GPS...", "Mengakses koordinat satelit peranti Anda...", "info");
 
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
@@ -295,22 +295,63 @@ export const JadwalSholatWidget: React.FC<SholatWidgetProps> = ({ addToast }) =>
               id: result.id,
               lokasi: result.lokasi || result.kabko
             });
-            addToast("GPS Terkunci!", `Berhasil menemukan wilayah GPS: ${result.lokasi || result.kabko}.`, "success");
+            if (!silent) addToast("GPS Terkunci!", `Berhasil menemukan wilayah GPS: ${result.lokasi || result.kabko}.`, "success");
           } else {
              // Fallback
              setSelectedCity({ id: "1301", lokasi: "KOTA JAKARTA (GPS)" });
-             addToast("Lokasi Default", "Kota spesifik tidak ditemukan di database jadwal sholat, menggunakan Jakarta.", "info");
+             if (!silent) addToast("Lokasi Default", "Kota spesifik tidak ditemukan di database jadwal sholat, menggunakan Jakarta.", "info");
           }
         } catch (err) {
-          addToast("GPS Terkunci", "Menggunakan koordinat tapi gagal menentukan kota, fallback ke Jakarta.", "success");
+          if (!silent) addToast("GPS Terkunci", "Menggunakan koordinat tapi gagal menentukan kota, fallback ke Jakarta.", "success");
           setSelectedCity({ id: "1301", lokasi: "KOTA JAKARTA (GPS)" });
         }
       },
       (err) => {
-        addToast("GPS Gagal", "Harap izinkan hak akses peta atau tulis kota secara manual.", "warning");
+        if (!silent) addToast("GPS Gagal", "Harap izinkan hak akses peta atau tulis kota secara manual.", "warning");
       }
     );
   };
+
+  const getIPLocation = async () => {
+    try {
+      const r = await fetch("https://api.bigdatacloud.net/data/reverse-geocode-client");
+      if (!r.ok) return;
+      const data = await r.json();
+      let cityName = data.city || data.locality || data.principalSubdivision;
+      if (!cityName) return;
+      cityName = cityName.replace(/Kabupaten|Kota|Kab\./gi, "").trim();
+
+      const s = await fetch(`https://api.myquran.com/v3/sholat/kota/cari/${encodeURIComponent(cityName)}`);
+      if (!s.ok) return;
+      const sData = await s.json();
+      if (sData.status && Array.isArray(sData.data) && sData.data.length > 0) {
+        const result = sData.data[0];
+        setSelectedCity({
+          id: result.id,
+          lokasi: result.lokasi || result.kabko
+        });
+      }
+    } catch (e) {
+      // fail silently
+    }
+  };
+
+  useEffect(() => {
+    // Attempt Auto-Locate if permitted without annoying the user
+    if (navigator.permissions && navigator.geolocation) {
+      navigator.permissions.query({ name: 'geolocation' }).then(result => {
+        if (result.state === 'granted') {
+          getGPSLocation(true);
+        } else {
+          getIPLocation();
+        }
+      }).catch(() => {
+        getIPLocation();
+      });
+    } else {
+      getIPLocation();
+    }
+  }, []);
 
   const togglePrayerNotification = (prayer: string) => {
     setNotifiedPrayers((prev) => {

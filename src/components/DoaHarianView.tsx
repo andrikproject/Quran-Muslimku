@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "motion/react";
 import { 
   Heart, Search, Share2, Copy, Trash, RotateCw, 
@@ -751,22 +752,23 @@ export const DoaHarianView: React.FC<DoaHarianViewProps> = ({ addToast }) => {
       )}
 
       {/* ASMAUL HUSNA MODAL DETAILS DIALOG */}
-      <AnimatePresence>
-        {selectedAsma && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl flex flex-col p-6 relative"
-            >
-              {/* Close Button */}
-              <button
-                onClick={() => setSelectedAsma(null)}
-                className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 font-bold p-1 hover:bg-slate-100 rounded-lg text-sm cursor-pointer"
+      {typeof document !== 'undefined' && createPortal(
+        <AnimatePresence>
+          {selectedAsma && (
+            <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-[90]">
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.95, opacity: 0 }}
+                className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl flex flex-col p-6 relative"
               >
-                ✕
-              </button>
+                {/* Close Button */}
+                <button
+                  onClick={() => setSelectedAsma(null)}
+                  className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 font-bold p-1 hover:bg-slate-100 rounded-lg text-sm cursor-pointer"
+                >
+                  ✕
+                </button>
 
               <div className="flex flex-col items-center text-center mt-2">
                 <span className="bg-amber-100 text-[#0F4C3A] font-bold text-xs px-3 py-1 rounded-full font-mono">
@@ -812,7 +814,9 @@ export const DoaHarianView: React.FC<DoaHarianViewProps> = ({ addToast }) => {
             </motion.div>
           </div>
         )}
-      </AnimatePresence>
+      </AnimatePresence>,
+      document.body
+    )}
     </div>
   );
 };
