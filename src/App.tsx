@@ -92,6 +92,7 @@ export default function App() {
   // State: User profile parameters
   const [userName, setUserName] = useState("Ahlan");
   const [dailyGoalMinutes, setDailyGoalMinutes] = useState(15);
+  const [geminiApiKey, setGeminiApiKey] = useState("");
 
   // Jump from Home / search directly into Specific Surah details
   const [deepLinkSurah, setDeepLinkSurah] = useState<number | null>(null);
@@ -121,6 +122,11 @@ export default function App() {
     const cachedGoal = localStorage.getItem("qs_goal");
     if (cachedGoal) {
       setDailyGoalMinutes(Number(cachedGoal));
+    }
+
+    const cachedApiKey = localStorage.getItem("qs_gemini_key");
+    if (cachedApiKey) {
+      setGeminiApiKey(cachedApiKey);
     }
   }, []);
 
@@ -178,6 +184,11 @@ export default function App() {
   const handleSetDailyGoalMinutes = (m: number) => {
     setDailyGoalMinutes(m);
     localStorage.setItem("qs_goal", m.toString());
+  };
+
+  const handleSetGeminiApiKey = (key: string) => {
+    setGeminiApiKey(key);
+    localStorage.setItem("qs_gemini_key", key);
   };
 
   // Jump page reader
@@ -471,7 +482,7 @@ export default function App() {
         return <DoaHarianView addToast={addToast} />;
 
       case "cari":
-        return <CariView onSelectSurah={handleJumpToSurah} addToast={addToast} />;
+        return <CariView onSelectSurah={handleJumpToSurah} addToast={addToast} geminiApiKey={geminiApiKey} />;
 
       case "tasbih":
         return <TasbihView addToast={addToast} />;
@@ -494,6 +505,8 @@ export default function App() {
             setUserName={handleSetUserName}
             dailyGoalMinutes={dailyGoalMinutes}
             setDailyGoalMinutes={handleSetDailyGoalMinutes}
+            geminiApiKey={geminiApiKey}
+            setGeminiApiKey={handleSetGeminiApiKey}
             addToast={addToast}
           />
         );
@@ -638,27 +651,29 @@ export default function App() {
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id as any)}
-              className="flex flex-col items-center justify-center p-1.5 cursor-pointer focus:outline-none transition-colors group select-none flex-1 pb-1"
+              className="relative flex flex-col items-center justify-center p-2 cursor-pointer focus:outline-none group select-none flex-1 pb-1.5"
             >
-              <div className={`transition-all duration-500 ease-out ${
+              {isAct && (
+                <motion.div
+                  layoutId="active-nav-indicator"
+                  className="absolute inset-0 bg-[#0F4C3A]/10 rounded-2xl"
+                  transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                />
+              )}
+              <div className={`relative z-10 transition-all duration-500 ease-out ${
                 isAct 
                   ? "text-[#0F4C3A] scale-110 drop-shadow-md translate-y-[-2px]" 
                   : "text-slate-400 group-hover:text-slate-700 group-hover:-translate-y-1"
               }`}>
                 {item.icon}
               </div>
-              <span className={`text-[10px] font-bold tracking-tight mt-1 transition-colors duration-500 ${
+              <span className={`relative z-10 text-[10px] font-bold tracking-tight mt-1 transition-colors duration-500 ${
                 isAct 
                   ? "text-[#0F4C3A]" 
                   : "text-slate-400 group-hover:text-slate-700"
               }`}>
                 {item.label}
               </span>
-              
-              {/* Micro active dot */}
-              {isAct && (
-                <span className="w-1 h-1 bg-[#0F4C3A] rounded-full mt-0.5"></span>
-              )}
             </button>
           );
         })}

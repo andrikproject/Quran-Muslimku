@@ -180,12 +180,21 @@ async function startServer() {
   // API Route - Ask AI Scholar about verse or spiritual guidance
   app.post("/api/ask-ai", async (req, res) => {
     try {
-      const { prompt, verseText, context } = req.body;
-      const client = getGeminiClient();
+      const { prompt, verseText, context, apiKey } = req.body;
+      let client = getGeminiClient();
+      
+      if (apiKey && apiKey.trim() !== "") {
+        try {
+          client = new GoogleGenAI({ apiKey: apiKey.trim() });
+        } catch (e) {
+          console.error("Failed to initialize Google Gen AI with custom key", e);
+        }
+      }
+
       if (!client) {
         return res.status(403).json({
           status: false,
-          message: "Gemini API Key belum ditentukan. Harap tambahkan API Key di tab Secrets pada AI Studio.",
+          message: "Gemini API Key belum ditentukan. Harap tambahkan API Key secara mandiri melalui menu Pengaturan Profil.",
           isConfigured: false
         });
       }

@@ -20,6 +20,8 @@ interface SettingsViewProps {
   setUserName: (n: string) => void;
   dailyGoalMinutes: number;
   setDailyGoalMinutes: (m: number) => void;
+  geminiApiKey: string;
+  setGeminiApiKey: (key: string) => void;
   addToast: (title: string, body: string, type: "success" | "info" | "warning" | "notification") => void;
 }
 
@@ -33,15 +35,19 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   setUserName,
   dailyGoalMinutes,
   setDailyGoalMinutes,
+  geminiApiKey,
+  setGeminiApiKey,
   addToast
 }) => {
   const [activeMenu, setActiveMenu] = useState<"profil" | "bookmarks" | "notes" | "support">("profil");
   const [editingName, setEditingName] = useState(userName);
+  const [editingGeminiKey, setEditingGeminiKey] = useState(geminiApiKey);
 
   const saveProfileSettings = (e: React.FormEvent) => {
     e.preventDefault();
     setUserName(editingName);
-    addToast("Profil Disimpan", `Nama panggilan Anda diperbarui menjadi: ${editingName}`, "success");
+    setGeminiApiKey(editingGeminiKey);
+    addToast("Profil Disimpan", `Pengaturan profil dan API Key telah diperbarui.`, "success");
   };
 
   const clearAllAppletState = () => {
@@ -72,6 +78,23 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
     } catch {
       addToast("Uji Coba Gagal 🔇", "Aktifkan audio untuk mendengar simulasi.", "warning");
     }
+  };
+
+  const exportDataBackup = () => {
+    const data = {
+      bookmarks,
+      notes
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `quransaku-backup-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    addToast("Berhasil Unduh Data", "File cadangan JSON berhasil diunduh ke perangkat Anda.", "success");
   };
 
   return (
@@ -158,6 +181,21 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
               </span>
             </div>
 
+            {/* Editing Gemini API Key field */}
+            <div className="flex flex-col gap-2 mt-2">
+              <label className="text-xs font-bold text-slate-500">GEMINI API KEY <span className="text-[#0F4C3A] font-semibold text-[9px] bg-[#0F4C3A]/10 px-1.5 py-0.5 rounded-full ml-1">OPSIONAL</span></label>
+              <input
+                type="password"
+                value={editingGeminiKey}
+                onChange={(e) => setEditingGeminiKey(e.target.value)}
+                placeholder="Masukkan Gemini API Key..."
+                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-xs sm:text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#0F4C3A]/20 font-mono"
+              />
+              <span className="text-[10px] text-slate-400 font-semibold block leading-normal italic">
+                Digunakan untuk fitur Tanya Ustadz AI. Kunci ini hanya disimpan di perangkat Anda (local storage) secara aman. Dapatkan gratis di <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer" className="text-indigo-500 hover:underline">Google AI Studio</a>.
+              </span>
+            </div>
+
             {/* Test alert sound mock notification */}
             <div className="border border-slate-100 p-4.5 rounded-2xl flex flex-col sm:flex-row gap-4 items-center justify-between bg-slate-50">
               <div className="text-center sm:text-left">
@@ -181,17 +219,26 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             <div className="h-4"></div>
 
             {/* Actions array */}
-            <div className="flex justify-between items-center border-t border-slate-50 pt-5">
-              <button
-                type="button"
-                onClick={clearAllAppletState}
-                className="px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-500 rounded-xl text-xs font-bold border border-red-100 transition-colors cursor-pointer"
-              >
-                Reset Semua Data
-              </button>
+            <div className="flex flex-col sm:flex-row justify-between items-center border-t border-slate-50 pt-5 gap-3">
+              <div className="flex gap-2 w-full sm:w-auto">
+                <button
+                  type="button"
+                  onClick={clearAllAppletState}
+                  className="flex-1 sm:flex-none px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-500 rounded-xl text-xs font-bold border border-red-100 transition-colors cursor-pointer"
+                >
+                  Reset Data
+                </button>
+                <button
+                  type="button"
+                  onClick={exportDataBackup}
+                  className="flex-1 sm:flex-none px-4 py-2.5 bg-indigo-50 hover:bg-indigo-100 border border-indigo-100 text-indigo-700 rounded-xl text-xs font-bold transition-colors cursor-pointer"
+                >
+                  Export JSON
+                </button>
+              </div>
               <button
                 type="submit"
-                className="px-5 py-2.5 bg-[#0F4C3A] hover:bg-emerald-950 text-white rounded-xl text-xs font-bold shadow transition-colors cursor-pointer"
+                className="w-full sm:w-auto px-5 py-2.5 bg-[#0F4C3A] hover:bg-emerald-950 text-white rounded-xl text-xs font-bold shadow transition-colors cursor-pointer"
               >
                 Simpan Perubahan
               </button>

@@ -19,9 +19,10 @@ interface ChatMessage {
 interface CariViewProps {
   onSelectSurah: (surahNo: number) => void;
   addToast: (title: string, body: string, type: "success" | "info" | "warning" | "notification") => void;
+  geminiApiKey?: string;
 }
 
-export const CariView: React.FC<CariViewProps> = ({ onSelectSurah, addToast }) => {
+export const CariView: React.FC<CariViewProps> = ({ onSelectSurah, addToast, geminiApiKey }) => {
   // Global search states
   const [globalQuery, setGlobalQuery] = useState("");
   const [matchedSurahs, setMatchedSurahs] = useState<typeof STATIC_SURAHS>([]);
@@ -85,7 +86,10 @@ export const CariView: React.FC<CariViewProps> = ({ onSelectSurah, addToast }) =
       const response = await fetch("/api/ask-ai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: textToSend })
+        body: JSON.stringify({ 
+          prompt: textToSend,
+          apiKey: geminiApiKey // Pass custom API key if user has set it
+        })
       });
 
       const payload = await response.json();
@@ -107,7 +111,7 @@ export const CariView: React.FC<CariViewProps> = ({ onSelectSurah, addToast }) =
         ...prev,
         {
           sender: "ai",
-          text: `Maaf, saya mengalami kendala teknis: ${err.message}. Pastikan koneksi internet stabil dan kunci API Gemini telah terpasang dengan benar di menu administrasi panel luar.`,
+          text: `Maaf, saya mengalami kendala teknis: ${err.message}. Pastikan koneksi internet stabil dan kunci API Gemini telah terpasang dengan benar di menu Pengaturan Profil.`,
           timestamp: new Date()
         }
       ]);
@@ -200,19 +204,21 @@ export const CariView: React.FC<CariViewProps> = ({ onSelectSurah, addToast }) =
       <div className="lg:col-span-7 flex flex-col gap-4">
         <div className="bg-white border border-slate-100 rounded-3xl shadow-sm overflow-hidden flex flex-col h-[520px]">
           {/* Header panel */}
-          <div className="p-4.5 bg-gradient-to-r from-[#0F4C3A] to-emerald-950 text-white flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2.5 bg-white/10 rounded-2xl">
+          <div className="p-3 sm:p-4.5 bg-gradient-to-r from-[#0F4C3A] to-emerald-950 flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              <div className="p-2 sm:p-2.5 bg-white/10 rounded-2xl shrink-0">
                 <Bot className="w-5 h-5 text-[#ECC17A]" />
               </div>
-              <div>
-                <h3 className="font-serif font-bold text-sm text-white flex items-center gap-1.5/2">
-                  Tanya Ustadz AI
-                  <span className="text-[9px] bg-[#ECC17A] text-[#0F4C3A] font-extrabold px-1.5 py-0.5 rounded-full ml-1.5">
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                  <h3 className="font-serif font-bold text-sm sm:text-base text-white leading-tight">
+                    Tanya Ustadz AI
+                  </h3>
+                  <span className="text-[9px] bg-[#ECC17A] text-[#0F4C3A] font-extrabold px-1.5 py-0.5 rounded-full shrink-0 leading-none">
                     PEMBELAJARAN
                   </span>
-                </h3>
-                <p className="text-[10px] text-teal-100/90 font-medium leading-none mt-1">
+                </div>
+                <p className="text-[10px] text-teal-100/90 font-medium leading-none mt-1 truncate">
                   Didukung model Gemini 2.5 Flash
                 </p>
               </div>
@@ -221,7 +227,7 @@ export const CariView: React.FC<CariViewProps> = ({ onSelectSurah, addToast }) =
             {/* Clear btn */}
             <button
               onClick={handleClearChat}
-              className="text-xs text-[#ECC17A] hover:text-white px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 font-bold transition-all cursor-pointer"
+              className="shrink-0 text-[10px] sm:text-xs text-[#ECC17A] hover:text-white px-2 py-1.5 sm:px-3 sm:py-2 rounded-xl bg-white/5 hover:bg-white/10 font-bold transition-all cursor-pointer whitespace-nowrap"
             >
               Hapus Obrolan
             </button>
