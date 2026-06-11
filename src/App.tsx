@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from "motion/react";
 import { 
   Home, BookOpen, Search, Heart, User, Bell, ChevronRight, 
   BookMarked, HelpCircle, FileText, Calendar, Clock, Sparkles, 
-  Share2, Play, Volume2, History, RotateCcw, PenTool, HandHeart
+  Share2, Play, Volume2, History, RotateCcw, PenTool, HandHeart,
+  Compass
 } from "lucide-react";
 
 // Components
@@ -15,13 +16,16 @@ import { DoaHarianView } from "./components/DoaHarianView";
 import { CariView } from "./components/CariView";
 import { SettingsView } from "./components/SettingsView";
 import { InstallPrompt } from "./components/InstallPrompt";
+import { TasbihView } from "./components/TasbihView";
+import { ArahKiblatView } from "./components/ArahKiblatView";
+import { KalenderView } from "./components/KalenderView";
 
 // Typings and Data
 import { Bookmark, Note, TilawahProgress } from "./types";
 
 export default function App() {
   const [showSplash, setShowSplash] = useState(true);
-  const [activeTab, setActiveTab] = useState<"beranda" | "quran" | "cari" | "doa" | "profil">("beranda");
+  const [activeTab, setActiveTab] = useState<"beranda" | "quran" | "cari" | "doa" | "profil" | "tasbih" | "kiblat" | "kalender">("beranda");
 
   // Notifications/Toasts System
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
@@ -253,8 +257,8 @@ export default function App() {
                 {[
                   { tag: "Al-Qur'an", action: () => setActiveTab("quran"), bg: "bg-[#EDF4F1] text-[#0F4C3A]", icon: <BookOpen className="w-5.5 h-5.5" /> },
                   { tag: "Terakhir Baca", action: () => handleJumpToSurah(tilawahProgress.currentSurah), bg: "bg-[#FDF7E7] text-amber-700", icon: <Clock className="w-5.5 h-5.5" /> },
-                  { tag: "Bookmark", action: () => { setActiveTab("profil"); addToast("Markah Koleksi", "Membuka daftar markah bacaan Al-Qur'an.", "info"); }, bg: "bg-[#EDF6F5] text-teal-700", icon: <BookMarked className="w-5.5 h-5.5" /> },
-                  { tag: "Catatan", action: () => { setActiveTab("profil"); addToast("Catatan Tadabbur", "Membuka riwayat kumpulan catatan pribadi.", "info"); }, bg: "bg-[#F7F2EC] text-amber-900", icon: <PenTool className="w-5.5 h-5.5" /> },
+                  { tag: "Arah Kiblat", action: () => { setActiveTab("kiblat"); addToast("Arah Kiblat", "Membuka navigator kiblat.", "info"); }, bg: "bg-[#EDF6F5] text-teal-700", icon: <Compass className="w-5.5 h-5.5" /> },
+                  { tag: "Kalender", action: () => { setActiveTab("kalender"); addToast("Kalender Hijriah", "Membuka penanggalan Islam.", "info"); }, bg: "bg-[#F7F2EC] text-amber-900", icon: <Calendar className="w-5.5 h-5.5" /> },
                   { tag: "Tafsir", action: () => setActiveTab("quran"), bg: "bg-[#F3EEF8] text-purple-700", icon: <FileText className="w-5.5 h-5.5" /> },
                   { tag: "Doa Harian", action: () => setActiveTab("doa"), bg: "bg-[#FDF2EB] text-orange-700", icon: <HandHeart className="w-5.5 h-5.5" /> },
                   { tag: "Jadwal Sholat", action: () => {
@@ -264,11 +268,10 @@ export default function App() {
                       addToast("Jadwal Sholat", "Menampilkan panel jadwal sholat.", "info");
                     }
                   }, bg: "bg-[#EEF6FA] text-sky-700", icon: <Calendar className="w-5.5 h-5.5" /> },
-                  { tag: "Acak Surah", action: () => {
-                    const randomSurah = Math.floor(Math.random() * 114) + 1;
-                    handleJumpToSurah(randomSurah);
-                    addToast("Surah Acak", "Menampilkan surah pilihan acak untuk Anda baca hari ini.", "info");
-                  }, bg: "bg-[#EDF5F1] text-slate-700", icon: <Sparkles className="w-5.5 h-5.5" /> }
+                  { tag: "Tasbih", action: () => {
+                    setActiveTab("tasbih");
+                    addToast("Tasbih Digital", "Membuka fitur Tasbih Digital.", "info");
+                  }, bg: "bg-[#EDF5F1] text-emerald-700", icon: <RotateCcw className="w-5.5 h-5.5" /> }
                 ].map((itm, i) => (
                   <button
                     key={i}
@@ -448,6 +451,15 @@ export default function App() {
 
       case "cari":
         return <CariView onSelectSurah={handleJumpToSurah} addToast={addToast} />;
+
+      case "tasbih":
+        return <TasbihView addToast={addToast} />;
+
+      case "kiblat":
+        return <ArahKiblatView addToast={addToast} />;
+
+      case "kalender":
+        return <KalenderView addToast={addToast} />;
 
       case "profil":
         return (

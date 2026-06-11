@@ -57,15 +57,6 @@ export const Splash: React.FC<SplashProps> = ({ onFinish }) => {
       {/* Gradient overlay to ensure text is readable at the bottom */}
       <div className="absolute inset-0 z-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent pointer-events-none" />
 
-      {/* Top bar indicators */}
-      <div className="px-6 pt-5 flex justify-between items-center z-10 text-white drop-shadow-md">
-        <span className="text-sm font-semibold tracking-tight">9:41</span>
-        <div className="flex gap-1.5 items-center">
-          <span className="w-4 h-3 bg-white/40 rounded-sm"></span>
-          <span className="w-3 h-3 bg-white/40 rounded-full"></span>
-        </div>
-      </div>
-
       <div className="flex-1 flex flex-col items-center justify-center relative z-10">
         <motion.img
           initial={{ opacity: 0, y: 30, scale: 0.8 }}

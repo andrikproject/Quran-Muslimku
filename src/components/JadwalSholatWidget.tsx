@@ -317,19 +317,30 @@ export const JadwalSholatWidget: React.FC<SholatWidgetProps> = ({ addToast }) =>
       const r = await fetch("https://api.bigdatacloud.net/data/reverse-geocode-client");
       if (!r.ok) return;
       const data = await r.json();
-      let cityName = data.city || data.locality || data.principalSubdivision;
-      if (!cityName) return;
-      cityName = cityName.replace(/Kabupaten|Kota|Kab\./gi, "").trim();
+      
+      const keywords = [];
+      if (data.city) keywords.push(data.city.replace(/Kabupaten|Kota|Kab\./gi, "").trim());
+      if (data.locality) keywords.push(data.locality.replace(/Kabupaten|Kota|Kab\./gi, "").trim());
+      
+      let foundCity = null;
 
-      const s = await fetch(`https://api.myquran.com/v3/sholat/kota/cari/${encodeURIComponent(cityName)}`);
-      if (!s.ok) return;
-      const sData = await s.json();
-      if (sData.status && Array.isArray(sData.data) && sData.data.length > 0) {
-        const result = sData.data[0];
+      for (const kw of keywords) {
+        if (!kw) continue;
+        const s = await fetch(`https://api.myquran.com/v3/sholat/kota/cari/${encodeURIComponent(kw)}`);
+        if (!s.ok) continue;
+        const sData = await s.json();
+        if (sData.status && Array.isArray(sData.data) && sData.data.length > 0) {
+          foundCity = sData.data[0];
+          break;
+        }
+      }
+
+      if (foundCity) {
         setSelectedCity({
-          id: result.id,
-          lokasi: result.lokasi || result.kabko
+          id: foundCity.id,
+          lokasi: foundCity.lokasi || foundCity.kabko
         });
+        addToast("Lokasi Terdeteksi", `Menggunakan lokasi perkiraan: ${foundCity.lokasi || foundCity.kabko}`, "info");
       }
     } catch (e) {
       // fail silently
