@@ -22,10 +22,28 @@ import { KalenderView } from "./components/KalenderView";
 
 // Typings and Data
 import { Bookmark, Note, TilawahProgress } from "./types";
+import { App as CapacitorApp } from "@capacitor/app";
 
 export default function App() {
   const [showSplash, setShowSplash] = useState(true);
   const [activeTab, setActiveTab] = useState<"beranda" | "quran" | "cari" | "doa" | "profil" | "tasbih" | "kiblat" | "kalender">("beranda");
+
+  // Handle Android Physical Back Button
+  useEffect(() => {
+    const handleBackButton = async () => {
+      if (activeTab !== "beranda") {
+        setActiveTab("beranda");
+      } else {
+        await CapacitorApp.exitApp();
+      }
+    };
+
+    const backListener = CapacitorApp.addListener('backButton', handleBackButton);
+
+    return () => {
+      backListener.then(listener => listener.remove());
+    };
+  }, [activeTab]);
 
   // Notifications/Toasts System
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
