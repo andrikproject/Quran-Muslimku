@@ -6,6 +6,8 @@ import {
   Bot,
   User,
   ArrowLeft,
+  Copy,
+  Share2,
 } from "lucide-react";
 
 interface ChatMessage {
@@ -237,12 +239,48 @@ export const TanyaUstadzView: React.FC<TanyaUstadzViewProps> = ({
                     <span>{msg.text}</span>
                   )}
                 </div>
-                <span className="text-[10px] text-slate-400 font-bold tracking-wider px-1 opacity-70">
-                  {msg.timestamp.toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </span>
+                <div className={`flex items-center gap-3 px-1 mt-0.5 ${isAi ? "justify-between w-full" : "justify-end"}`}>
+                  {isAi && (
+                    <div className="flex items-center gap-1">
+                      <button 
+                        onClick={() => {
+                          navigator.clipboard.writeText(msg.text);
+                          addToast("Disalin", "Jawaban disalin ke clipboard.", "info");
+                        }}
+                        className="flex items-center gap-1.5 text-[10px] text-slate-400 hover:text-[#0F4C3A] hover:bg-emerald-50 px-2 py-1 rounded-md transition-all uppercase tracking-wider font-bold cursor-pointer"
+                      >
+                        <Copy className="w-3 h-3" /> Salin
+                      </button>
+                      <button 
+                        onClick={async () => {
+                          if (navigator.share) {
+                            try {
+                              await navigator.share({
+                                title: "Tanya Ustadz AI - Quran Saku",
+                                text: msg.text,
+                              });
+                            } catch (e) {
+                              console.log("Membagikan dibatalkan");
+                            }
+                          } else {
+                            navigator.clipboard.writeText(msg.text);
+                            addToast("Disalin", "Jawaban disalin karena browser tidak mendukung Web Share API.", "info");
+                          }
+                        }}
+                        className="flex items-center gap-1.5 text-[10px] text-slate-400 hover:text-[#0F4C3A] hover:bg-emerald-50 px-2 py-1 rounded-md transition-all uppercase tracking-wider font-bold cursor-pointer"
+                      >
+                        <Share2 className="w-3 h-3" /> Bagikan
+                      </button>
+                    </div>
+                  )}
+
+                  <span className="text-[10px] text-slate-400 font-bold tracking-wider opacity-70 shrink-0">
+                    {msg.timestamp.toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </span>
+                </div>
               </div>
             </motion.div>
           );
