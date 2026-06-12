@@ -2,7 +2,7 @@
  * @author Habib Ismail Al Qadri
  * @app Quran Saku
  */
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { 
   Home, BookOpen, Search, Heart, User, Bell, ChevronRight, 
@@ -30,6 +30,24 @@ import { HaditsView } from "./components/HaditsView";
 // Typings and Data
 import { Bookmark, Note, TilawahProgress } from "./types";
 import { App as CapacitorApp } from "@capacitor/app";
+
+const AYAT_HARIAN_COLLECTION = [
+  { surahId: 94, surahName: "Asy-Syarh", verseId: 5, arab: "فَإِنَّ مَعَ الْعُسْرِ يُسْرًا", indonesian: "Karena sesungguhnya sesudah kesulitan itu ada kemudahan." },
+  { surahId: 94, surahName: "Asy-Syarh", verseId: 6, arab: "إِنَّ مَعَ الْعُسْرِ يُسْرًا", indonesian: "Sesungguhnya sesudah kesulitan itu ada kemudahan." },
+  { surahId: 55, surahName: "Ar-Rahman", verseId: 60, arab: "هَلْ جَزَاءُ الْإِحْسَانِ إِلَّا الْإِحْسَانُ", indonesian: "Tidak ada balasan kebaikan kecuali kebaikan (pula)." },
+  { surahId: 2, surahName: "Al-Baqarah", verseId: 152, arab: "فَاذْكُرُونِي أَذْكُرْكُمْ وَاشْكُرُوا لِي وَلَا تَكْفُرُونِ", indonesian: "Maka ingatlah kepada-Ku, Aku pun akan ingat kepadamu. Bersyukurlah kepada-Ku, dan janganlah kamu ingkar kepada-Ku." },
+  { surahId: 2, surahName: "Al-Baqarah", verseId: 186, arab: "وَإِذَا سَأَلَكَ عِبَادِي عَنِّي فَإِنِّي قَرِيبٌ", indonesian: "Dan apabila hamba-hamba-Ku bertanya kepadamu tentang Aku, maka (jawablah), bahwasanya Aku adalah dekat." },
+  { surahId: 2, surahName: "Al-Baqarah", verseId: 286, arab: "لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسْعَهَا", indonesian: "Allah tidak membebani seseorang melainkan sesuai dengan kesanggupannya." },
+  { surahId: 3, surahName: "Ali 'Imran", verseId: 139, arab: "وَلَا تَهِنُوا وَلَا تَحْزَنُوا وَأَنْتُمُ الْأَعْلَوْنَ إِنْ كُنْتُمْ مُؤْمِنِينَ", indonesian: "Janganlah kamu bersikap lemah, dan janganlah (pula) kamu bersedih hati, padahal kamulah orang-orang yang paling tinggi derajatnya." },
+  { surahId: 3, surahName: "Ali 'Imran", verseId: 173, arab: "حَسْبُنَا اللَّهُ وَنِعْمَ الْوَكِيلُ", indonesian: "Cukuplah Allah menjadi Penolong kami dan Allah adalah sebaik-baik Pelindung." },
+  { surahId: 13, surahName: "Ar-Ra'd", verseId: 28, arab: "أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ", indonesian: "Ingatlah, hanya dengan mengingati Allah-lah hati menjadi tenteram." },
+  { surahId: 14, surahName: "Ibrahim", verseId: 7, arab: "لَئِنْ شَكَرْتُمْ لَأَزِيدَنَّكُمْ", indonesian: "Sesungguhnya jika kamu bersyukur, pasti Kami akan menambah (nikmat) kepadamu." },
+  { surahId: 20, surahName: "Ta-Ha", verseId: 114, arab: "وَقُلْ رَبِّ زِدْنِي عِلْمًا", indonesian: "Dan katakanlah: 'Ya Tuhanku, tambahkanlah kepadaku ilmu pengetahuan.'" },
+  { surahId: 40, surahName: "Ghafir", verseId: 60, arab: "وَقَالَ رَبُّكُمُ ادْعُونِي أَسْتَجِبْ لَكُمْ", indonesian: "Dan Tuhanmu berfirman: 'Berdoalah kepada-Ku, niscaya akan Kuperkenankan bagimu.'" },
+  { surahId: 65, surahName: "At-Talaq", verseId: 2, arab: "وَمَنْ يَتَّقِ اللَّهَ يَجْعَلْ لَهُ مَخْرَجًا", indonesian: "Barangsiapa bertakwa kepada Allah niscaya Dia akan membukakan jalan keluar baginya." },
+  { surahId: 65, surahName: "At-Talaq", verseId: 3, arab: "وَيَرْزُقْهُ مِنْ حَيْثُ لَا يَحْتَسِبُ", indonesian: "Dan Dia memberinya rezeki dari arah yang tidak disangka-sangkanya." },
+  { surahId: 93, surahName: "Ad-Duha", verseId: 5, arab: "وَلَسَوْفَ يُعْطِيكَ رَبُّكَ فَتَرْضَىٰ", indonesian: "Dan sungguh, kelak Tuhanmu pasti memberikan karunia-Nya kepadamu, sehingga engkau menjadi puas." }
+];
 
 export default function App() {
   const [showSplash, setShowSplash] = useState(true);
@@ -240,14 +258,27 @@ export default function App() {
     }
   }, []);
 
-  // Verse of the day visual selection - QS Al-Kahf: 110 (as suggested under the aesthetic screen)
-  const [ayatOfTheDay] = useState({
-    surahId: 18,
-    surahName: "Al-Kahf",
-    verseId: 110,
-    arab: "وَاصْبِرْ نَفْسَكَ مَعَ الَّذِينَ يَدْعُونَ رَبَّهُمْ بِالْغَدَاةِ وَالْعَشِيِّ يُرِيدُونَ وَجْهَهُ",
-    indonesian: "“Dan bersabarlah engkau bersama orang-orang yang menyeru Tuhannya di pagi dan petang hari dengan mengharap keridhaan-Nya.”",
-  });
+  // Verse of the day visual selection - Sliding collection changing daily
+  const dayOfYear = Math.floor(Date.now() / 86400000);
+  const todaysAyats = useMemo(() => {
+    const ayats = [];
+    const startIndex = (dayOfYear * 5) % AYAT_HARIAN_COLLECTION.length;
+    for (let i = 0; i < 5; i++) {
+      ayats.push(AYAT_HARIAN_COLLECTION[(startIndex + i) % AYAT_HARIAN_COLLECTION.length]);
+    }
+    return ayats;
+  }, [dayOfYear]);
+
+  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlideIndex((prev) => (prev + 1) % 5);
+    }, 12000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const ayatOfTheDay = todaysAyats[currentSlideIndex];
 
   const shareAyatOfTheDay = () => {
     const text = `*Ayat Hari Ini (QS ${ayatOfTheDay.surahName}:${ayatOfTheDay.verseId})*\n\n${ayatOfTheDay.arab}\n\n"${ayatOfTheDay.indonesian}"\n\n- Dibagikan via Quran Saku App -`;
@@ -269,22 +300,51 @@ export default function App() {
                   <Sparkles className="w-4 h-4 fill-amber-100/55" />
                   <span className="font-extrabold text-slate-800 font-sans tracking-wide">Ayat Hari Ini</span>
                 </div>
-                <span className="font-sans tracking-wide text-slate-400 font-bold">
-                  Al-Kahf · 18:24
-                </span>
+                <div className="flex gap-1.5 items-center">
+                  <AnimatePresence mode="wait" initial={false}>
+                    <motion.span
+                      key={ayatOfTheDay.surahId + "-" + ayatOfTheDay.verseId}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="font-sans tracking-wide text-slate-400 font-bold"
+                    >
+                      {ayatOfTheDay.surahName} · {ayatOfTheDay.surahId}:{ayatOfTheDay.verseId}
+                    </motion.span>
+                  </AnimatePresence>
+                </div>
               </div>
 
               {/* Quran script */}
-              <div className="py-2.5 text-center mt-1">
-                <p className="font-serif text-2xl font-bold leading-relaxed text-slate-800 px-1" dir="rtl">
-                  {ayatOfTheDay.arab}
-                </p>
-              </div>
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.div
+                  key={ayatOfTheDay.arab}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.4 }}
+                  className="py-2.5 text-center mt-1"
+                >
+                  <p className="font-serif text-2xl font-bold leading-relaxed text-slate-800 px-1" dir="rtl">
+                    {ayatOfTheDay.arab}
+                  </p>
+                </motion.div>
+              </AnimatePresence>
 
               {/* Translation */}
-              <p className="text-[11px] sm:text-xs text-slate-600 leading-relaxed font-sans font-medium text-left px-1 mt-1 border-t border-slate-50 pt-3">
-                {ayatOfTheDay.indonesian}
-              </p>
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.p
+                  key={ayatOfTheDay.indonesian}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.4, delay: 0.1 }}
+                  className="text-[11px] sm:text-xs text-slate-600 leading-relaxed font-sans font-medium text-left px-1 mt-1 border-t border-slate-50 pt-3"
+                >
+                  {ayatOfTheDay.indonesian}
+                </motion.p>
+              </AnimatePresence>
 
               {/* Tool row actions */}
               <div className="flex justify-between items-center pt-3 mt-1 border-t border-slate-50">
