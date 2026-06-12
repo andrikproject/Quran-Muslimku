@@ -71,3 +71,15 @@ body {
   direction: rtl;
 }
 
+/* Native Night Mode Override Trick for Reading App */
+.night-mode {
+  filter: invert(0.92) hue-rotate(180deg);
+  background-color: #ededed !important;
+}
+
+.night-mode img, 
+.night-mode video, 
+.night-mode .keep-color {
+  filter: invert(1) hue-rotate(180deg);
+}
+

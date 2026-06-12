@@ -47,6 +47,9 @@ import { KalenderView } from "./components/KalenderView";
 import { TafsirView } from "./components/TafsirView";
 import { FikihView } from "./components/FikihView";
 import { HaditsView } from "./components/HaditsView";
+import { JurnalIbadahView } from "./components/JurnalIbadahView";
+import { DzikirPagiPetangView } from "./components/DzikirPagiPetangView";
+import { KalkulatorZakatView } from "./components/KalkulatorZakatView";
 
 // Typings and Data
 import { Bookmark, Note, TilawahProgress } from "./types";
@@ -186,6 +189,9 @@ export default function App() {
     | "tafsir"
     | "hadits"
     | "fikih"
+    | "jurnal"
+    | "dzikir"
+    | "zakat"
   >("beranda");
   const [showSubMenu, setShowSubMenu] = useState(false);
 
@@ -323,6 +329,21 @@ export default function App() {
   const [geminiApiKey, setGeminiApiKey] = useState(
     () => localStorage.getItem("qs_gemini_key") || "",
   );
+  
+  const [isNightMode, setIsNightMode] = useState(
+    () => localStorage.getItem("qs_nightmode") === "true"
+  );
+  
+  useEffect(() => {
+    localStorage.setItem("qs_nightmode", isNightMode.toString());
+    if (isNightMode) {
+      document.documentElement.classList.add("night-mode");
+      document.body.style.backgroundColor = "#121212";
+    } else {
+      document.documentElement.classList.remove("night-mode");
+      document.body.style.backgroundColor = "#FDFBF7";
+    }
+  }, [isNightMode]);
 
   // Jump from Home / search directly into Specific Surah details
   const [deepLinkSurah, setDeepLinkSurah] = useState<number | null>(null);
@@ -688,6 +709,24 @@ export default function App() {
                         icon: <ArrowLeft className="w-5.5 h-5.5" />,
                       },
                       {
+                        tag: "Jurnal",
+                        action: () => setActiveTab("jurnal"),
+                        bg: "bg-[#F0FDF4] text-emerald-600",
+                        icon: <PenTool className="w-5.5 h-5.5" />,
+                      },
+                      {
+                        tag: "Dzikir",
+                        action: () => setActiveTab("dzikir"),
+                        bg: "bg-[#FFFCE8] text-amber-600",
+                        icon: <Heart className="w-5.5 h-5.5" />,
+                      },
+                      {
+                        tag: "Zakat",
+                        action: () => setActiveTab("zakat"),
+                        bg: "bg-[#F8FAFC] text-blue-600",
+                        icon: <LibraryBig className="w-5.5 h-5.5" />,
+                      },
+                      {
                         tag: "Tasbih",
                         action: () => {
                           setActiveTab("tasbih");
@@ -724,7 +763,7 @@ export default function App() {
                           );
                         },
                         bg: "bg-[#FDF2F8] text-pink-700",
-                        icon: <LibraryBig className="w-5.5 h-5.5" />,
+                        icon: <BookMarked className="w-5.5 h-5.5" />,
                       },
                     ].map((itm, i) => (
                       <button
@@ -992,6 +1031,20 @@ export default function App() {
       case "fikih":
         return <FikihView onBack={() => setActiveTab("beranda")} />;
 
+      case "jurnal":
+        return <JurnalIbadahView onBack={() => setActiveTab("beranda")} />;
+
+      case "dzikir":
+        return (
+          <DzikirPagiPetangView 
+            addToast={addToast}
+            onBack={() => setActiveTab("beranda")} 
+          />
+        );
+
+      case "zakat":
+        return <KalkulatorZakatView onBack={() => setActiveTab("beranda")} />;
+
       case "profil":
         return (
           <SettingsView
@@ -1006,6 +1059,8 @@ export default function App() {
             setDailyGoalMinutes={handleSetDailyGoalMinutes}
             geminiApiKey={geminiApiKey}
             setGeminiApiKey={handleSetGeminiApiKey}
+            isNightMode={isNightMode}
+            setIsNightMode={setIsNightMode}
             addToast={addToast}
           />
         );
@@ -1028,7 +1083,7 @@ export default function App() {
       {/* 1. TOP COVER DECORATION & COHESIVE SYSTEM HEADERS */}
       {activeTab === "beranda" ? (
         <div className="relative w-full text-white">
-          <div className="absolute top-0 inset-x-0 h-[50vh] sm:h-[55vh] min-h-[400px] z-0 pointer-events-none overflow-hidden bg-slate-800">
+          <div className="absolute top-0 inset-x-0 h-[50vh] sm:h-[55vh] min-h-[400px] z-0 pointer-events-none overflow-hidden bg-slate-800 keep-color">
             <motion.div
               animate={{ scale: [1, 1.08] }}
               transition={{

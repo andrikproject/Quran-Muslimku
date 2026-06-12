@@ -35,6 +35,8 @@ interface SettingsViewProps {
   setDailyGoalMinutes: (m: number) => void;
   geminiApiKey: string;
   setGeminiApiKey: (key: string) => void;
+  isNightMode?: boolean;
+  setIsNightMode?: (val: boolean) => void;
   addToast: (
     title: string,
     body: string,
@@ -54,6 +56,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   setDailyGoalMinutes,
   geminiApiKey,
   setGeminiApiKey,
+  isNightMode,
+  setIsNightMode,
   addToast,
 }) => {
   const [activeMenu, setActiveMenu] = useState<
@@ -294,6 +298,35 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                 .
               </span>
             </div>
+
+            {/* Night Mode Toggle */}
+            {setIsNightMode && (
+              <div className="flex justify-between items-center bg-slate-900 border border-slate-700 p-5 rounded-2xl mt-2">
+                <div className="flex flex-col gap-1">
+                  <h4 className="text-sm font-bold text-white tracking-wide">
+                    Tema Gelap Membaca
+                  </h4>
+                  <p className="text-[11px] text-slate-400 font-medium">
+                    "Night Mode" yang nyaman di mata untuk membaca saat malam
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsNightMode(!isNightMode)}
+                  className={`relative flex items-center w-14 h-7 rounded-full p-1 transition-colors cursor-pointer ${
+                    isNightMode ? "bg-[#ECC17A]" : "bg-slate-600"
+                  }`}
+                >
+                  <motion.div
+                    layout
+                    className={`w-5 h-5 rounded-full shadow-sm bg-white`}
+                    style={{
+                      transform: isNightMode ? "translateX(28px)" : "translateX(0px)",
+                    }}
+                  />
+                </button>
+              </div>
+            )}
 
             {/* Test alert sound mock notification */}
             <div className="border border-emerald-100/60 p-5 rounded-2xl flex flex-col sm:flex-row gap-5 items-center justify-between bg-emerald-50/50 shadow-sm">
