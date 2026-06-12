@@ -70,11 +70,11 @@ export default function App() {
   const [notes, setNotes] = useState<Note[]>([]);
   // State: Tilawah logs & progress tracker
   const [tilawahProgress, setTilawahProgress] = useState<TilawahProgress>({
-    currentSurah: 2,
-    currentSurahName: "Al-Baqarah",
-    currentAyat: 183,
-    totalAyat: 286,
-    progressPercentage: 64
+    currentSurah: 1,
+    currentSurahName: "Al-Fatihah",
+    currentAyat: 1,
+    totalAyat: 7,
+    progressPercentage: 0
   });
 
   // Daily Reading Target
