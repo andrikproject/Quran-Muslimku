@@ -71,16 +71,27 @@ export default function App() {
   };
 
   // State: Bookmarks
-  const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
+  const [bookmarks, setBookmarks] = useState<Bookmark[]>(() => {
+    const cached = localStorage.getItem("qs_bookmarks");
+    return cached ? JSON.parse(cached) : [];
+  });
+  
   // State: Notes
-  const [notes, setNotes] = useState<Note[]>([]);
+  const [notes, setNotes] = useState<Note[]>(() => {
+    const cached = localStorage.getItem("qs_notes");
+    return cached ? JSON.parse(cached) : [];
+  });
+  
   // State: Tilawah logs & progress tracker
-  const [tilawahProgress, setTilawahProgress] = useState<TilawahProgress>({
-    currentSurah: 1,
-    currentSurahName: "Al-Fatihah",
-    currentAyat: 1,
-    totalAyat: 7,
-    progressPercentage: 0
+  const [tilawahProgress, setTilawahProgress] = useState<TilawahProgress>(() => {
+    const cached = localStorage.getItem("qs_progress");
+    return cached ? JSON.parse(cached) : {
+      currentSurah: 1,
+      currentSurahName: "Al-Fatihah",
+      currentAyat: 1,
+      totalAyat: 7,
+      progressPercentage: 0
+    };
   });
 
   // Daily Reading Target
@@ -96,58 +107,37 @@ export default function App() {
   };
 
   // State: User profile parameters
-  const [userName, setUserName] = useState("Habib Ismail Al Qadri");
-  const [dailyGoalMinutes, setDailyGoalMinutes] = useState(15);
-  const [geminiApiKey, setGeminiApiKey] = useState("");
+  const [userName, setUserName] = useState(() => localStorage.getItem("qs_username") || "Habib Ismail Al Qadri");
+  const [dailyGoalMinutes, setDailyGoalMinutes] = useState(() => Number(localStorage.getItem("qs_goal")) || 15);
+  const [geminiApiKey, setGeminiApiKey] = useState(() => localStorage.getItem("qs_gemini_key") || "");
 
   // Jump from Home / search directly into Specific Surah details
   const [deepLinkSurah, setDeepLinkSurah] = useState<number | null>(null);
   const [deepLinkAyat, setDeepLinkAyat] = useState<number | null>(null);
 
-  // Load persistence from client localStorage
+  // Note: We initialize all local persistence from useState initializers directly now.
+
+  // Save persistence when states adjust using useEffect for real-time synchronization
   useEffect(() => {
-    const cachedBookmarks = localStorage.getItem("qs_bookmarks");
-    if (cachedBookmarks) {
-      try { setBookmarks(JSON.parse(cachedBookmarks)); } catch {}
-    }
+    localStorage.setItem("qs_bookmarks", JSON.stringify(bookmarks));
+  }, [bookmarks]);
 
-    const cachedNotes = localStorage.getItem("qs_notes");
-    if (cachedNotes) {
-      try { setNotes(JSON.parse(cachedNotes)); } catch {}
-    }
+  useEffect(() => {
+    localStorage.setItem("qs_notes", JSON.stringify(notes));
+  }, [notes]);
 
-    const cachedProgress = localStorage.getItem("qs_progress");
-    if (cachedProgress) {
-      try { setTilawahProgress(JSON.parse(cachedProgress)); } catch {}
-    }
+  useEffect(() => {
+    localStorage.setItem("qs_progress", JSON.stringify(tilawahProgress));
+  }, [tilawahProgress]);
 
-    const cachedName = localStorage.getItem("qs_username");
-    if (cachedName) {
-      setUserName(cachedName);
-    }
-
-    const cachedGoal = localStorage.getItem("qs_goal");
-    if (cachedGoal) {
-      setDailyGoalMinutes(Number(cachedGoal));
-    }
-
-    const cachedApiKey = localStorage.getItem("qs_gemini_key");
-    if (cachedApiKey) {
-      setGeminiApiKey(cachedApiKey);
-    }
-  }, []);
-
-  // Save persistence when states adjust
   const handleAddBookmark = (b: Bookmark) => {
     const updated = [...bookmarks, b];
     setBookmarks(updated);
-    localStorage.setItem("qs_bookmarks", JSON.stringify(updated));
   };
 
   const handleRemoveBookmark = (surahNo: number, ayatNo: number) => {
     const updated = bookmarks.filter((b) => !(b.surahNo === surahNo && b.ayatNo === ayatNo));
     setBookmarks(updated);
-    localStorage.setItem("qs_bookmarks", JSON.stringify(updated));
   };
 
   const handleAddNote = (surahNo: number, surahName: string, ayatNo: number, txt: string) => {
@@ -161,13 +151,11 @@ export default function App() {
     };
     const updated = [entry, ...notes];
     setNotes(updated);
-    localStorage.setItem("qs_notes", JSON.stringify(updated));
   };
 
   const handleDeleteNote = (id: string) => {
     const updated = notes.filter((n) => n.id !== id);
     setNotes(updated);
-    localStorage.setItem("qs_notes", JSON.stringify(updated));
   };
 
   const handleUpdateTilawahProgress = (surahNo: number, surahName: string, ayatNo: number, totalAyat: number) => {
@@ -180,7 +168,6 @@ export default function App() {
       progressPercentage: percentage
     };
     setTilawahProgress(updated);
-    localStorage.setItem("qs_progress", JSON.stringify(updated));
   };
 
   const handleSetUserName = (n: string) => {

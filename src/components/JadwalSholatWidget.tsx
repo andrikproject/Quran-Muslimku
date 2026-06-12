@@ -124,6 +124,7 @@ export const JadwalSholatWidget: React.FC<SholatWidgetProps> = ({ addToast }) =>
 
   // Run on city change
   useEffect(() => {
+    if (selectedCity.id === "COORD") return;
     fetchSchedule(selectedCity.id);
   }, [selectedCity]);
 
@@ -291,41 +292,66 @@ export const JadwalSholatWidget: React.FC<SholatWidgetProps> = ({ addToast }) =>
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
         try {
-          // fetch accurate locality/city from bigdatacloud open api
-          const r = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${pos.coords.latitude}&longitude=${pos.coords.longitude}&localityLanguage=id`);
-          if (!r.ok) throw new Error();
-          const data = await r.json();
-          let cityName = data.city || data.locality || data.principalSubdivision || "Jakarta";
+          const lat = pos.coords.latitude;
+          const lon = pos.coords.longitude;
           
-          cityName = cityName.replace(/Kabupaten|Kota|Kab\./gi, "").trim();
-
-          // Search MyQuran API with that string
-          const s = await fetch(`https://api.myquran.com/v3/sholat/kota/cari/${encodeURIComponent(cityName)}`);
-          if (!s.ok) throw new Error();
-          const sData = await s.json();
+          // fetch accurate locality/city from bigdatacloud open api for display name
+          let displayName = "Lokasi Saat Ini";
+          try {
+            const r = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=id`);
+            if (r.ok) {
+              const data = await r.json();
+              displayName = data.city || data.locality || data.principalSubdivision || "Lokasi Saat Ini";
+            }
+          } catch (e) {}
           
-          if (sData.status && Array.isArray(sData.data) && sData.data.length > 0) {
-            const result = sData.data[0];
-            setSelectedCity({
-              id: result.id,
-              lokasi: result.lokasi || result.kabko
-            });
+          // Call Aladhan API for accurate coordinates-based prayer times
+          const now = new Date();
+          const yr = now.getFullYear();
+          const mo = now.getMonth() + 1;
+          const dy = now.getDate();
+          
+          const aladhanRes = await fetch(`https://api.aladhan.com/v1/timings/${dy}-${mo}-${yr}?latitude=${lat}&longitude=${lon}&method=11`); // method 11 is Majelis Ulama Indonesia
+          if (!aladhanRes.ok) throw new Error("Gagal mengambil jadwal berdasar koordinat");
+          const asData = await aladhanRes.json();
+          
+          if (asData.code === 200 && asData.data && asData.data.timings) {
+            const timings = asData.data.timings;
+            // Adapt Aladhan to our PrayerSchedule format
+            const coordSchedule: PrayerSchedule = {
+              tanggal: `${String(dy).padStart(2, "0")}/${String(mo).padStart(2, "0")}/${yr}`,
+              imsak: timings.Imsak,
+              subuh: timings.Fajr,
+              terbit: timings.Sunrise,
+              dhuha: timings.Sunrise, // Aladhan doesn't give dhuha natively, use sunrise
+              dzuhur: timings.Dhuhr,
+              ashar: timings.Asr,
+              maghrib: timings.Maghrib,
+              isya: timings.Isha,
+              date: `${yr}-${String(mo).padStart(2, "0")}-${String(dy).padStart(2, "0")}`
+            };
+            
+            // Store the special auto-located coordinate city format
+            const dynamicCity: SholatCity = { id: "COORD", lokasi: displayName };
+            
+            // We set the schedule internally and avoid triggering `fetchSchedule` (which would reset to myquran defaults if id="COORD")
+            setSelectedCity(dynamicCity);
+            setSchedule(coordSchedule);
             localStorage.setItem("qd_has_located", "1");
-            if (!silent) addToast("GPS Terkunci!", `Berhasil menemukan wilayah GPS: ${result.lokasi || result.kabko}.`, "success");
+            
+            if (!silent) addToast("GPS Terkunci!", `Jadwal sholat akurat sesuai koordinat GPS (${displayName}).`, "success");
           } else {
-             // Fallback
-             setSelectedCity({ id: "1301", lokasi: "KOTA JAKARTA (GPS)" });
-             localStorage.setItem("qd_has_located", "1");
-             if (!silent) addToast("Lokasi Default", "Kota spesifik tidak ditemukan di database jadwal sholat, menggunakan Jakarta.", "info");
+             throw new Error("Invalid Aladhan structure");
           }
         } catch (err) {
-          if (!silent) addToast("GPS Terkunci", "Menggunakan koordinat tapi gagal menentukan kota, fallback ke Jakarta.", "success");
+          if (!silent) addToast("Jadwal Koordinat Gagal", "Gagal memproses posisi. Menggunakan default.", "warning");
+          // Fallback to Jakarta via MyQuran
           setSelectedCity({ id: "1301", lokasi: "KOTA JAKARTA (GPS)" });
           localStorage.setItem("qd_has_located", "1");
         }
       },
       (err) => {
-        if (!silent) addToast("GPS Gagal", "Harap izinkan hak akses peta atau tulis kota secara manual.", "warning");
+        if (!silent) addToast("GPS Gagal", "Harap izinkan hak akses atau tulis nama kota secara manual.", "warning");
       }
     );
   };
@@ -367,10 +393,8 @@ export const JadwalSholatWidget: React.FC<SholatWidgetProps> = ({ addToast }) =>
   };
 
   useEffect(() => {
-    // Call IP location first as a quick fallback if GPS takes time or is denied
-    getIPLocation().then(() => {
-      getGPSLocation(true);
-    });
+    // Automatically detect exact coordinate location on mount
+    getGPSLocation(true);
   }, []);
 
   const togglePrayerNotification = (prayer: string) => {
