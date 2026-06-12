@@ -38,6 +38,25 @@ body {
   flex-direction: column;
 }
 
+@media (min-width: 768px) {
+  #root {
+    max-width: 768px; /* Tablet width constraint */
+    min-height: calc(100vh - 32px);
+    margin: 16px 0;
+    border-radius: 20px;
+    overflow: hidden;
+  }
+}
+
+@media (min-width: 1024px) {
+  #root {
+    max-width: 1024px; /* Desktop width constraint */
+    min-height: calc(100vh - 48px);
+    margin: 24px 0;
+    border-radius: 24px;
+  }
+}
+
 /* Custom scrollbar remover helper class */
 .scrollbar-none::-webkit-scrollbar {
   display: none;

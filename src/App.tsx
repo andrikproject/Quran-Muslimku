@@ -291,7 +291,7 @@ export default function App() {
     switch (activeTab) {
       case "beranda":
         return (
-          <div className="flex flex-col gap-6 -mt-[125px] sm:-mt-[145px] relative z-20">
+          <div className="flex flex-col gap-6 -mt-[125px] sm:-mt-[145px] relative z-20 w-full max-w-2xl lg:max-w-4xl mx-auto">
             {/* Ayat Hari Ini (Verse of the day card) */}
             <div className="bg-white/95 backdrop-blur-xl rounded-[28px] p-5 shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-white/60 flex flex-col gap-3 relative overflow-hidden select-none z-10 w-full mb-2 mx-auto max-w-2xl">
               {/* Corner label row */}
@@ -375,7 +375,7 @@ export default function App() {
                     animate={{ x: 0, opacity: 1 }}
                     exit={{ x: -20, opacity: 0 }}
                     transition={{ duration: 0.2 }}
-                    className="grid grid-cols-4 sm:grid-cols-5 gap-y-5 gap-x-2 sm:gap-x-4"
+                    className="grid grid-cols-4 md:grid-cols-4 lg:grid-cols-8 gap-y-5 gap-x-2 sm:gap-x-4"
                   >
                     {[
                       { tag: "Al-Qur'an", action: () => setActiveTab("quran"), bg: "bg-[#EDF4F1] text-[#0F4C3A]", icon: <BookOpen className="w-5.5 h-5.5" /> },
@@ -416,7 +416,7 @@ export default function App() {
                     animate={{ x: 0, opacity: 1 }}
                     exit={{ x: 20, opacity: 0 }}
                     transition={{ duration: 0.2 }}
-                    className="grid grid-cols-4 sm:grid-cols-5 gap-y-5 gap-x-2 sm:gap-x-4"
+                    className="grid grid-cols-4 md:grid-cols-4 gap-y-5 gap-x-2 sm:gap-x-4"
                   >
                     {[
                       { tag: "Kembali", action: () => setShowSubMenu(false), bg: "bg-[#F5F5F5] text-slate-500", icon: <ArrowLeft className="w-5.5 h-5.5" /> },
@@ -681,7 +681,7 @@ export default function App() {
             <div className="absolute inset-0 bg-black/10 mix-blend-overlay"></div>
           </div>
 
-          <div className="relative z-10 pt-12 pb-[180px] sm:pb-[220px] px-5 max-w-7xl mx-auto w-full drop-shadow-md">
+          <div className="relative z-10 pt-12 pb-[180px] sm:pb-[220px] px-5 max-w-2xl lg:max-w-4xl mx-auto w-full drop-shadow-md">
             <div className="flex items-center justify-between">
               <div className="flex flex-col drop-shadow-md">
                 <span className="text-sm font-medium tracking-wide">
@@ -760,7 +760,7 @@ export default function App() {
         initial={{ y: 50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: [0.25, 0.8, 0.25, 1], delay: 0.1 }}
-        className="fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-slate-100 rounded-t-[32px] px-6 py-2 pb-6 flex justify-between items-end shadow-2xl shadow-slate-900/10 z-40 max-w-md mx-auto"
+        className="fixed bottom-0 md:bottom-6 inset-x-0 bg-white/95 backdrop-blur-md border-t md:border border-slate-100 rounded-t-[32px] md:rounded-[32px] px-6 sm:px-10 py-2 pb-6 md:pb-2 flex justify-between items-end shadow-2xl shadow-slate-900/10 z-40 w-full sm:max-w-lg md:max-w-2xl lg:max-w-3xl mx-auto transition-all"
       >
         {[
           { id: "beranda", label: "Beranda", icon: <Home className="w-[22px] h-[22px]" strokeWidth={1.5} /> },

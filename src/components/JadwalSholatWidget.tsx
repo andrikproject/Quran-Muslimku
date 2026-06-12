@@ -524,24 +524,24 @@ export const JadwalSholatWidget: React.FC<SholatWidgetProps> = ({ addToast }) =>
       )}
 
       {/* Action panel */}
-      <div className="flex flex-col sm:flex-row items-center gap-3 bg-slate-50 p-4 rounded-2xl">
-        <div className="flex-1 text-center sm:text-left">
+      <div className="flex flex-col md:flex-row items-center gap-4 bg-slate-50 p-4 rounded-2xl">
+        <div className="flex-1 text-center md:text-left">
           <h4 className="text-sm font-bold text-slate-700">Notifikasi Otomatis Pengingat Adzan</h4>
           <p className="text-xs text-slate-500 mt-0.5">
             Aplikasi melalukan hit mingguan jadwal sholat dan memicu notifikasi adzan di latar belakang.
           </p>
         </div>
-        <div className="flex flex-col xs:flex-row gap-2 w-full xs:w-auto justify-center">
+        <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto justify-center">
           <button
             onClick={() => getGPSLocation(false)}
-            className="px-4 py-2 bg-white border border-slate-200 hover:bg-slate-50 cursor-pointer rounded-xl text-slate-600 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors w-full xs:w-auto"
+            className="px-4 py-2.5 sm:py-2 bg-white border border-slate-200 hover:bg-slate-50 cursor-pointer rounded-xl text-slate-600 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors w-full sm:w-auto min-w-[140px]"
           >
             <Map className="w-4 h-4 text-emerald-700" />
             Gunakan GPS Anda
           </button>
           <button
             onClick={() => setShowSearchModal(true)}
-            className="px-4 py-2 bg-emerald-800 hover:bg-emerald-950 text-white cursor-pointer rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-colors shadow w-full xs:w-auto"
+            className="px-4 py-2.5 sm:py-2 bg-[#0F4C3A] hover:bg-[#0a3629] text-white cursor-pointer rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-colors shadow w-full sm:w-auto min-w-[120px]"
           >
             <Search className="w-4 h-4" />
             Cari Kota
