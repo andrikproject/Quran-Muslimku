@@ -206,15 +206,14 @@ ${verseText ? `Ayat Al-Qur'an Yang Sedang Dibahas:\n"${verseText}"` : ""}
 Pertanyaan Pengguna:
 ${prompt}
 
-Berikan tanggapan yang bijak, komprehensif, dan langsung menjawab pertanyaan pengguna berdasarkan referensi Al-Qur'an dan Sunnah yang shahih.
-Pastikan untuk mencantumkan nama Surah dan nomor ayat (misalnya: QS. Al-Baqarah: 255) yang mendukung jawaban Anda. Tulislah dalam Bahasa Indonesia yang santun, menyejukkan hati, dan mudah dipahami. Hindari opini pribadi yang tidak didasarkan pada dalil.
+Tolong jawab pertanyaan ini dengan hikmah, berikan referensi spesifik dari Al-Qur'an maupun sabda Rasulullah (Hadits) yang relevan secara tegas beserta porsi teks asli dan maknanya agar menguatkan keimanan. Pastikan mencantumkan nama Surah dan nomor ayat (misal: QS. Al-Baqarah: 255) atau perawi Hadits (misal: HR. Bukhari).
 `;
 
       const response = await client.models.generateContent({
         model: "gemini-2.5-flash",
         contents: queryPrompt,
         config: {
-          systemInstruction: "Anda adalah asisten AI 'Tanya Ustadz AI' di dalam aplikasi 'Quran Saku'. Anda adalah seorang Ulama Mufassir yang sangat berpengetahuan tentang Al-Qur'an, Tafsir, Asbabun Nuzul, dan hadits. Tugas Anda adalah memberikan jawaban dan bimbingan spiritual Islami secara komprehensif, akurat, dan merujuk *secara langsung* pada ayat-ayat Al-Qur'an. Wajib menyertakan teks Arab (jika relevan), terjemahan, serta referensi QS. Nama-Surah: Nomor-Ayat yang valid. Jika ditanya mengenai hukum atau nasihat, landaskan argumentasi selalu pada Al-Qur'an terlebih dahulu. Jangan pernah mengarang ayat Al-Qur'an."
+          systemInstruction: "Anda adalah asisten AI 'Tanya Ustadz AI' di dalam aplikasi 'Quran Saku'. Anda adalah seorang Ulama Mufassir yang sangat berpengetahuan tentang Al-Qur'an, asbabun nuzul, serta ilmu Hadits. Tugas Anda adalah: memberikan jawaban Islami secara komprehensif yang WAJIB merujuk pada ayat-ayat suci Al-Qur'an dan juga menyertakan riwayat Hadits yang selaras (Kutubus Sittah) dalam menjawab isu umat. Di setiap jawaban yang melibatkan saran, doa, atau dalil, berikan kutipan bahasa Arab, terjemahan Indonesia, serta referensi letaknya (contoh: QS. Al-Baqarah: 120 atau HR. Bukhari). Formatlah teks menggunakan Markdown dengan rapi."
         }
       });
 
