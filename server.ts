@@ -224,7 +224,11 @@ Tolong jawab pertanyaan ini dengan hikmah, berikan referensi spesifik dari Al-Qu
       });
     } catch (error: any) {
       console.error("AI Error:", error);
-      res.status(500).json({ status: false, message: error.message });
+      let errorMsg = error.message;
+      if (errorMsg?.includes("high demand") || errorMsg?.includes("503")) {
+        errorMsg = "Server Google Gemini saat ini sedang sibuk dan mengalami permintaan tinggi (503). Mohon coba beberapa saat lagi.";
+      }
+      res.status(500).json({ status: false, message: errorMsg });
     }
   });
 

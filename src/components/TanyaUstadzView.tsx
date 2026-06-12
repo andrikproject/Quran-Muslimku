@@ -128,17 +128,23 @@ export const TanyaUstadzView: React.FC<TanyaUstadzViewProps> = ({
       ]);
     } catch (err: any) {
       console.error(err);
+      
+      const isOverloaded = err.message?.includes("high demand") || err.message?.includes("503");
+      const errorMsg = isOverloaded
+        ? "**Ustadz AI Sedang Sibuk:**\nMaaf, sistem AI Ustadz saat ini sedang mengalami lonjakan antrean. Mohon tunggu beberapa menit lalu coba tanyakan kembali ya. Insya Allah segera membaik. (Status: 503 Server Sibuk)"
+        : `**Maaf, saya mengalami kendala interaksi:** ${err.message}`;
+
       setMessages((prev) => [
         ...prev,
         {
           sender: "ai",
-          text: `**Maaf, saya mengalami kendala interaksi:** ${err.message}`,
+          text: errorMsg,
           timestamp: new Date(),
         },
       ]);
       addToast(
-        "AI Gagal Menjawab",
-        "Harap periksa pengaturan Kunci API atau koneksi Anda.",
+        "AI Sedang Sibuk",
+        isOverloaded ? "Server sedang padat, silakan coba lagi." : "Harap periksa pengaturan pengaturan.",
         "warning"
       );
     } finally {
@@ -158,9 +164,9 @@ export const TanyaUstadzView: React.FC<TanyaUstadzViewProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-[35] bg-[#FDFBF7] flex flex-col pb-[85px] sm:pb-[100px]">
+    <div className="fixed top-0 left-0 right-0 h-[100dvh] z-[35] bg-[#FDFBF7] flex flex-col pb-[115px] md:pb-[125px]">
       {/* Header Panel */}
-      <div className="bg-gradient-to-r from-[#0F4C3A] to-emerald-950 z-20 px-5 pt-6 pb-4 sm:pt-8 flex items-center justify-between gap-4 shadow-sm border-b border-emerald-900/50">
+      <div className="bg-gradient-to-r from-[#0F4C3A] to-emerald-950 z-20 px-5 pt-6 pb-4 sm:pt-8 flex items-center justify-between gap-4 shadow-sm border-b border-emerald-900/50 shrink-0">
         <div className="flex items-center gap-4 min-w-0">
           <button
             onClick={onBack}
@@ -217,14 +223,14 @@ export const TanyaUstadzView: React.FC<TanyaUstadzViewProps> = ({
 
               <div className="flex flex-col gap-1 w-full min-w-0">
                 <div
-                  className={`p-4 rounded-[20px] text-[13px] sm:text-sm leading-relaxed whitespace-pre-wrap select-text shadow-sm border overflow-x-auto ${
+                  className={`p-4 rounded-[20px] text-[13px] sm:text-sm leading-relaxed select-text shadow-sm border overflow-x-auto ${
                     isAi
                       ? "bg-white border-slate-100 text-slate-800 rounded-tl-sm"
-                      : "bg-[#0F4C3A] border-[#0F4C3A] text-white rounded-tr-sm"
+                      : "bg-[#0F4C3A] border-[#0F4C3A] text-white rounded-tr-sm whitespace-pre-wrap"
                   }`}
                 >
                   {isAi ? (
-                    <div className="prose prose-sm prose-slate max-w-none prose-p:leading-relaxed prose-pre:bg-slate-800 prose-pre:text-slate-50 prose-a:text-[#0F4C3A] break-words">
+                    <div className="prose prose-sm prose-slate max-w-none prose-p:leading-normal prose-li:my-0.5 prose-ul:my-2 prose-ol:my-2 prose-pre:bg-slate-800 prose-pre:text-slate-50 prose-a:text-[#0F4C3A] break-words">
                       <ReactMarkdown>{msg.text}</ReactMarkdown>
                     </div>
                   ) : (
