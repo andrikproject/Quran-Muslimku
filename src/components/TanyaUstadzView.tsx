@@ -315,30 +315,36 @@ export const TanyaUstadzView: React.FC<TanyaUstadzViewProps> = ({
                     <span>{msg.text}</span>
                   )}
                 </div>
-                <div className={`flex items-center gap-3 px-1 mt-0.5 ${isAi ? "justify-between w-full" : "justify-end"}`}>
+                <div className={`flex items-center gap-3 px-1 mt-1 ${isAi ? "justify-between w-full" : "justify-end"}`}>
                   {isAi && (
-                    <div className="flex items-center gap-1 flex-wrap">
+                    <div className="flex items-center gap-1 bg-white border border-slate-200/60 rounded-xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] px-1 py-0.5 mt-0.5">
                       <button 
                         onClick={() => handleSpeak(msg.text)}
-                        className="flex items-center gap-1.5 text-[10px] text-slate-400 hover:text-[#0F4C3A] hover:bg-emerald-50 px-2 py-1 rounded-md transition-all uppercase tracking-wider font-bold cursor-pointer"
+                        title="Baca Jawaban"
+                        className="p-1.5 text-slate-400 hover:text-[#0F4C3A] hover:bg-emerald-50 active:bg-emerald-100/50 rounded-lg transition-all cursor-pointer"
                       >
-                        <Volume2 className="w-3 h-3" /> Baca
+                        <Volume2 className="w-4 h-4" />
                       </button>
+                      <div className="w-px h-3.5 bg-slate-200/80"></div>
                       <button 
                         onClick={() => {
                           navigator.clipboard.writeText(msg.text);
                           addToast("Disalin", "Jawaban disalin ke clipboard.", "info");
                         }}
-                        className="flex items-center gap-1.5 text-[10px] text-slate-400 hover:text-[#0F4C3A] hover:bg-emerald-50 px-2 py-1 rounded-md transition-all uppercase tracking-wider font-bold cursor-pointer"
+                        title="Salin Jawaban"
+                        className="p-1.5 text-slate-400 hover:text-[#0F4C3A] hover:bg-emerald-50 active:bg-emerald-100/50 rounded-lg transition-all cursor-pointer"
                       >
-                        <Copy className="w-3 h-3" /> Salin
+                        <Copy className="w-4 h-4" />
                       </button>
+                      <div className="w-px h-3.5 bg-slate-200/80"></div>
                       <button 
                         onClick={() => handleExportPdf(msg.text, msg.timestamp)}
-                        className="flex items-center gap-1.5 text-[10px] text-slate-400 hover:text-[#0F4C3A] hover:bg-emerald-50 px-2 py-1 rounded-md transition-all uppercase tracking-wider font-bold cursor-pointer"
+                        title="Unduh PDF"
+                        className="p-1.5 text-slate-400 hover:text-[#0F4C3A] hover:bg-emerald-50 active:bg-emerald-100/50 rounded-lg transition-all cursor-pointer"
                       >
-                        <Download className="w-3 h-3" /> PDF
+                        <Download className="w-4 h-4" />
                       </button>
+                      <div className="w-px h-3.5 bg-slate-200/80"></div>
                       <button 
                         onClick={async () => {
                           if (navigator.share) {
@@ -355,14 +361,15 @@ export const TanyaUstadzView: React.FC<TanyaUstadzViewProps> = ({
                             addToast("Disalin", "Jawaban disalin karena browser tidak mendukung Web Share API.", "info");
                           }
                         }}
-                        className="flex items-center gap-1.5 text-[10px] text-slate-400 hover:text-[#0F4C3A] hover:bg-emerald-50 px-2 py-1 rounded-md transition-all uppercase tracking-wider font-bold cursor-pointer"
+                        title="Bagikan Jawaban"
+                        className="p-1.5 text-slate-400 hover:text-[#0F4C3A] hover:bg-emerald-50 active:bg-emerald-100/50 rounded-lg transition-all cursor-pointer"
                       >
-                        <Share2 className="w-3 h-3" /> Bagikan
+                        <Share2 className="w-4 h-4" />
                       </button>
                     </div>
                   )}
 
-                  <span className="text-[10px] text-slate-400 font-bold tracking-wider opacity-70 shrink-0">
+                  <span className="text-[10px] text-slate-400 font-bold tracking-wider opacity-70 shrink-0 self-end mb-1">
                     {msg.timestamp.toLocaleTimeString([], {
                       hour: "2-digit",
                       minute: "2-digit",
