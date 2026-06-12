@@ -51,7 +51,7 @@ export const Splash: React.FC<SplashProps> = ({ onFinish }) => {
   }, [onFinish]);
 
   return (
-    <div className="relative h-[100dvh] w-full bg-[#FDFBF7] font-sans flex flex-col justify-between overflow-hidden">
+    <div className="relative flex-1 min-h-[100dvh] w-full bg-[#FDFBF7] font-sans flex flex-col justify-between overflow-hidden">
       {/* Background Image provided by user */}
       <div 
         className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
