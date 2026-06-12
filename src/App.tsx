@@ -686,7 +686,7 @@ export default function App() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.98 }}
             transition={{ duration: 0.4, ease: [0.25, 0.8, 0.25, 1] }}
-            className="w-full h-full pb-32"
+            className="w-full h-full pb-6 sm:pb-8"
           >
             {renderTabContent()}
           </motion.div>
