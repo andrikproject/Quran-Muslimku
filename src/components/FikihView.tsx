@@ -66,14 +66,14 @@ export const FikihView: React.FC<FikihViewProps> = ({ onBack }) => {
   ];
 
   return (
-    <div className="flex flex-col h-full bg-white relative max-w-2xl mx-auto w-full pb-20">
-      <div className="sticky top-0 bg-white/90 backdrop-blur-md border-b border-slate-100 z-10 px-4 py-4 flex items-center gap-4">
-        <button onClick={onBack} className="p-2 hover:bg-slate-100 rounded-full cursor-pointer">
-          <ArrowLeft className="w-5 h-5 text-slate-700" />
+    <div className="flex flex-col h-full bg-[#FDFBF7] relative max-w-2xl mx-auto w-full pb-20">
+      <div className="sticky top-0 bg-[#FDFBF7]/90 backdrop-blur-xl border-b border-slate-200/60 z-20 px-5 py-4 flex items-center gap-4">
+        <button onClick={onBack} className="p-2 bg-white border border-slate-200 hover:bg-slate-50 hover:scale-105 rounded-full cursor-pointer transition-all shadow-sm">
+          <ArrowLeft className="w-5 h-5 text-[#0F4C3A]" />
         </button>
         <div>
-          <h3 className="font-bold text-slate-800 text-lg">Fikih & Panduan</h3>
-          <p className="text-[11px] font-semibold text-slate-500">Tuntunan Ibadah Dasar</p>
+          <h3 className="font-bold text-[#0F4C3A] text-lg leading-tight">Fikih & Panduan</h3>
+          <p className="text-[11px] font-bold text-emerald-700/70 uppercase tracking-widest mt-0.5">Tuntunan Ibadah Dasar</p>
         </div>
       </div>
 
@@ -87,26 +87,31 @@ export const FikihView: React.FC<FikihViewProps> = ({ onBack }) => {
               exit={{ opacity: 0 }}
               className="flex flex-col gap-4"
             >
-              <div className="bg-emerald-50 border border-emerald-100 p-5 rounded-[24px]">
-                 <h4 className="font-serif font-bold text-[#0F4C3A] text-lg">Tuntunan Beribadah</h4>
-                 <p className="text-xs text-emerald-800/80 font-medium mt-1">Panduan praktis syarat syukur menjadi hamba-Nya.</p>
+              <div className="bg-gradient-to-br from-[#0F4C3A] to-emerald-900 border border-emerald-800 p-6 rounded-[28px] relative overflow-hidden shadow-md">
+                 <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl"></div>
+                 <h4 className="font-serif font-bold text-[#ECC17A] text-xl relative z-10">Tuntunan Beribadah</h4>
+                 <p className="text-xs text-emerald-100/80 font-medium mt-1.5 relative z-10 leading-relaxed max-w-[85%]">
+                   Panduan praktis syarat syukur menjadi hamba-Nya. Pahami rukun dan tata cara ibadah harian.
+                 </p>
               </div>
               
-              <div className="grid gap-3">
+              <div className="grid gap-3.5 mt-2">
                 {guides.map((g) => (
                   <button
                     key={g.id}
                     onClick={() => setActiveCategory(g.id)}
-                    className="flex items-center gap-4 p-4 border border-slate-100 rounded-[20px] bg-white shadow-sm hover:border-emerald-200 hover:shadow-md transition-all cursor-pointer text-left"
+                    className="flex items-center gap-4 p-4 border border-slate-200/60 rounded-[24px] bg-white shadow-sm hover:border-emerald-300 hover:shadow-md transition-all cursor-pointer text-left group"
                   >
-                    <div className={`w-12 h-12 flex justify-center items-center rounded-[14px] ${g.color}`}>
+                    <div className={`w-14 h-14 flex justify-center items-center rounded-2xl ${g.color} group-hover:scale-105 transition-transform`}>
                       {g.icon}
                     </div>
                     <div className="flex-1">
-                       <h4 className="font-bold text-slate-800">{g.title}</h4>
-                       <p className="text-[11px] font-medium text-slate-500">{g.content.length} Poin Panduan</p>
+                       <h4 className="font-bold text-slate-800 text-[15px] group-hover:text-[#0F4C3A] transition-colors">{g.title}</h4>
+                       <p className="text-[11px] font-bold text-slate-400 mt-1 uppercase tracking-widest">{g.content.length} POIN PANDUAN</p>
                     </div>
-                    <ChevronRight className="w-5 h-5 text-slate-300" />
+                    <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-[#0F4C3A] transition-colors">
+                      <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-[#ECC17A] transition-colors" />
+                    </div>
                   </button>
                 ))}
               </div>
@@ -120,30 +125,37 @@ export const FikihView: React.FC<FikihViewProps> = ({ onBack }) => {
             >
               <button 
                 onClick={() => setActiveCategory(null)}
-                className="flex items-center gap-1.5 text-emerald-700 text-xs font-bold mb-4 ml-1 cursor-pointer hover:underline"
+                className="flex items-center gap-1.5 text-slate-500 hover:text-[#0F4C3A] bg-white border border-slate-200 px-4 py-2 rounded-xl text-xs font-bold mb-5 cursor-pointer max-w-max shadow-sm transition-all"
               >
-                <ArrowLeft className="w-3.5 h-3.5" /> Kembali
+                <ArrowLeft className="w-4 h-4" /> Kembali
               </button>
               
               {guides.filter(g => g.id === activeCategory).map(guide => (
-                <div key={guide.id} className="flex flex-col gap-5">
-                  <div className={`p-6 border rounded-[28px] ${guide.color} border-current/10`}>
-                    <div className="flex items-center gap-3 mb-2">
-                       {guide.icon}
-                       <h3 className="font-bold text-lg">{guide.title}</h3>
+                <div key={guide.id} className="flex flex-col gap-6">
+                  <div className={`p-6 border rounded-[28px] ${guide.color} border-current/10 relative overflow-hidden`}>
+                    <div className="absolute right-0 bottom-0 opacity-10 translate-x-1/4 translate-y-1/4">
+                      {React.cloneElement(guide.icon as React.ReactElement, { className: "w-32 h-32" })}
                     </div>
-                    <p className="text-[12px] opacity-80 font-medium">Langkah demi langkah menuju kesempurnaan beribadah.</p>
+                    <div className="flex items-center gap-3 mb-3 relative z-10">
+                       <div className="p-2 bg-white/40 backdrop-blur-sm rounded-xl">
+                         {guide.icon}
+                       </div>
+                       <h3 className="font-bold text-xl">{guide.title}</h3>
+                    </div>
+                    <p className="text-[13px] opacity-90 font-medium relative z-10 leading-relaxed">
+                      Langkah demi langkah menuju kesempurnaan beribadah sesuai syariat.
+                    </p>
                   </div>
 
-                  <div className="flex flex-col gap-3">
+                  <div className="flex flex-col gap-3.5">
                      {guide.content.map((item, id) => (
-                        <div key={item.title} className="bg-white border border-slate-100 rounded-[20px] p-4 flex gap-4">
-                           <span className="w-7 h-7 rounded-full bg-slate-100 text-slate-600 font-bold text-xs flex items-center justify-center shrink-0">
+                        <div key={item.title} className="bg-white border border-slate-200/60 rounded-[24px] p-5 flex gap-4 shadow-sm hover:shadow-md transition-shadow group">
+                           <span className="w-8 h-8 rounded-xl bg-[#FDFBF7] text-[#0F4C3A] border border-slate-200 font-bold text-sm flex items-center justify-center shrink-0 group-hover:bg-[#0F4C3A] group-hover:text-white transition-colors">
                              {id + 1}
                            </span>
                            <div>
-                              <h4 className="font-bold text-sm text-slate-800 mb-0.5">{item.title}</h4>
-                              <p className="text-xs text-slate-600 leading-relaxed font-medium">{item.desc}</p>
+                              <h4 className="font-bold text-[15px] text-slate-800 mb-1.5 leading-tight">{item.title}</h4>
+                              <p className="text-[13px] text-slate-600 leading-relaxed font-medium">{item.desc}</p>
                            </div>
                         </div>
                      ))}
