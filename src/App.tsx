@@ -36,6 +36,7 @@ import {
 import { Splash } from "./components/Splash";
 import { ToastContainer, ToastMessage } from "./components/Toast";
 import { JadwalSholatWidget } from "./components/JadwalSholatWidget";
+import { TargetKhatamWidget } from "./components/TargetKhatamWidget";
 import { QuranReader } from "./components/QuranReader";
 import { DoaHarianView } from "./components/DoaHarianView";
 import { CariView } from "./components/CariView";
@@ -952,6 +953,14 @@ export default function App() {
             {/* Realtime prayer schedule display */}
             <div id="jadwal-sholat-widget-container">
               <JadwalSholatWidget addToast={addToast} />
+            </div>
+
+            {/* Target Khatam Planner */}
+            <div id="target-khatam-widget-container">
+              <TargetKhatamWidget 
+                addToast={addToast} 
+                onNavigateToQuran={() => setActiveTab("quran")}
+              />
             </div>
           </div>
         );

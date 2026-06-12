@@ -149,6 +149,35 @@ export const FikihView: React.FC<FikihViewProps> = ({ onBack }) => {
       ],
       reference: "Kitab Fathul Mu'in",
     },
+    {
+      id: "haji_umrah",
+      title: "Haji & Umrah",
+      icon: <CheckCircle2 className="w-5 h-5" />,
+      color: "bg-teal-50 text-teal-700",
+      content: [
+        {
+          title: "Syarat Haji",
+          desc: "Islam, Baligh, Berakal, Merdeka, dan Mampu (Istitha'ah) baik fisik maupun finansial.",
+        },
+        {
+          title: "Rukun Haji",
+          desc: "1. Ihram (Niat), 2. Wukuf di Arafah, 3. Thawaf Ifadhah, 4. Sa'i, 5. Tahallul (Bercukur/Menggunting rambut), 6. Tertib.",
+        },
+        {
+          title: "Rukun Umrah",
+          desc: "Sama dengan Haji kecuali Wukuf di Arafah. (Ihram, Thawaf, Sa'i, Tahallul, Tertib).",
+        },
+        {
+          title: "Niat Ihram",
+          desc: "Niat Ihram Umrah: 'Labbaik Allahumma 'Umratan'. Niat Ihram Haji: 'Labbaik Allahumma Hajjan'. Wajib diucapkan dari Miqat.",
+        },
+        {
+          title: "Larangan Ihram",
+          desc: "Bagi pria memakai mukena/baju berjahit, menutup kepala. Umum: Memotong kuku/rambut, memakai wangi-wangian, berburu, menikah/menikahkan.",
+        },
+      ],
+      reference: "Kitab Al-Idhah fi Manasik Al-Hajj & Umrah",
+    },
   ];
 
   return (

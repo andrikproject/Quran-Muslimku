@@ -288,6 +288,13 @@ export const KalenderView: React.FC<KalenderViewProps> = ({
                         className={`absolute top-1 right-1 w-1.5 h-1.5 rounded-full ${isCuti ? "bg-amber-400" : "bg-red-500"}`}
                       ></div>
                     )}
+                    {/* Fasting (Puasa) marker */}
+                    {(dayObj.date.getDay() === 1 || dayObj.date.getDay() === 4) && dayObj.isCurrentMonth && (
+                      <div title="Puasa Sunnah Senin Kamis" className="absolute bottom-1 right-1 w-1.5 h-1.5 bg-blue-400 rounded-full"></div>
+                    )}
+                    {(["13", "14", "15"].includes(getHijriDate(dayObj.date).split(" ")[0])) && dayObj.isCurrentMonth && (
+                      <div title="Puasa Ayyamul Bidh" className="absolute bottom-1 left-1 w-1.5 h-1.5 bg-indigo-500 rounded-full"></div>
+                    )}
                   </div>
                 );
               })}
@@ -308,6 +315,16 @@ export const KalenderView: React.FC<KalenderViewProps> = ({
               <div className="flex items-center gap-1.5">
                 <div className="w-2 h-2 bg-amber-400 rounded-full"></div> Cuti
                 Bersama
+              </div>
+              <div className="flex flex-col gap-2 w-full text-center sm:text-left mt-2 border-t pt-3">
+                <div className="flex flex-wrap items-center justify-center gap-4 text-[10px] font-semibold text-slate-500">
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-2 h-2 bg-blue-400 rounded-full"></div> Puasa Senin Kamis
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-2 h-2 bg-indigo-500 rounded-full"></div> Puasa Ayyamul Bidh
+                  </div>
+                </div>
               </div>
             </div>
 
