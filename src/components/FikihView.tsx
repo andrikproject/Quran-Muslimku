@@ -241,7 +241,7 @@ export const FikihView: React.FC<FikihViewProps> = ({ onBack }) => {
                       className={`p-6 border rounded-[28px] ${guide.color} border-current/10 relative overflow-hidden`}
                     >
                       <div className="absolute right-0 bottom-0 opacity-10 translate-x-1/4 translate-y-1/4">
-                        {React.cloneElement(guide.icon as React.ReactElement, {
+                        {React.cloneElement(guide.icon as React.ReactElement<any>, {
                           className: "w-32 h-32",
                         })}
                       </div>

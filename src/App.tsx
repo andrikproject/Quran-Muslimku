@@ -1083,6 +1083,18 @@ export default function App() {
         </div>
       ) : null}
 
+      {/* GLOBAL HEADER FOR PRIMARY TABS */}
+      {["quran", "doa", "cari", "profil"].includes(activeTab) && !showSubMenu ? (
+        <div className="sticky top-0 bg-[#FDFBF7]/90 backdrop-blur-xl border-b border-slate-200/60 z-30 px-5 py-4 flex items-center justify-center">
+          <h2 className="font-serif font-bold text-lg text-[#0F4C3A]">
+            {activeTab === "quran" && "Mushaf Al-Qur'an"}
+            {activeTab === "doa" && "Kumpulan Doa Harian"}
+            {activeTab === "cari" && "Pencarian & AI"}
+            {activeTab === "profil" && "Profil Pengaturan"}
+          </h2>
+        </div>
+      ) : null}
+
       {/* 2. DYNAMIC WORK SPACE */}
       <main
         className={`flex-1 w-full mx-auto relative z-10 
@@ -1101,7 +1113,7 @@ export default function App() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.98 }}
             transition={{ duration: 0.4, ease: [0.25, 0.8, 0.25, 1] }}
-            className="w-full h-full pb-6 sm:pb-8"
+            className="w-full h-full pb-24 sm:pb-28"
           >
             {renderTabContent()}
           </motion.div>

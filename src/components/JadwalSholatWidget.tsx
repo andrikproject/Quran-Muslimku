@@ -260,7 +260,7 @@ export const JadwalSholatWidget: React.FC<SholatWidgetProps> = ({
               badge: "/icons/icon-192x192.png",
               vibrate: [300, 100, 300, 100, 300],
               tag: `sholat-${targetSholat.name.toLowerCase()}`,
-            });
+            } as any);
           });
         }
 
