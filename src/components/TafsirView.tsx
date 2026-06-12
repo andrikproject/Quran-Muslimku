@@ -84,18 +84,16 @@ export const TafsirView: React.FC<TafsirViewProps> = ({ onBack, addToast }) => {
 
   if (selectedSurahData) {
     return (
-      <div className="flex flex-col h-full bg-white relative">
-        <div className="sticky top-0 bg-white/80 backdrop-blur-md border-b border-slate-100 z-10 p-4">
-           <div className="flex items-center gap-4">
-             <button onClick={() => setSelectedSurahData(null)} className="p-2 hover:bg-slate-100 rounded-full">
-               <ArrowLeft className="w-5 h-5 text-slate-600" />
-             </button>
-             <div>
-               <h3 className="font-bold text-slate-800 text-lg flex items-center gap-2">
-                 Tafsir {selectedSurahData.namaLatin}
-               </h3>
-               <p className="text-xs font-semibold text-slate-500">Tafsir Tahlili Kemenag RI</p>
-             </div>
+      <div className="flex flex-col h-full bg-[#FDFBF7] relative max-w-2xl mx-auto w-full pb-20">
+        <div className="sticky top-0 bg-[#FDFBF7]/90 backdrop-blur-xl border-b border-slate-200/60 z-20 px-5 py-4 flex items-center gap-4">
+           <button onClick={() => setSelectedSurahData(null)} className="p-2 bg-white border border-slate-200 hover:bg-slate-50 hover:scale-105 rounded-full cursor-pointer transition-all shadow-sm">
+             <ArrowLeft className="w-5 h-5 text-[#0F4C3A]" />
+           </button>
+           <div>
+             <h3 className="font-bold text-[#0F4C3A] text-lg leading-tight">
+               Tafsir Surah {selectedSurahData.namaLatin}
+             </h3>
+             <p className="text-[11px] font-bold text-emerald-700/70 uppercase tracking-widest mt-0.5">Tafsir Tahlili Kemenag RI</p>
            </div>
         </div>
 
@@ -124,19 +122,21 @@ export const TafsirView: React.FC<TafsirViewProps> = ({ onBack, addToast }) => {
   }
 
   return (
-    <div className="flex flex-col py-8 px-4 sm:px-6 w-full max-w-2xl mx-auto h-full">
-      <div className="flex flex-col items-center mb-6">
-         <span className="text-[10px] font-extrabold text-slate-400 tracking-widest block uppercase mb-1">
-          KEMENAG RI
-        </span>
-        <h3 className="font-serif font-bold text-[#0F4C3A] text-2xl flex items-center gap-2">
-          <FileText className="w-6 h-6 text-emerald-600" />
-           Tafsir Al-Qur'an
-        </h3>
-        <p className="text-xs text-slate-500 font-semibold mt-1 text-center">Baca penjelasan surah dan Asbabun Nuzul secara detail.</p>
+    <div className="flex flex-col h-full bg-[#FDFBF7] relative max-w-2xl mx-auto w-full pb-20">
+      <div className="sticky top-0 bg-[#FDFBF7]/90 backdrop-blur-xl border-b border-slate-200/60 z-20 px-5 py-4 flex items-center gap-4">
+        {onBack && (
+          <button onClick={onBack} className="p-2 bg-white border border-slate-200 hover:bg-slate-50 hover:scale-105 rounded-full cursor-pointer transition-all shadow-sm">
+            <ArrowLeft className="w-5 h-5 text-[#0F4C3A]" />
+          </button>
+        )}
+        <div>
+          <h3 className="font-bold text-[#0F4C3A] text-lg leading-tight">Tafsir Al-Qur'an</h3>
+          <p className="text-[11px] font-bold text-emerald-700/70 uppercase tracking-widest mt-0.5">KEMENAG RI</p>
+        </div>
       </div>
 
-      <div className="relative mb-6">
+      <div className="flex flex-col py-8 px-4 sm:px-6 w-full max-w-2xl mx-auto h-full">
+        <div className="relative mb-6">
         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
           <Search className="w-4 h-4 text-emerald-700/50" />
         </div>
@@ -192,6 +192,7 @@ export const TafsirView: React.FC<TafsirViewProps> = ({ onBack, addToast }) => {
           </div>
         )}
       </div>
+    </div>
     </div>
   );
 };

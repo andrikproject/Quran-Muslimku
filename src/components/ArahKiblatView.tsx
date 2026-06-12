@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Compass, AlertTriangle, MapPin } from "lucide-react";
+import { Compass, AlertTriangle, MapPin, ArrowLeft } from "lucide-react";
 
 interface ArahKiblatViewProps {
   addToast: (title: string, body: string, type: "success" | "info" | "warning" | "notification") => void;
+  onBack?: () => void;
 }
 
-export const ArahKiblatView: React.FC<ArahKiblatViewProps> = ({ addToast }) => {
+export const ArahKiblatView: React.FC<ArahKiblatViewProps> = ({ addToast, onBack }) => {
   const [deviceHeading, setDeviceHeading] = useState(0);
   const [manualHeading, setManualHeading] = useState(135);
   const [supportsSensor, setSupportsSensor] = useState(false);
@@ -107,8 +108,21 @@ export const ArahKiblatView: React.FC<ArahKiblatViewProps> = ({ addToast }) => {
   const isAligned = Math.abs(activeCompassHeading - targetKiblatAngle) <= 6;
 
   return (
-    <div className="flex flex-col gap-6 items-center px-4 py-8 max-w-md mx-auto">
-      <div className="flex flex-col items-center mb-2">
+    <div className="flex flex-col h-full bg-[#FDFBF7] relative max-w-2xl mx-auto w-full pb-20">
+      <div className="sticky top-0 bg-[#FDFBF7]/90 backdrop-blur-xl border-b border-slate-200/60 z-20 px-5 py-4 flex items-center gap-4">
+        {onBack && (
+          <button onClick={onBack} className="p-2 bg-white border border-slate-200 hover:bg-slate-50 hover:scale-105 rounded-full cursor-pointer transition-all shadow-sm">
+            <ArrowLeft className="w-5 h-5 text-[#0F4C3A]" />
+          </button>
+        )}
+        <div>
+          <h3 className="font-bold text-[#0F4C3A] text-lg leading-tight">Arah Kiblat</h3>
+          <p className="text-[11px] font-bold text-emerald-700/70 uppercase tracking-widest mt-0.5">Kompas Terintegrasi</p>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-6 items-center px-4 py-8 w-full max-w-md mx-auto">
+        <div className="flex flex-col items-center mb-2">
          <span className="text-[10px] font-extrabold text-slate-400 tracking-widest block uppercase mb-1">
           NAVIGASI
         </span>
@@ -236,6 +250,7 @@ export const ArahKiblatView: React.FC<ArahKiblatViewProps> = ({ addToast }) => {
             </div>
           )}
 
+      </div>
       </div>
     </div>
   );

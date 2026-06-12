@@ -207,13 +207,27 @@ export const JadwalSholatWidget: React.FC<SholatWidgetProps> = ({ addToast }) =>
     if (targetSholat.remaining === "00:00:01" || targetSholat.remaining === "00:00:00") {
       const canonicalName = targetSholat.name.toLowerCase();
       if (notifiedPrayers[canonicalName]) {
-        // Trigger push-like adhan
+        // Trigger in-app toast
         addToast(
           `⏱️ Waktu Sholat Tiba!`,
           `Saatnya menunaikan ibadah Sholat ${targetSholat.name} untuk wilayah ${selectedCity.lokasi}. Mari bersiap menghadap-Nya.`,
           "notification"
         );
-        // Play sweet notification tone (synthesized or direct audiotone)
+        
+        // Trigger Native OS push notification via service worker
+        if ("Notification" in window && Notification.permission === "granted" && "serviceWorker" in navigator) {
+          navigator.serviceWorker.ready.then((registration) => {
+            registration.showNotification(`Waktu Sholat ${targetSholat.name}`, {
+              body: `Telah masuk waktu sholat ${targetSholat.name} untuk wilayah ${selectedCity.lokasi}.`,
+              icon: '/icons/icon-192x192.png',
+              badge: '/icons/icon-192x192.png',
+              vibrate: [300, 100, 300, 100, 300],
+              tag: `sholat-${targetSholat.name.toLowerCase()}`
+            });
+          });
+        }
+
+        // Play adhan tone
         playAdhanTone(targetSholat.name);
       }
     }
@@ -393,6 +407,14 @@ export const JadwalSholatWidget: React.FC<SholatWidgetProps> = ({ addToast }) =>
   const togglePrayerNotification = (prayer: string) => {
     setNotifiedPrayers((prev) => {
       const updated = { ...prev, [prayer]: !prev[prayer] };
+      
+      // Request service worker / browser notification permission if activated
+      if (updated[prayer] && "Notification" in window) {
+        if (Notification.permission !== "granted" && Notification.permission !== "denied") {
+          Notification.requestPermission();
+        }
+      }
+
       addToast(
         updated[prayer] ? "Alarm Aktif" : "Alarm Dimatikan",
         `Pengingat adzan Sholat ${prayer.toUpperCase()} sekarang ${updated[prayer] ? "aktif" : "nonaktif"}.`,

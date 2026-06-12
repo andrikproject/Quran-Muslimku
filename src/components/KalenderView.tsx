@@ -3,13 +3,14 @@
  * @app Quran Saku
  */
 import React, { useState, useEffect, useMemo } from "react";
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Info } from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Info, ArrowLeft } from "lucide-react";
 
 interface KalenderViewProps {
   addToast: (title: string, body: string, type: "success" | "info" | "warning" | "notification") => void;
+  onBack?: () => void;
 }
 
-export const KalenderView: React.FC<KalenderViewProps> = ({ addToast }) => {
+export const KalenderView: React.FC<KalenderViewProps> = ({ addToast, onBack }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [holidays, setHolidays] = useState<Record<string, { summary: string }>>({});
   
@@ -130,8 +131,21 @@ export const KalenderView: React.FC<KalenderViewProps> = ({ addToast }) => {
   }, [holidays, currentDate]);
 
   return (
-    <div className="flex flex-col gap-6 w-full py-8">
-      <div className="flex flex-col items-center mb-2">
+    <div className="flex flex-col h-full bg-[#FDFBF7] relative max-w-2xl mx-auto w-full pb-20">
+      <div className="sticky top-0 bg-[#FDFBF7]/90 backdrop-blur-xl border-b border-slate-200/60 z-20 px-5 py-4 flex items-center gap-4">
+        {onBack && (
+          <button onClick={onBack} className="p-2 bg-white border border-slate-200 hover:bg-slate-50 hover:scale-105 rounded-full cursor-pointer transition-all shadow-sm">
+            <ArrowLeft className="w-5 h-5 text-[#0F4C3A]" />
+          </button>
+        )}
+        <div>
+          <h3 className="font-bold text-[#0F4C3A] text-lg leading-tight">Kalender Hijriah</h3>
+          <p className="text-[11px] font-bold text-emerald-700/70 uppercase tracking-widest mt-0.5">Penanggalan Islam & Libur</p>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-6 w-full py-8 px-4">
+        <div className="flex flex-col items-center mb-2">
          <span className="text-[10px] font-extrabold text-slate-400 tracking-widest block uppercase mb-1">
           WAKTU & TANGGAL
         </span>
@@ -256,6 +270,7 @@ export const KalenderView: React.FC<KalenderViewProps> = ({ addToast }) => {
         </div>
 
       </div>
+    </div>
     </div>
   );
 };

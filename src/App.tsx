@@ -4,11 +4,32 @@
  */
 import React, { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { 
-  Home, BookOpen, Search, Heart, User, Bell, ChevronRight, 
-  BookMarked, HelpCircle, FileText, Calendar, Clock, Sparkles, 
-  Share2, Play, Volume2, History, RotateCcw, PenTool, HandHeart,
-  Compass, Scroll, LibraryBig, LayoutGrid, ArrowLeft
+import {
+  Home,
+  BookOpen,
+  Search,
+  Heart,
+  User,
+  Bell,
+  ChevronRight,
+  BookMarked,
+  HelpCircle,
+  FileText,
+  Calendar,
+  Clock,
+  Sparkles,
+  Share2,
+  Play,
+  Volume2,
+  History,
+  RotateCcw,
+  PenTool,
+  HandHeart,
+  Compass,
+  Scroll,
+  LibraryBig,
+  LayoutGrid,
+  ArrowLeft,
 } from "lucide-react";
 
 // Components
@@ -32,26 +53,140 @@ import { Bookmark, Note, TilawahProgress } from "./types";
 import { App as CapacitorApp } from "@capacitor/app";
 
 const AYAT_HARIAN_COLLECTION = [
-  { surahId: 94, surahName: "Asy-Syarh", verseId: 5, arab: "فَإِنَّ مَعَ الْعُسْرِ يُسْرًا", indonesian: "Karena sesungguhnya sesudah kesulitan itu ada kemudahan." },
-  { surahId: 94, surahName: "Asy-Syarh", verseId: 6, arab: "إِنَّ مَعَ الْعُسْرِ يُسْرًا", indonesian: "Sesungguhnya sesudah kesulitan itu ada kemudahan." },
-  { surahId: 55, surahName: "Ar-Rahman", verseId: 60, arab: "هَلْ جَزَاءُ الْإِحْسَانِ إِلَّا الْإِحْسَانُ", indonesian: "Tidak ada balasan kebaikan kecuali kebaikan (pula)." },
-  { surahId: 2, surahName: "Al-Baqarah", verseId: 152, arab: "فَاذْكُرُونِي أَذْكُرْكُمْ وَاشْكُرُوا لِي وَلَا تَكْفُرُونِ", indonesian: "Maka ingatlah kepada-Ku, Aku pun akan ingat kepadamu. Bersyukurlah kepada-Ku, dan janganlah kamu ingkar kepada-Ku." },
-  { surahId: 2, surahName: "Al-Baqarah", verseId: 186, arab: "وَإِذَا سَأَلَكَ عِبَادِي عَنِّي فَإِنِّي قَرِيبٌ", indonesian: "Dan apabila hamba-hamba-Ku bertanya kepadamu tentang Aku, maka (jawablah), bahwasanya Aku adalah dekat." },
-  { surahId: 2, surahName: "Al-Baqarah", verseId: 286, arab: "لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسْعَهَا", indonesian: "Allah tidak membebani seseorang melainkan sesuai dengan kesanggupannya." },
-  { surahId: 3, surahName: "Ali 'Imran", verseId: 139, arab: "وَلَا تَهِنُوا وَلَا تَحْزَنُوا وَأَنْتُمُ الْأَعْلَوْنَ إِنْ كُنْتُمْ مُؤْمِنِينَ", indonesian: "Janganlah kamu bersikap lemah, dan janganlah (pula) kamu bersedih hati, padahal kamulah orang-orang yang paling tinggi derajatnya." },
-  { surahId: 3, surahName: "Ali 'Imran", verseId: 173, arab: "حَسْبُنَا اللَّهُ وَنِعْمَ الْوَكِيلُ", indonesian: "Cukuplah Allah menjadi Penolong kami dan Allah adalah sebaik-baik Pelindung." },
-  { surahId: 13, surahName: "Ar-Ra'd", verseId: 28, arab: "أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ", indonesian: "Ingatlah, hanya dengan mengingati Allah-lah hati menjadi tenteram." },
-  { surahId: 14, surahName: "Ibrahim", verseId: 7, arab: "لَئِنْ شَكَرْتُمْ لَأَزِيدَنَّكُمْ", indonesian: "Sesungguhnya jika kamu bersyukur, pasti Kami akan menambah (nikmat) kepadamu." },
-  { surahId: 20, surahName: "Ta-Ha", verseId: 114, arab: "وَقُلْ رَبِّ زِدْنِي عِلْمًا", indonesian: "Dan katakanlah: 'Ya Tuhanku, tambahkanlah kepadaku ilmu pengetahuan.'" },
-  { surahId: 40, surahName: "Ghafir", verseId: 60, arab: "وَقَالَ رَبُّكُمُ ادْعُونِي أَسْتَجِبْ لَكُمْ", indonesian: "Dan Tuhanmu berfirman: 'Berdoalah kepada-Ku, niscaya akan Kuperkenankan bagimu.'" },
-  { surahId: 65, surahName: "At-Talaq", verseId: 2, arab: "وَمَنْ يَتَّقِ اللَّهَ يَجْعَلْ لَهُ مَخْرَجًا", indonesian: "Barangsiapa bertakwa kepada Allah niscaya Dia akan membukakan jalan keluar baginya." },
-  { surahId: 65, surahName: "At-Talaq", verseId: 3, arab: "وَيَرْزُقْهُ مِنْ حَيْثُ لَا يَحْتَسِبُ", indonesian: "Dan Dia memberinya rezeki dari arah yang tidak disangka-sangkanya." },
-  { surahId: 93, surahName: "Ad-Duha", verseId: 5, arab: "وَلَسَوْفَ يُعْطِيكَ رَبُّكَ فَتَرْضَىٰ", indonesian: "Dan sungguh, kelak Tuhanmu pasti memberikan karunia-Nya kepadamu, sehingga engkau menjadi puas." }
+  {
+    surahId: 94,
+    surahName: "Asy-Syarh",
+    verseId: 5,
+    arab: "فَإِنَّ مَعَ الْعُسْرِ يُسْرًا",
+    indonesian: "Karena sesungguhnya sesudah kesulitan itu ada kemudahan.",
+  },
+  {
+    surahId: 94,
+    surahName: "Asy-Syarh",
+    verseId: 6,
+    arab: "إِنَّ مَعَ الْعُسْرِ يُسْرًا",
+    indonesian: "Sesungguhnya sesudah kesulitan itu ada kemudahan.",
+  },
+  {
+    surahId: 55,
+    surahName: "Ar-Rahman",
+    verseId: 60,
+    arab: "هَلْ جَزَاءُ الْإِحْسَانِ إِلَّا الْإِحْسَانُ",
+    indonesian: "Tidak ada balasan kebaikan kecuali kebaikan (pula).",
+  },
+  {
+    surahId: 2,
+    surahName: "Al-Baqarah",
+    verseId: 152,
+    arab: "فَاذْكُرُونِي أَذْكُرْكُمْ وَاشْكُرُوا لِي وَلَا تَكْفُرُونِ",
+    indonesian:
+      "Maka ingatlah kepada-Ku, Aku pun akan ingat kepadamu. Bersyukurlah kepada-Ku, dan janganlah kamu ingkar kepada-Ku.",
+  },
+  {
+    surahId: 2,
+    surahName: "Al-Baqarah",
+    verseId: 186,
+    arab: "وَإِذَا سَأَلَكَ عِبَادِي عَنِّي فَإِنِّي قَرِيبٌ",
+    indonesian:
+      "Dan apabila hamba-hamba-Ku bertanya kepadamu tentang Aku, maka (jawablah), bahwasanya Aku adalah dekat.",
+  },
+  {
+    surahId: 2,
+    surahName: "Al-Baqarah",
+    verseId: 286,
+    arab: "لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسْعَهَا",
+    indonesian:
+      "Allah tidak membebani seseorang melainkan sesuai dengan kesanggupannya.",
+  },
+  {
+    surahId: 3,
+    surahName: "Ali 'Imran",
+    verseId: 139,
+    arab: "وَلَا تَهِنُوا وَلَا تَحْزَنُوا وَأَنْتُمُ الْأَعْلَوْنَ إِنْ كُنْتُمْ مُؤْمِنِينَ",
+    indonesian:
+      "Janganlah kamu bersikap lemah, dan janganlah (pula) kamu bersedih hati, padahal kamulah orang-orang yang paling tinggi derajatnya.",
+  },
+  {
+    surahId: 3,
+    surahName: "Ali 'Imran",
+    verseId: 173,
+    arab: "حَسْبُنَا اللَّهُ وَنِعْمَ الْوَكِيلُ",
+    indonesian:
+      "Cukuplah Allah menjadi Penolong kami dan Allah adalah sebaik-baik Pelindung.",
+  },
+  {
+    surahId: 13,
+    surahName: "Ar-Ra'd",
+    verseId: 28,
+    arab: "أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ",
+    indonesian:
+      "Ingatlah, hanya dengan mengingati Allah-lah hati menjadi tenteram.",
+  },
+  {
+    surahId: 14,
+    surahName: "Ibrahim",
+    verseId: 7,
+    arab: "لَئِنْ شَكَرْتُمْ لَأَزِيدَنَّكُمْ",
+    indonesian:
+      "Sesungguhnya jika kamu bersyukur, pasti Kami akan menambah (nikmat) kepadamu.",
+  },
+  {
+    surahId: 20,
+    surahName: "Ta-Ha",
+    verseId: 114,
+    arab: "وَقُلْ رَبِّ زِدْنِي عِلْمًا",
+    indonesian:
+      "Dan katakanlah: 'Ya Tuhanku, tambahkanlah kepadaku ilmu pengetahuan.'",
+  },
+  {
+    surahId: 40,
+    surahName: "Ghafir",
+    verseId: 60,
+    arab: "وَقَالَ رَبُّكُمُ ادْعُونِي أَسْتَجِبْ لَكُمْ",
+    indonesian:
+      "Dan Tuhanmu berfirman: 'Berdoalah kepada-Ku, niscaya akan Kuperkenankan bagimu.'",
+  },
+  {
+    surahId: 65,
+    surahName: "At-Talaq",
+    verseId: 2,
+    arab: "وَمَنْ يَتَّقِ اللَّهَ يَجْعَلْ لَهُ مَخْرَجًا",
+    indonesian:
+      "Barangsiapa bertakwa kepada Allah niscaya Dia akan membukakan jalan keluar baginya.",
+  },
+  {
+    surahId: 65,
+    surahName: "At-Talaq",
+    verseId: 3,
+    arab: "وَيَرْزُقْهُ مِنْ حَيْثُ لَا يَحْتَسِبُ",
+    indonesian:
+      "Dan Dia memberinya rezeki dari arah yang tidak disangka-sangkanya.",
+  },
+  {
+    surahId: 93,
+    surahName: "Ad-Duha",
+    verseId: 5,
+    arab: "وَلَسَوْفَ يُعْطِيكَ رَبُّكَ فَتَرْضَىٰ",
+    indonesian:
+      "Dan sungguh, kelak Tuhanmu pasti memberikan karunia-Nya kepadamu, sehingga engkau menjadi puas.",
+  },
 ];
 
 export default function App() {
   const [showSplash, setShowSplash] = useState(true);
-  const [activeTab, setActiveTab] = useState<"beranda" | "quran" | "cari" | "doa" | "profil" | "tasbih" | "kiblat" | "kalender" | "tafsir" | "hadits" | "fikih">("beranda");
+  const [activeTab, setActiveTab] = useState<
+    | "beranda"
+    | "quran"
+    | "cari"
+    | "doa"
+    | "profil"
+    | "tasbih"
+    | "kiblat"
+    | "kalender"
+    | "tafsir"
+    | "hadits"
+    | "fikih"
+  >("beranda");
   const [showSubMenu, setShowSubMenu] = useState(false);
 
   // Sync state to History API for Android/Browser Back Button Support
@@ -71,12 +206,24 @@ export default function App() {
   useEffect(() => {
     const currentState = window.history.state;
     // If the state is different from what's currently in history, push a new state
-    if (!currentState || currentState.tab !== activeTab || currentState.sub !== showSubMenu) {
+    if (
+      !currentState ||
+      currentState.tab !== activeTab ||
+      currentState.sub !== showSubMenu
+    ) {
       // If it's the very first load and we're just syncing defaults, replace instead of push
       if (!currentState && activeTab === "beranda" && !showSubMenu) {
-        window.history.replaceState({ tab: activeTab, sub: showSubMenu }, "", `#${activeTab}`);
+        window.history.replaceState(
+          { tab: activeTab, sub: showSubMenu },
+          "",
+          `#${activeTab}`,
+        );
       } else {
-        window.history.pushState({ tab: activeTab, sub: showSubMenu }, "", `#${activeTab}${showSubMenu ? '-menu' : ''}`);
+        window.history.pushState(
+          { tab: activeTab, sub: showSubMenu },
+          "",
+          `#${activeTab}${showSubMenu ? "-menu" : ""}`,
+        );
       }
     }
   }, [activeTab, showSubMenu]);
@@ -93,19 +240,26 @@ export default function App() {
       }
     };
 
-    const backListener = CapacitorApp.addListener('backButton', handleBackButton);
+    const backListener = CapacitorApp.addListener(
+      "backButton",
+      handleBackButton,
+    );
 
     return () => {
-      backListener.then(listener => listener.remove());
+      backListener.then((listener) => listener.remove());
     };
   }, [activeTab, showSubMenu]);
 
   // Notifications/Toasts System
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
-  const addToast = (title: string, body: string, type: ToastMessage["type"]) => {
+  const addToast = (
+    title: string,
+    body: string,
+    type: ToastMessage["type"],
+  ) => {
     const id = Math.random().toString(36).substring(2, 9);
     setToasts((prev) => [...prev, { id, title, body, type }]);
-    
+
     // Auto remove toast in 4.5 seconds
     setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== id));
@@ -120,41 +274,55 @@ export default function App() {
     const cached = localStorage.getItem("qs_bookmarks");
     return cached ? JSON.parse(cached) : [];
   });
-  
+
   // State: Notes
   const [notes, setNotes] = useState<Note[]>(() => {
     const cached = localStorage.getItem("qs_notes");
     return cached ? JSON.parse(cached) : [];
   });
-  
+
   // State: Tilawah logs & progress tracker
-  const [tilawahProgress, setTilawahProgress] = useState<TilawahProgress>(() => {
-    const cached = localStorage.getItem("qs_progress");
-    return cached ? JSON.parse(cached) : {
-      currentSurah: 1,
-      currentSurahName: "Al-Fatihah",
-      currentAyat: 1,
-      totalAyat: 7,
-      progressPercentage: 0
-    };
-  });
+  const [tilawahProgress, setTilawahProgress] = useState<TilawahProgress>(
+    () => {
+      const cached = localStorage.getItem("qs_progress");
+      return cached
+        ? JSON.parse(cached)
+        : {
+            currentSurah: 1,
+            currentSurahName: "Al-Fatihah",
+            currentAyat: 1,
+            totalAyat: 7,
+            progressPercentage: 0,
+          };
+    },
+  );
 
   // Daily Reading Target
   const [dailyReadingTime, setDailyReadingTime] = useState(() => {
     return parseInt(localStorage.getItem("qs_daily_time") || "0");
   });
-  
+
   const updateDailyReadingTime = (incrementMins: number) => {
     const newVal = Math.min(dailyReadingTime + incrementMins, 15);
     setDailyReadingTime(newVal);
     localStorage.setItem("qs_daily_time", newVal.toString());
-    addToast("Waktu Berlalu", `Tercatat +${incrementMins} menit untuk target harian Anda.`, "success");
+    addToast(
+      "Waktu Berlalu",
+      `Tercatat +${incrementMins} menit untuk target harian Anda.`,
+      "success",
+    );
   };
 
   // State: User profile parameters
-  const [userName, setUserName] = useState(() => localStorage.getItem("qs_username") || "Habib Ismail Al Qadri");
-  const [dailyGoalMinutes, setDailyGoalMinutes] = useState(() => Number(localStorage.getItem("qs_goal")) || 15);
-  const [geminiApiKey, setGeminiApiKey] = useState(() => localStorage.getItem("qs_gemini_key") || "");
+  const [userName, setUserName] = useState(
+    () => localStorage.getItem("qs_username") || "Habib Ismail Al Qadri",
+  );
+  const [dailyGoalMinutes, setDailyGoalMinutes] = useState(
+    () => Number(localStorage.getItem("qs_goal")) || 15,
+  );
+  const [geminiApiKey, setGeminiApiKey] = useState(
+    () => localStorage.getItem("qs_gemini_key") || "",
+  );
 
   // Jump from Home / search directly into Specific Surah details
   const [deepLinkSurah, setDeepLinkSurah] = useState<number | null>(null);
@@ -181,18 +349,25 @@ export default function App() {
   };
 
   const handleRemoveBookmark = (surahNo: number, ayatNo: number) => {
-    const updated = bookmarks.filter((b) => !(b.surahNo === surahNo && b.ayatNo === ayatNo));
+    const updated = bookmarks.filter(
+      (b) => !(b.surahNo === surahNo && b.ayatNo === ayatNo),
+    );
     setBookmarks(updated);
   };
 
-  const handleAddNote = (surahNo: number, surahName: string, ayatNo: number, txt: string) => {
+  const handleAddNote = (
+    surahNo: number,
+    surahName: string,
+    ayatNo: number,
+    txt: string,
+  ) => {
     const entry: Note = {
       id: Math.random().toString(36).substring(2, 9),
       surahNo,
       surahName,
       ayatNo,
       text: txt,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
     const updated = [entry, ...notes];
     setNotes(updated);
@@ -203,14 +378,19 @@ export default function App() {
     setNotes(updated);
   };
 
-  const handleUpdateTilawahProgress = (surahNo: number, surahName: string, ayatNo: number, totalAyat: number) => {
+  const handleUpdateTilawahProgress = (
+    surahNo: number,
+    surahName: string,
+    ayatNo: number,
+    totalAyat: number,
+  ) => {
     const percentage = Math.round((ayatNo / totalAyat) * 100);
     const updated: TilawahProgress = {
       currentSurah: surahNo,
       currentSurahName: surahName,
       currentAyat: ayatNo,
       totalAyat,
-      progressPercentage: percentage
+      progressPercentage: percentage,
     };
     setTilawahProgress(updated);
   };
@@ -240,7 +420,7 @@ export default function App() {
   // Get localized Islamic greeting and greeting based on current local time
   const [greetingText, setGreetingText] = useState("Selamat datang!");
   const [timeOfDay, setTimeOfDay] = useState("malam");
-  
+
   useEffect(() => {
     const hr = new Date().getHours();
     if (hr >= 4 && hr < 11) {
@@ -264,7 +444,11 @@ export default function App() {
     const ayats = [];
     const startIndex = (dayOfYear * 5) % AYAT_HARIAN_COLLECTION.length;
     for (let i = 0; i < 5; i++) {
-      ayats.push(AYAT_HARIAN_COLLECTION[(startIndex + i) % AYAT_HARIAN_COLLECTION.length]);
+      ayats.push(
+        AYAT_HARIAN_COLLECTION[
+          (startIndex + i) % AYAT_HARIAN_COLLECTION.length
+        ],
+      );
     }
     return ayats;
   }, [dayOfYear]);
@@ -283,7 +467,11 @@ export default function App() {
   const shareAyatOfTheDay = () => {
     const text = `*Ayat Hari Ini (QS ${ayatOfTheDay.surahName}:${ayatOfTheDay.verseId})*\n\n${ayatOfTheDay.arab}\n\n"${ayatOfTheDay.indonesian}"\n\n- Dibagikan via Quran Saku App -`;
     navigator.clipboard.writeText(text);
-    addToast("Teks Disalin", "Ayat hari ini disalin ke clipboard untuk Anda bagikan.", "success");
+    addToast(
+      "Teks Disalin",
+      "Ayat hari ini disalin ke clipboard untuk Anda bagikan.",
+      "success",
+    );
   };
 
   // Switcher rendering of tabs
@@ -298,7 +486,9 @@ export default function App() {
               <div className="flex justify-between items-center text-slate-500 text-[11px] font-semibold">
                 <div className="flex items-center gap-1.5 text-amber-600">
                   <Sparkles className="w-4 h-4 fill-amber-100/55" />
-                  <span className="font-extrabold text-slate-800 font-sans tracking-wide">Ayat Hari Ini</span>
+                  <span className="font-extrabold text-slate-800 font-sans tracking-wide">
+                    Ayat Hari Ini
+                  </span>
                 </div>
                 <div className="flex gap-1.5 items-center">
                   <AnimatePresence mode="wait" initial={false}>
@@ -310,7 +500,8 @@ export default function App() {
                       transition={{ duration: 0.3 }}
                       className="font-sans tracking-wide text-slate-400 font-bold"
                     >
-                      {ayatOfTheDay.surahName} · {ayatOfTheDay.surahId}:{ayatOfTheDay.verseId}
+                      {ayatOfTheDay.surahName} · {ayatOfTheDay.surahId}:
+                      {ayatOfTheDay.verseId}
                     </motion.span>
                   </AnimatePresence>
                 </div>
@@ -326,7 +517,10 @@ export default function App() {
                   transition={{ duration: 0.4 }}
                   className="py-2.5 text-center mt-1"
                 >
-                  <p className="font-serif text-2xl font-bold leading-relaxed text-slate-800 px-1" dir="rtl">
+                  <p
+                    className="font-serif text-2xl font-bold leading-relaxed text-slate-800 px-1"
+                    dir="rtl"
+                  >
                     {ayatOfTheDay.arab}
                   </p>
                 </motion.div>
@@ -360,7 +554,8 @@ export default function App() {
                   onClick={() => handleJumpToSurah(ayatOfTheDay.surahId)}
                   className="text-xs font-bold text-slate-800 hover:text-[#0F4C3A] flex items-center gap-1.5 cursor-pointer transition select-none pr-1"
                 >
-                  Baca Ayat <BookOpen className="w-3.5 h-3.5 text-slate-400" /> <ChevronRight className="w-4 h-4 text-slate-400" />
+                  Baca Ayat <BookOpen className="w-3.5 h-3.5 text-slate-400" />{" "}
+                  <ChevronRight className="w-4 h-4 text-slate-400" />
                 </button>
               </div>
             </div>
@@ -378,20 +573,87 @@ export default function App() {
                     className="grid grid-cols-4 md:grid-cols-4 lg:grid-cols-8 gap-y-5 gap-x-2 sm:gap-x-4"
                   >
                     {[
-                      { tag: "Al-Qur'an", action: () => setActiveTab("quran"), bg: "bg-[#EDF4F1] text-[#0F4C3A]", icon: <BookOpen className="w-5.5 h-5.5" /> },
-                      { tag: "Terakhir Baca", action: () => handleJumpToSurah(tilawahProgress.currentSurah, tilawahProgress.currentAyat), bg: "bg-[#FDF7E7] text-amber-700", icon: <Clock className="w-5.5 h-5.5" /> },
-                      { tag: "Arah Kiblat", action: () => { setActiveTab("kiblat"); addToast("Arah Kiblat", "Membuka navigator kiblat.", "info"); }, bg: "bg-[#EDF6F5] text-teal-700", icon: <Compass className="w-5.5 h-5.5" /> },
-                      { tag: "Kalender", action: () => { setActiveTab("kalender"); addToast("Kalender Hijriah", "Membuka penanggalan Islam.", "info"); }, bg: "bg-[#F7F2EC] text-amber-900", icon: <Calendar className="w-5.5 h-5.5" /> },
-                      { tag: "Tafsir", action: () => setActiveTab("tafsir"), bg: "bg-[#F3EEF8] text-purple-700", icon: <FileText className="w-5.5 h-5.5" /> },
-                      { tag: "Doa Harian", action: () => setActiveTab("doa"), bg: "bg-[#FDF2EB] text-orange-700", icon: <HandHeart className="w-5.5 h-5.5" /> },
-                      { tag: "Jadwal Sholat", action: () => {
-                        const el = document.getElementById("jadwal-sholat-widget-container");
-                        if (el) {
-                          el.scrollIntoView({ behavior: "smooth", block: "center" });
-                          addToast("Jadwal Sholat", "Menampilkan panel jadwal sholat.", "info");
-                        }
-                      }, bg: "bg-[#EEF6FA] text-sky-700", icon: <Calendar className="w-5.5 h-5.5" /> },
-                      { tag: "Lainnya", action: () => setShowSubMenu(true), bg: "bg-[#F5F5F5] text-slate-700", icon: <LayoutGrid className="w-5.5 h-5.5" /> },
+                      {
+                        tag: "Al-Qur'an",
+                        action: () => setActiveTab("quran"),
+                        bg: "bg-[#EDF4F1] text-[#0F4C3A]",
+                        icon: <BookOpen className="w-5.5 h-5.5" />,
+                      },
+                      {
+                        tag: "Terakhir Baca",
+                        action: () =>
+                          handleJumpToSurah(
+                            tilawahProgress.currentSurah,
+                            tilawahProgress.currentAyat,
+                          ),
+                        bg: "bg-[#FDF7E7] text-amber-700",
+                        icon: <Clock className="w-5.5 h-5.5" />,
+                      },
+                      {
+                        tag: "Arah Kiblat",
+                        action: () => {
+                          setActiveTab("kiblat");
+                          addToast(
+                            "Arah Kiblat",
+                            "Membuka navigator kiblat.",
+                            "info",
+                          );
+                        },
+                        bg: "bg-[#EDF6F5] text-teal-700",
+                        icon: <Compass className="w-5.5 h-5.5" />,
+                      },
+                      {
+                        tag: "Kalender",
+                        action: () => {
+                          setActiveTab("kalender");
+                          addToast(
+                            "Kalender Hijriah",
+                            "Membuka penanggalan Islam.",
+                            "info",
+                          );
+                        },
+                        bg: "bg-[#F7F2EC] text-amber-900",
+                        icon: <Calendar className="w-5.5 h-5.5" />,
+                      },
+                      {
+                        tag: "Tafsir",
+                        action: () => setActiveTab("tafsir"),
+                        bg: "bg-[#F3EEF8] text-purple-700",
+                        icon: <FileText className="w-5.5 h-5.5" />,
+                      },
+                      {
+                        tag: "Doa Harian",
+                        action: () => setActiveTab("doa"),
+                        bg: "bg-[#FDF2EB] text-orange-700",
+                        icon: <HandHeart className="w-5.5 h-5.5" />,
+                      },
+                      {
+                        tag: "Jadwal Sholat",
+                        action: () => {
+                          const el = document.getElementById(
+                            "jadwal-sholat-widget-container",
+                          );
+                          if (el) {
+                            el.scrollIntoView({
+                              behavior: "smooth",
+                              block: "center",
+                            });
+                            addToast(
+                              "Jadwal Sholat",
+                              "Menampilkan panel jadwal sholat.",
+                              "info",
+                            );
+                          }
+                        },
+                        bg: "bg-[#EEF6FA] text-sky-700",
+                        icon: <Calendar className="w-5.5 h-5.5" />,
+                      },
+                      {
+                        tag: "Lainnya",
+                        action: () => setShowSubMenu(true),
+                        bg: "bg-[#F5F5F5] text-slate-700",
+                        icon: <LayoutGrid className="w-5.5 h-5.5" />,
+                      },
                     ].map((itm, i) => (
                       <button
                         key={i}
@@ -399,7 +661,7 @@ export default function App() {
                         className="flex flex-col items-center text-center gap-2 cursor-pointer focus:outline-none"
                       >
                         <div className="w-12 h-12 sm:w-13 sm:h-13 rounded-full bg-[#FAF6EE] border border-[#F2ECE4]/60 shadow-xs flex items-center justify-center hover:scale-105 active:scale-95 transition-transform">
-                          <div className={`p-1 ${itm.bg.split(' ')[1]}`}>
+                          <div className={`p-1 ${itm.bg.split(" ")[1]}`}>
                             {itm.icon}
                           </div>
                         </div>
@@ -419,13 +681,51 @@ export default function App() {
                     className="grid grid-cols-4 md:grid-cols-4 gap-y-5 gap-x-2 sm:gap-x-4"
                   >
                     {[
-                      { tag: "Kembali", action: () => setShowSubMenu(false), bg: "bg-[#F5F5F5] text-slate-500", icon: <ArrowLeft className="w-5.5 h-5.5" /> },
-                      { tag: "Tasbih", action: () => {
-                        setActiveTab("tasbih");
-                        addToast("Tasbih Digital", "Membuka fitur Tasbih Digital.", "info");
-                      }, bg: "bg-[#EDF5F1] text-emerald-700", icon: <RotateCcw className="w-5.5 h-5.5" /> },
-                      { tag: "Hadits", action: () => { setActiveTab("hadits"); addToast("Kumpulan Hadits", "Membuka perpustakaan hadits.", "info"); }, bg: "bg-[#F0F7FF] text-blue-700", icon: <Scroll className="w-5.5 h-5.5" /> },
-                      { tag: "Fikih", action: () => { setActiveTab("fikih"); addToast("Fikih", "Membuka panduan beribadah.", "info"); }, bg: "bg-[#FDF2F8] text-pink-700", icon: <LibraryBig className="w-5.5 h-5.5" /> }
+                      {
+                        tag: "Kembali",
+                        action: () => setShowSubMenu(false),
+                        bg: "bg-[#F5F5F5] text-slate-500",
+                        icon: <ArrowLeft className="w-5.5 h-5.5" />,
+                      },
+                      {
+                        tag: "Tasbih",
+                        action: () => {
+                          setActiveTab("tasbih");
+                          addToast(
+                            "Tasbih Digital",
+                            "Membuka fitur Tasbih Digital.",
+                            "info",
+                          );
+                        },
+                        bg: "bg-[#EDF5F1] text-emerald-700",
+                        icon: <RotateCcw className="w-5.5 h-5.5" />,
+                      },
+                      {
+                        tag: "Hadits",
+                        action: () => {
+                          setActiveTab("hadits");
+                          addToast(
+                            "Kumpulan Hadits",
+                            "Membuka perpustakaan hadits.",
+                            "info",
+                          );
+                        },
+                        bg: "bg-[#F0F7FF] text-blue-700",
+                        icon: <Scroll className="w-5.5 h-5.5" />,
+                      },
+                      {
+                        tag: "Fikih",
+                        action: () => {
+                          setActiveTab("fikih");
+                          addToast(
+                            "Fikih",
+                            "Membuka panduan beribadah.",
+                            "info",
+                          );
+                        },
+                        bg: "bg-[#FDF2F8] text-pink-700",
+                        icon: <LibraryBig className="w-5.5 h-5.5" />,
+                      },
                     ].map((itm, i) => (
                       <button
                         key={i}
@@ -433,7 +733,7 @@ export default function App() {
                         className="flex flex-col items-center text-center gap-2 cursor-pointer focus:outline-none"
                       >
                         <div className="w-12 h-12 sm:w-13 sm:h-13 rounded-full bg-[#FAF6EE] border border-[#F2ECE4]/60 shadow-xs flex items-center justify-center hover:scale-105 active:scale-95 transition-transform">
-                          <div className={`p-1 ${itm.bg.split(' ')[1]}`}>
+                          <div className={`p-1 ${itm.bg.split(" ")[1]}`}>
                             {itm.icon}
                           </div>
                         </div>
@@ -455,16 +755,20 @@ export default function App() {
                     <Clock className="w-4 h-4" />
                   </div>
                   <div>
-                    <h4 className="text-xs sm:text-sm font-bold text-slate-800">Target Harian</h4>
-                    <span className="text-[10px] sm:text-xs text-slate-500 font-semibold">{dailyReadingTime} dari 15 Menit hari ini</span>
+                    <h4 className="text-xs sm:text-sm font-bold text-slate-800">
+                      Target Harian
+                    </h4>
+                    <span className="text-[10px] sm:text-xs text-slate-500 font-semibold">
+                      {dailyReadingTime} dari 15 Menit hari ini
+                    </span>
                   </div>
                 </div>
-                <button 
+                <button
                   onClick={() => updateDailyReadingTime(5)}
                   disabled={dailyReadingTime >= 15}
                   className={`text-[10px] sm:text-xs font-bold px-3 py-1.5 rounded-xl transition ${
-                    dailyReadingTime >= 15 
-                      ? "bg-slate-100 text-slate-400 cursor-not-allowed" 
+                    dailyReadingTime >= 15
+                      ? "bg-slate-100 text-slate-400 cursor-not-allowed"
                       : "bg-[#0F4C3A]/10 text-[#0F4C3A] hover:bg-[#0F4C3A]/20 active:scale-95 cursor-pointer"
                   }`}
                 >
@@ -473,8 +777,10 @@ export default function App() {
               </div>
               <div className="flex items-center gap-3">
                 <div className="flex-1 bg-slate-100 h-2.5 rounded-full overflow-hidden">
-                  <div 
-                    style={{ width: `${Math.min((dailyReadingTime / 15) * 100, 100)}%` }} 
+                  <div
+                    style={{
+                      width: `${Math.min((dailyReadingTime / 15) * 100, 100)}%`,
+                    }}
                     className="h-full bg-[#ECC17A] rounded-full transition-all duration-500 ease-out"
                   />
                 </div>
@@ -487,9 +793,16 @@ export default function App() {
             {/* Progress Tilawah */}
             <div className="flex flex-col gap-2.5">
               <div className="flex justify-between items-center px-1">
-                <h4 className="text-xs sm:text-sm font-bold text-slate-855 tracking-wide">Progress Tilawah</h4>
+                <h4 className="text-xs sm:text-sm font-bold text-slate-855 tracking-wide">
+                  Progress Tilawah
+                </h4>
                 <button
-                  onClick={() => handleJumpToSurah(tilawahProgress.currentSurah, tilawahProgress.currentAyat)}
+                  onClick={() =>
+                    handleJumpToSurah(
+                      tilawahProgress.currentSurah,
+                      tilawahProgress.currentAyat,
+                    )
+                  }
                   className="text-xs font-bold text-[#0F4C3A] hover:underline flex items-center gap-0.5 cursor-pointer"
                 >
                   Lihat Semua
@@ -500,17 +813,21 @@ export default function App() {
               <div className="bg-[#EDF5F1] rounded-3xl p-5 sm:p-6 shadow-xs border border-emerald-100/40 flex items-center gap-5 justify-between">
                 <div className="flex-1 min-w-0">
                   <h4 className="text-sm sm:text-base font-bold text-slate-850 truncate">
-                    {tilawahProgress.currentSurahName} · {tilawahProgress.currentSurah}
+                    {tilawahProgress.currentSurahName} ·{" "}
+                    {tilawahProgress.currentSurah}
                   </h4>
                   <p className="text-xs text-slate-500 font-semibold mt-1">
-                    Ayat {tilawahProgress.currentAyat} dari {tilawahProgress.totalAyat}
+                    Ayat {tilawahProgress.currentAyat} dari{" "}
+                    {tilawahProgress.totalAyat}
                   </p>
-                  
+
                   {/* Progress bar and 64% inline */}
                   <div className="flex items-center gap-3 mt-3">
                     <div className="flex-1 bg-emerald-800/10 h-2.5 rounded-full overflow-hidden">
                       <div
-                        style={{ width: `${tilawahProgress.progressPercentage}%` }}
+                        style={{
+                          width: `${tilawahProgress.progressPercentage}%`,
+                        }}
                         className="h-full bg-[#0F4C3A] rounded-full transition-all duration-300"
                       ></div>
                     </div>
@@ -532,7 +849,9 @@ export default function App() {
             {/* Terakhir Dibaca directory list (from image) */}
             <div className="flex flex-col gap-2.5">
               <div className="flex justify-between items-center px-1">
-                <h4 className="text-xs sm:text-sm font-bold text-slate-855 tracking-wide">Terakhir Dibaca</h4>
+                <h4 className="text-xs sm:text-sm font-bold text-slate-855 tracking-wide">
+                  Terakhir Dibaca
+                </h4>
                 <button
                   onClick={() => setActiveTab("quran")}
                   className="text-xs font-bold text-[#0F4C3A] hover:underline flex items-center gap-0.5 cursor-pointer"
@@ -546,7 +865,7 @@ export default function App() {
                 {[
                   { name: "Al-Kahf", num: 18, details: "Halaman 293" },
                   { name: "Yasin", num: 36, details: "Halaman 440" },
-                  { name: "Ar-Rahman", num: 55, details: "Halaman 531" }
+                  { name: "Ar-Rahman", num: 55, details: "Halaman 531" },
                 ].map((itm, idx) => (
                   <button
                     key={idx}
@@ -557,14 +876,26 @@ export default function App() {
                   >
                     <div className="flex items-center gap-3.5">
                       {/* Premium elegant rounded square widget with mosque dome ornament */}
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 relative overflow-hidden ${
-                        idx === 0 ? "bg-[#0F4C3A]/10 text-[#0F4C3A]" : idx === 1 ? "bg-amber-100/70 text-amber-800" : "bg-[#EDF5F1] text-emerald-800"
-                      }`}>
-                        <svg className="absolute inset-0 opacity-15" viewBox="0 0 40 40" fill="currentColor">
+                      <div
+                        className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 relative overflow-hidden ${
+                          idx === 0
+                            ? "bg-[#0F4C3A]/10 text-[#0F4C3A]"
+                            : idx === 1
+                              ? "bg-amber-100/70 text-amber-800"
+                              : "bg-[#EDF5F1] text-emerald-800"
+                        }`}
+                      >
+                        <svg
+                          className="absolute inset-0 opacity-15"
+                          viewBox="0 0 40 40"
+                          fill="currentColor"
+                        >
                           <path d="M 20 6 L 33 24 Q 20 18 7 24 Z" />
                           <circle cx="20" cy="29" r="3.5" />
                         </svg>
-                        <span className="font-serif font-bold text-sm select-none z-10">📖</span>
+                        <span className="font-serif font-bold text-sm select-none z-10">
+                          📖
+                        </span>
                       </div>
                       <span className="font-bold text-slate-700 text-sm group-hover:text-[#0F4C3A] transition-colors">
                         {itm.name} · {itm.num}
@@ -610,22 +941,53 @@ export default function App() {
         return <DoaHarianView addToast={addToast} />;
 
       case "cari":
-        return <CariView onSelectSurah={handleJumpToSurah} addToast={addToast} geminiApiKey={geminiApiKey} />;
+        return (
+          <CariView
+            onSelectSurah={handleJumpToSurah}
+            addToast={addToast}
+            geminiApiKey={geminiApiKey}
+          />
+        );
 
       case "tasbih":
-        return <TasbihView addToast={addToast} />;
+        return (
+          <TasbihView
+            addToast={addToast}
+            onBack={() => setActiveTab("beranda")}
+          />
+        );
 
       case "kiblat":
-        return <ArahKiblatView addToast={addToast} />;
+        return (
+          <ArahKiblatView
+            addToast={addToast}
+            onBack={() => setActiveTab("beranda")}
+          />
+        );
 
       case "kalender":
-        return <KalenderView addToast={addToast} />;
+        return (
+          <KalenderView
+            addToast={addToast}
+            onBack={() => setActiveTab("beranda")}
+          />
+        );
 
       case "tafsir":
-        return <TafsirView addToast={addToast} onBack={() => setActiveTab("beranda")} />;
+        return (
+          <TafsirView
+            addToast={addToast}
+            onBack={() => setActiveTab("beranda")}
+          />
+        );
 
       case "hadits":
-        return <HaditsView addToast={addToast} onBack={() => setActiveTab("beranda")} />;
+        return (
+          <HaditsView
+            addToast={addToast}
+            onBack={() => setActiveTab("beranda")}
+          />
+        );
 
       case "fikih":
         return <FikihView onBack={() => setActiveTab("beranda")} />;
@@ -667,15 +1029,20 @@ export default function App() {
       {activeTab === "beranda" ? (
         <div className="relative w-full text-white">
           <div className="absolute top-0 inset-x-0 h-[50vh] sm:h-[55vh] min-h-[400px] z-0 pointer-events-none overflow-hidden bg-slate-800">
-            <motion.div 
+            <motion.div
               animate={{ scale: [1, 1.08] }}
-              transition={{ duration: 40, ease: "linear", repeat: Infinity, repeatType: "reverse" }}
+              transition={{
+                duration: 40,
+                ease: "linear",
+                repeat: Infinity,
+                repeatType: "reverse",
+              }}
               className="w-full h-full opacity-90 origin-bottom"
               style={{
                 backgroundImage: `url(/${timeOfDay}.png)`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center bottom',
-                backgroundRepeat: 'no-repeat'
+                backgroundSize: "cover",
+                backgroundPosition: "center bottom",
+                backgroundRepeat: "no-repeat",
               }}
             />
             <div className="absolute inset-0 bg-black/10 mix-blend-overlay"></div>
@@ -700,7 +1067,11 @@ export default function App() {
                 <button
                   onClick={() => {
                     setActiveTab("profil");
-                    addToast("Setelan Pengingat", "Silakan atur preferences profil & alarm sholat Anda.", "info");
+                    addToast(
+                      "Setelan Pengingat",
+                      "Silakan atur preferences profil & alarm sholat Anda.",
+                      "info",
+                    );
                   }}
                   className="w-11 h-11 bg-white/20 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center text-white hover:bg-white/30 cursor-pointer shadow-sm relative focus:outline-none transition-transform active:scale-95"
                 >
@@ -710,35 +1081,19 @@ export default function App() {
             </div>
           </div>
         </div>
-      ) : (
-        <header className="relative z-15 px-5 pt-6 pb-2.5 max-w-7xl mx-auto w-full flex items-center justify-between border-b border-slate-100 bg-white/60 backdrop-blur-xs">
-          <div className="flex items-center gap-3">
-            <div
-              onClick={() => setActiveTab("beranda")}
-              className="w-10 h-10 bg-[#0F4C3A] rounded-2xl flex items-center justify-center border border-amber-300/10 shadow-sm p-2 cursor-pointer transition-transform hover:scale-105"
-            >
-              <span className="text-xs font-serif font-bold text-[#ECC17A]">قرآن</span>
-            </div>
-            <div>
-              <span className="text-[9px] font-extrabold text-slate-400 tracking-widest block uppercase">
-                MUSHAF SAKU
-              </span>
-              <h2 className="font-extrabold text-slate-700 text-sm leading-none mt-0.5">
-                Al-Qur'an Premium
-              </h2>
-            </div>
-          </div>
-          <button
-            onClick={() => setActiveTab("beranda")}
-            className="text-xs font-bold text-[#0F4C3A] hover:underline cursor-pointer"
-          >
-            Beranda
-          </button>
-        </header>
-      )}
+      ) : null}
 
       {/* 2. DYNAMIC WORK SPACE */}
-      <main className={`flex-1 w-full mx-auto relative z-10 ${activeTab === 'beranda' ? 'bg-[#FDFBF7] rounded-t-[40px] sm:rounded-t-[48px] pt-6 px-5 shadow-[0_-8px_30px_rgba(0,0,0,0.05)]' : 'px-5 py-4 max-w-7xl'}`}>
+      <main
+        className={`flex-1 w-full mx-auto relative z-10 
+        ${
+          activeTab === "beranda"
+            ? "bg-[#FDFBF7] rounded-t-[40px] sm:rounded-t-[48px] pt-6 px-5 shadow-[0_-8px_30px_rgba(0,0,0,0.05)]"
+            : ["quran", "doa", "cari", "profil"].includes(activeTab)
+              ? "px-5 py-6 sm:py-8 max-w-7xl"
+              : "w-full h-full"
+        }`}
+      >
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
@@ -756,18 +1111,39 @@ export default function App() {
       <InstallPrompt />
 
       {/* 3. PREMIUM FLOATING BOTTOM NAVIGATION BAR */}
-      <motion.nav 
+      <motion.nav
         initial={{ y: 50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: [0.25, 0.8, 0.25, 1], delay: 0.1 }}
         className="fixed bottom-0 md:bottom-6 inset-x-0 bg-white/95 backdrop-blur-md border-t md:border border-slate-100 rounded-t-[32px] md:rounded-[32px] px-6 sm:px-10 py-2 pb-6 md:pb-2 flex justify-between items-end shadow-2xl shadow-slate-900/10 z-40 w-full sm:max-w-lg md:max-w-2xl lg:max-w-3xl mx-auto transition-all"
       >
         {[
-          { id: "beranda", label: "Beranda", icon: <Home className="w-[22px] h-[22px]" strokeWidth={1.5} /> },
-          { id: "quran", label: "Al-Qur'an", icon: <BookOpen className="w-[22px] h-[22px]" strokeWidth={1.5} /> },
-          { id: "cari", label: "Cari", icon: <Search className="w-5.5 h-5.5" strokeWidth={1.5} />, isCenter: true },
-          { id: "doa", label: "Doa", icon: <HandHeart className="w-[22px] h-[22px]" strokeWidth={1.5} /> },
-          { id: "profil", label: "Profil", icon: <User className="w-[22px] h-[22px]" strokeWidth={1.5} /> }
+          {
+            id: "beranda",
+            label: "Beranda",
+            icon: <Home className="w-[22px] h-[22px]" strokeWidth={1.5} />,
+          },
+          {
+            id: "quran",
+            label: "Al-Qur'an",
+            icon: <BookOpen className="w-[22px] h-[22px]" strokeWidth={1.5} />,
+          },
+          {
+            id: "cari",
+            label: "Cari",
+            icon: <Search className="w-5.5 h-5.5" strokeWidth={1.5} />,
+            isCenter: true,
+          },
+          {
+            id: "doa",
+            label: "Doa",
+            icon: <HandHeart className="w-[22px] h-[22px]" strokeWidth={1.5} />,
+          },
+          {
+            id: "profil",
+            label: "Profil",
+            icon: <User className="w-[22px] h-[22px]" strokeWidth={1.5} />,
+          },
         ].map((item) => {
           const isAct = activeTab === item.id;
 
@@ -781,9 +1157,13 @@ export default function App() {
                 <div className="relative -top-6 w-14 h-14 rounded-full bg-[#0F4C3A] text-white flex items-center justify-center shadow-lg shadow-emerald-950/30 transition-transform active:scale-95 hover:scale-105 border-4 border-white">
                   {item.icon}
                 </div>
-                <span className={`text-[10px] font-bold tracking-tight -mt-4 mb-0.5 transition-colors duration-300 ${
-                  isAct ? "text-[#0F4C3A]" : "text-slate-400 group-hover:text-slate-700"
-                }`}>
+                <span
+                  className={`text-[10px] font-bold tracking-tight -mt-4 mb-0.5 transition-colors duration-300 ${
+                    isAct
+                      ? "text-[#0F4C3A]"
+                      : "text-slate-400 group-hover:text-slate-700"
+                  }`}
+                >
                   {item.label}
                 </span>
               </button>
@@ -803,18 +1183,22 @@ export default function App() {
                   transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                 />
               )}
-              <div className={`relative z-10 transition-all duration-500 ease-out ${
-                isAct 
-                  ? "text-[#0F4C3A] scale-110 drop-shadow-md translate-y-[-2px]" 
-                  : "text-slate-400 group-hover:text-slate-700 group-hover:-translate-y-1"
-              }`}>
+              <div
+                className={`relative z-10 transition-all duration-500 ease-out ${
+                  isAct
+                    ? "text-[#0F4C3A] scale-110 drop-shadow-md translate-y-[-2px]"
+                    : "text-slate-400 group-hover:text-slate-700 group-hover:-translate-y-1"
+                }`}
+              >
                 {item.icon}
               </div>
-              <span className={`relative z-10 text-[10px] font-bold tracking-tight mt-1 transition-colors duration-500 ${
-                isAct 
-                  ? "text-[#0F4C3A]" 
-                  : "text-slate-400 group-hover:text-slate-700"
-              }`}>
+              <span
+                className={`relative z-10 text-[10px] font-bold tracking-tight mt-1 transition-colors duration-500 ${
+                  isAct
+                    ? "text-[#0F4C3A]"
+                    : "text-slate-400 group-hover:text-slate-700"
+                }`}
+              >
                 {item.label}
               </span>
             </button>
