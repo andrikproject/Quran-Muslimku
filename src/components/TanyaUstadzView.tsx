@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import { motion } from "motion/react";
+import html2canvas from "html2canvas";
+import { jsPDF } from "jspdf";
 import {
   Send,
   Bot,
@@ -8,6 +10,8 @@ import {
   ArrowLeft,
   Copy,
   Share2,
+  Download,
+  Volume2,
 } from "lucide-react";
 
 interface ChatMessage {
@@ -165,6 +169,78 @@ export const TanyaUstadzView: React.FC<TanyaUstadzViewProps> = ({
     addToast("Obrolan Dihapus", "Riwayat dialog dibersihkan.", "info");
   };
 
+  const handleExportPdf = async (text: string, timestamp: Date) => {
+    addToast("Menyiapkan PDF...", "Harap tunggu, merender dokumen.", "info");
+    
+    // Create a temporary unmounted-looking div but actually visibly appended
+    const exportContainer = document.createElement("div");
+    exportContainer.style.position = "absolute";
+    exportContainer.style.left = "-9999px"; // Move off-screen
+    exportContainer.style.top = "0";
+    exportContainer.style.width = "600px"; // Fixed width for A4 proportion approximation
+    exportContainer.style.backgroundColor = "#FDFBF7"; // App background
+    exportContainer.style.padding = "40px";
+    exportContainer.style.fontFamily = "sans-serif";
+    exportContainer.style.color = "#0F4C3A";
+    
+    exportContainer.innerHTML = `
+      <div style="text-align: center; margin-bottom: 25px; border-bottom: 2px solid rgba(15, 76, 58, 0.1); padding-bottom: 15px;">
+        <h1 style="margin: 0; font-size: 24px; font-weight: bold; color: #0F4C3A; font-family: serif;">Tanya Ustadz AI - Quran Saku</h1>
+        <p style="margin: 5px 0 0; font-size: 12px; color: #64748b;">Diterbitkan otomatis pada: ${timestamp.toLocaleString()}</p>
+      </div>
+      <div style="font-size: 14px; line-height: 1.6; color: #334155; white-space: pre-wrap;">
+        ${text}
+      </div>
+      <div style="margin-top: 30px; font-size: 10px; text-align: center; color: #94a3b8;">
+        Semoga jawaban ini menjadi ilmu yang bermanfaat. Teruslah istiqamah.
+      </div>
+    `;
+
+    document.body.appendChild(exportContainer);
+
+    try {
+      const canvas = await html2canvas(exportContainer, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: "#FDFBF7"
+      });
+
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
+      });
+
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+      pdf.save("TanyaUstadzAI-Document.pdf");
+      
+      addToast("Sukses", "PDF Ustadz AI berhasil diunduh.", "success");
+    } catch (err) {
+      console.error(err);
+      addToast("Gagal", "Gagal merender PDF.", "warning");
+    } finally {
+      document.body.removeChild(exportContainer);
+    }
+  };
+
+  const handleSpeak = (text: string) => {
+    if ("speechSynthesis" in window) {
+      // Clean text slightly from markdown standard chars to improve TTS reading
+      const cleanText = text.replace(/[*_#]/g, "");
+      const utterance = new SpeechSynthesisUtterance(cleanText);
+      utterance.lang = "id-ID";
+      utterance.rate = 0.9;
+      window.speechSynthesis.speak(utterance);
+      addToast("Membacakan Jawaban", "Asisten AI membaca rujukan...", "info");
+    } else {
+      addToast("Fitur Tidak Didukung", "Browser Anda tidak mendukung Web Speech API.", "warning");
+    }
+  };
+
   return (
     <div className="fixed top-0 left-0 right-0 h-[100dvh] z-[35] bg-[#FDFBF7] flex flex-col pb-[115px] md:pb-[125px]">
       {/* Header Panel */}
@@ -241,7 +317,13 @@ export const TanyaUstadzView: React.FC<TanyaUstadzViewProps> = ({
                 </div>
                 <div className={`flex items-center gap-3 px-1 mt-0.5 ${isAi ? "justify-between w-full" : "justify-end"}`}>
                   {isAi && (
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1 flex-wrap">
+                      <button 
+                        onClick={() => handleSpeak(msg.text)}
+                        className="flex items-center gap-1.5 text-[10px] text-slate-400 hover:text-[#0F4C3A] hover:bg-emerald-50 px-2 py-1 rounded-md transition-all uppercase tracking-wider font-bold cursor-pointer"
+                      >
+                        <Volume2 className="w-3 h-3" /> Baca
+                      </button>
                       <button 
                         onClick={() => {
                           navigator.clipboard.writeText(msg.text);
@@ -250,6 +332,12 @@ export const TanyaUstadzView: React.FC<TanyaUstadzViewProps> = ({
                         className="flex items-center gap-1.5 text-[10px] text-slate-400 hover:text-[#0F4C3A] hover:bg-emerald-50 px-2 py-1 rounded-md transition-all uppercase tracking-wider font-bold cursor-pointer"
                       >
                         <Copy className="w-3 h-3" /> Salin
+                      </button>
+                      <button 
+                        onClick={() => handleExportPdf(msg.text, msg.timestamp)}
+                        className="flex items-center gap-1.5 text-[10px] text-slate-400 hover:text-[#0F4C3A] hover:bg-emerald-50 px-2 py-1 rounded-md transition-all uppercase tracking-wider font-bold cursor-pointer"
+                      >
+                        <Download className="w-3 h-3" /> PDF
                       </button>
                       <button 
                         onClick={async () => {
