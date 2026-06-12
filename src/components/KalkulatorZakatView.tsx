@@ -19,19 +19,33 @@ export const KalkulatorZakatView: React.FC<KalkulatorZakatViewProps> = ({ onBack
   const [hutang, setHutang] = useState("");
 
   // Consts
-  const HARGA_BERAS = 15000;
-  const NISHAB_PROFESI = 85 * 1000000; // approximation
-  const NISHAB_MAAL = 85 * 1000000;
+  const HARGA_EMAS_PER_GRAM = 1200000; // Asumsi harga emas terkini per gram
+  const NISHAB_MAAL_TAHUNAN = 85 * HARGA_EMAS_PER_GRAM; // 85 gram emas per tahun
+  const NISHAB_PROFESI_BULANAN = NISHAB_MAAL_TAHUNAN / 12; // Nishab profesi per bulan (dikiaskan ke emas)
+
+  const parseNum = (val: string) => Number(val.replace(/\./g, "")) || 0;
+
+  const formatInputAmount = (val: string) => {
+    const numericValue = val.replace(/\D/g, "");
+    if (!numericValue) return "";
+    return new Intl.NumberFormat("id-ID").format(Number(numericValue));
+  };
 
   const hitungZakatProfesi = () => {
-    const total = (Number(pendapatan) || 0) + (Number(bonus) || 0);
-    // 2.5% per bulan
-    return total * 0.025;
+    const total = parseNum(pendapatan) + parseNum(bonus);
+    // Cek apakah mencapai nishab bulanan
+    if (total >= NISHAB_PROFESI_BULANAN) {
+      return total * 0.025;
+    }
+    return 0; // Tidak wajib zakat jika di bawah nishab
   };
 
   const hitungZakatMaal = () => {
-    const total = (Number(tabungan) || 0) + (Number(investasi) || 0) - (Number(hutang) || 0);
-    return Math.max(0, total * 0.025);
+    const total = parseNum(tabungan) + parseNum(investasi) - parseNum(hutang);
+    if (total >= NISHAB_MAAL_TAHUNAN) {
+      return total * 0.025;
+    }
+    return 0;
   };
 
   const formatRupiah = (val: number) => {
@@ -88,9 +102,10 @@ export const KalkulatorZakatView: React.FC<KalkulatorZakatViewProps> = ({ onBack
                 <div className="relative">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">Rp</span>
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="numeric"
                     value={pendapatan}
-                    onChange={(e) => setPendapatan(e.target.value)}
+                    onChange={(e) => setPendapatan(formatInputAmount(e.target.value))}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-12 pr-4 focus:outline-none focus:border-[#0F4C3A] focus:ring-1 focus:ring-[#0F4C3A] transition font-mono"
                     placeholder="0"
                   />
@@ -99,23 +114,35 @@ export const KalkulatorZakatView: React.FC<KalkulatorZakatViewProps> = ({ onBack
               
               <div>
                 <label className="block text-xs font-bold text-slate-500 mb-1">Bonus / THP Tambahan (Opsional)</label>
-                <div className="relative">
+                <div className="relative mb-2">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">Rp</span>
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="numeric"
                     value={bonus}
-                    onChange={(e) => setBonus(e.target.value)}
+                    onChange={(e) => setBonus(formatInputAmount(e.target.value))}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-12 pr-4 focus:outline-none focus:border-[#0F4C3A] focus:ring-1 focus:ring-[#0F4C3A] transition font-mono"
                     placeholder="0"
                   />
                 </div>
+                <div className="flex justify-end">
+                  {(parseNum(pendapatan) + parseNum(bonus)) < NISHAB_PROFESI_BULANAN && (
+                    <span className="text-[10px] font-bold text-red-500 bg-red-50 px-2 py-0.5 rounded-md">Belum Mencapai Nishab</span>
+                  )}
+                  {(parseNum(pendapatan) + parseNum(bonus)) >= NISHAB_PROFESI_BULANAN && (
+                    <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">Wajib Zakat</span>
+                  )}
+                </div>
               </div>
 
               <div className="mt-8 pt-6 border-t border-slate-100">
-                <h4 className="text-sm font-bold text-slate-500 mb-2">Zakat yang harus dibayar (Per Bulan)</h4>
+                <div className="flex justify-between items-end mb-2">
+                  <h4 className="text-sm font-bold text-slate-500">Zakat yang harus dibayar (Per Bulan)</h4>
+                </div>
                 <div className="text-3xl font-bold font-mono text-[#0F4C3A]">
                   {formatRupiah(hitungZakatProfesi())}
                 </div>
+                <p className="text-xs text-slate-400 mt-2">Nishab Bulanan: {formatRupiah(NISHAB_PROFESI_BULANAN)} (Asumsi Emas {formatRupiah(HARGA_EMAS_PER_GRAM)}/gr)</p>
               </div>
             </div>
           ) : (
@@ -130,9 +157,10 @@ export const KalkulatorZakatView: React.FC<KalkulatorZakatViewProps> = ({ onBack
                 <div className="relative">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">Rp</span>
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="numeric"
                     value={tabungan}
-                    onChange={(e) => setTabungan(e.target.value)}
+                    onChange={(e) => setTabungan(formatInputAmount(e.target.value))}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-12 pr-4 focus:outline-none focus:border-[#0F4C3A] focus:ring-1 focus:ring-[#0F4C3A] transition font-mono"
                     placeholder="0"
                   />
@@ -144,9 +172,10 @@ export const KalkulatorZakatView: React.FC<KalkulatorZakatViewProps> = ({ onBack
                 <div className="relative">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">Rp</span>
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="numeric"
                     value={investasi}
-                    onChange={(e) => setInvestasi(e.target.value)}
+                    onChange={(e) => setInvestasi(formatInputAmount(e.target.value))}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-12 pr-4 focus:outline-none focus:border-[#0F4C3A] focus:ring-1 focus:ring-[#0F4C3A] transition font-mono"
                     placeholder="0"
                   />
@@ -155,23 +184,35 @@ export const KalkulatorZakatView: React.FC<KalkulatorZakatViewProps> = ({ onBack
 
               <div>
                 <label className="block text-xs font-bold text-slate-500 mb-1">Hutang Jatuh Tempo (Pengurang)</label>
-                <div className="relative">
+                <div className="relative mb-2">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">Rp</span>
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="numeric"
                     value={hutang}
-                    onChange={(e) => setHutang(e.target.value)}
+                    onChange={(e) => setHutang(formatInputAmount(e.target.value))}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-12 pr-4 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition font-mono"
                     placeholder="0"
                   />
                 </div>
+                <div className="flex justify-end">
+                  {(parseNum(tabungan) + parseNum(investasi) - parseNum(hutang)) < NISHAB_MAAL_TAHUNAN && (
+                    <span className="text-[10px] font-bold text-red-500 bg-red-50 px-2 py-0.5 rounded-md">Belum Mencapai Nishab</span>
+                  )}
+                  {(parseNum(tabungan) + parseNum(investasi) - parseNum(hutang)) >= NISHAB_MAAL_TAHUNAN && (
+                    <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">Wajib Zakat</span>
+                  )}
+                </div>
               </div>
 
               <div className="mt-8 pt-6 border-t border-slate-100">
-                <h4 className="text-sm font-bold text-slate-500 mb-2">Zakat yang harus dibayar (Per Tahun)</h4>
+                <div className="flex justify-between items-end mb-2">
+                  <h4 className="text-sm font-bold text-slate-500">Zakat yang harus dibayar (Per Tahun)</h4>
+                </div>
                 <div className="text-3xl font-bold font-mono text-[#0F4C3A]">
                   {formatRupiah(hitungZakatMaal())}
                 </div>
+                <p className="text-xs text-slate-400 mt-2">Nishab Tahunan: {formatRupiah(NISHAB_MAAL_TAHUNAN)} (Asumsi Emas {formatRupiah(HARGA_EMAS_PER_GRAM)}/gr)</p>
               </div>
             </div>
           )}

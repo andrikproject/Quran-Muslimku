@@ -18,165 +18,211 @@ export const FikihView: React.FC<FikihViewProps> = ({ onBack }) => {
   const guides = [
     {
       id: "wudhu",
-      title: "Thaharah (Bersuci)",
+      title: "Kitab Thaharah (Bersuci)",
       icon: <Droplet className="w-5 h-5" />,
       color: "bg-blue-50 text-blue-700",
       content: [
         {
-          title: "Definisi Thaharah",
-          desc: "Bersuci dari hadats (kecil dan besar) serta dari najis. Syarat mutlak sahnya sholat.",
+          title: "Macam-macam Air yang Boleh Untuk Bersuci",
+          desc: "Air hujan, air laut, air sungai, air sumur, air mata air, air salju, dan air embun. Sesuai dengan pembagian air thohir muthohir (suci dan mensucikan).",
         },
         {
-          title: "Niat Wudhu",
-          desc: "Membaca Bismillah dan berniat wudhu di dalam hati bersamaan dengan membasuh wajah.",
+          title: "Hal yang Mewajibkan Mandi (Janabah)",
+          desc: "Bertemunya dua khitan (bersetubuh), keluarnya mani, haid, nifas, melahirkan (wiladah), dan mati.",
         },
         {
-          title: "Rukun Wudhu",
-          desc: "1. Niat, 2. Membasuh muka, 3. Membasuh kedua tangan hingga siku, 4. Mengusap sebagian kepala, 5. Membasuh kedua kaki hingga mata kaki, 6. Tertib (berurutan).",
+          title: "Fardhu (Rukun) Wudhu Ada 6",
+          desc: "1. Niat, 2. Membasuh muka, 3. Membasuh kedua tangan hingga siku, 4. Mengusap sebagian kepala, 5. Membasuh kedua kaki hingga mata kaki, 6. Tertib.",
         },
         {
-          title: "Sunnah Wudhu",
-          desc: "Membasuh telapak tangan, berkumur, istinsyaq (memasukkan air ke hidung), mengusap seluruh kepala, dan telinga.",
+          title: "Hal yang Membatalkan Wudhu",
+          desc: "Keluarnya sesuatu dari Qubul/Dubur, hilangnya akal (tidur pulas/mabuk), bersentuhan kulit laki-laki dan perempuan bukan mahram tanpa penghalang, dan menyentuh kemaluan dengan telapak tangan.",
         },
         {
-          title: "Mandi Wajib (Janabah)",
-          desc: "1. Niat mandi wajib, 2. Meratakan air ke seluruh tubuh (kulit dan rambut) tanpa terkecuali.",
-        },
-        {
-          title: "Tayammum",
-          desc: "Bersuci menggunakan debu yang suci jika tidak ada air atau sakit. Rukunnya: Niat, mengusap wajah, dan mengusap kedua tangan hingga siku.",
+          title: "Syarat dan Rukun Tayammum",
+          desc: "Syaratnya: Udzur karena safar/sakit, masuk waktu shalat, mencari air dahulu, ada debu yang suci. Rukunnya: Niat, mengusap wajah, mengusap kedua tangan sampai siku.",
         },
       ],
-      reference: "Kitab Safinatun Naja & Fathul Qorib",
+      reference: "Kitab Matan Abu Syuja' & Safinatun Naja",
     },
     {
       id: "sholat_wajib",
-      title: "Rukun & Syarat Sholat",
+      title: "Kitab Shalat",
       icon: <CheckCircle2 className="w-5 h-5" />,
       color: "bg-emerald-50 text-emerald-700",
       content: [
         {
-          title: "Syarat Sah Sholat",
-          desc: "1. Suci dari hadats dan najis, 2. Menutup aurat, 3. Masuk waktu sholat, 4. Menghadap Kiblat.",
+          title: "Syarat Wajib & Sah Shalat",
+          desc: "Syarat Wajib: Islam, baligh, berakal. Syarat Sah: Suci dari hadast dan najis, menutup aurat, berdiri di tempat suci, masuk waktu shalat, dan menghadap kiblat.",
         },
         {
-          title: "Rukun Sholat",
-          desc: "Berdiri (bagi yang mampu), Niat, Takbiratul Ihram, Membaca Al-Fatihah, Ruku', I'tidal, Sujud, Duduk di antara dua sujud, Tasyahud Akhir, Shalawat, Salam pertama, Tertib.",
+          title: "Rukun Shalat (18 Rukun)",
+          desc: "Niat, Takbiratul Ihram, Berdiri, Membaca Al-Fatihah, Ruku', Thuma'ninah ruku', I'tidal, Thuma'ninah I'tidal, Sujud 2 kali, Thuma'ninah sujud, Duduk antara 2 sujud, Thuma'ninah duduk, Tasyahud akhir, Duduk tasyahud akhir, Shalawat nabi, Salam pertama, Niat keluar shalat, Tertib.",
         },
         {
-          title: "Hal yang Membatalkan",
-          desc: "Berbicara dengan sengaja, makan/minum, bergerak berturut-turut 3 kali (menurut mazhab Syafi'i), terkena najis, terbuka aurat secara sengaja, membelakangi kiblat.",
+          title: "Hal yang Membatalkan Shalat",
+          desc: "Berbicara dengan sengaja, bergerak berturut-turut (3 kali), berhadast, terkena najis, terbukanya aurat, berubah niat, membelakangi kiblat, makan, minum, tertawa, murtad.",
         },
         {
-          title: "Sholat Jamaah",
-          desc: "Sangat dianjurkan (Sunnah Muakkad/Fardhu Kifayah) dengan keutamaan 27 derajat dibanding sholat sendirian.",
+          title: "Sujud Sahwi",
+          desc: "Disunnahkan apabila meninggalkan sunnah ab'adl (misal: qunut subuh, tasyahud awal) atau ragu dalam jumlah rakaat. Dilakukan sebelum salam.",
         },
       ],
-      reference: "Kitab Safinatun Naja & Al-Fiqh Al-Manhaji",
+      reference: "Kitab Matan Abu Syuja' & Safinatun Naja",
     },
     {
       id: "puasa",
-      title: "Puasa (Shaum)",
+      title: "Kitab Puasa",
       icon: <Star className="w-5 h-5" />,
       color: "bg-amber-50 text-amber-700",
       content: [
         {
-          title: "Syarat Wajib",
-          desc: "Islam, Baligh, Berakal, Mampu, Mukim (tidak musafir), Suci dari haid/nifas bagi wanita.",
+          title: "Syarat Wajib Puasa Ramadhan",
+          desc: "1. Islam, 2. Baligh, 3. Berakal, 4. Mampu berpuasa, 5. Sehat, 6. Mukim (bukan musafir).",
         },
         {
-          title: "Rukun Puasa",
-          desc: "1. Niat (di malam hari untuk puasa wajib), 2. Menahan diri dari hal-hal yang membatalkan puasa mulai dari terbit fajar (shubuh) hingga terbenam matahari (maghrib).",
+          title: "Syarat Sah & Rukun Puasa",
+          desc: "Syarat Sah: Islam, berakal, suci dari haid/nifas, dan di waktu yang diperbolehkan puasa. Rukun: 1. Niat di malam hari (untuk puasa fardhu), 2. Menahan dari yang membatalkan puasa.",
         },
         {
-          title: "Yang Membatalkan",
-          desc: "Makan/minum dengan sengaja, muntah disengaja, berhubungan suami istri di siang hari, keluarnya mani dengan sengaja, haid/nifas, gila, murtad.",
+          title: "Perkara yang Membatalkan Puasa",
+          desc: "Memasukkan sesuatu ke rongga tubuh terbuka (mulut, hidung, telinga), muntah disengaja, jima' (bersetubuh) di siang hari, keluar mani dengan sengaja, haid, nifas, gila, murtad.",
         },
         {
-          title: "Hari Diharamkan Puasa",
-          desc: "Hari Raya Idul Fitri (1 Syawal), Idul Adha (10 Dzulhijjah), dan Hari Tasyrik (11, 12, 13 Dzulhijjah).",
+          title: "Hari Diharamkannya Puasa",
+          desc: "Hari raya Idul Fitri (1 Syawal), Idul Adha (10 Dzulhijjah), dan Hari-hari Tasyrik (11, 12, 13 Dzulhijjah). Serta puasa sunnah di hari Jumat tanpa diikuti hari sebelum/sesudahnya.",
         },
       ],
-      reference: "Kitab Fathul Qorib & Bulughul Maram",
+      reference: "Kitab Matan Abu Syuja', Fathul Qorib",
     },
     {
       id: "zakat",
-      title: "Zakat & Sedekah",
+      title: "Kitab Zakat",
       icon: <CheckCircle2 className="w-5 h-5" />,
       color: "bg-indigo-50 text-indigo-700",
       content: [
         {
+          title: "Zakat yang Wajib Dikeluarkan",
+          desc: "Binatang ternak (unta, sapi, kambing), Emas dan Perak (juga emas batangan/uang), Harta perniagaan (tijarah), Hasil pertanian (zuru' wa tsimaar), dan Zakat Fitrah.",
+        },
+        {
+          title: "Syarat Wajib Zakat Maal",
+          desc: "Islam, merdeka, milik sempurna, mencapai satu nishab, dan telah berlalu satu tahun penuh (haul) kecuali pada tanaman/buah yang diwajibkan saat panen.",
+        },
+        {
           title: "Zakat Fitrah",
-          desc: "Wajib bagi setiap Muslim sebelum sholat Idul Fitri. Besaran: 1 sha' (sekitar 2.5 - 2.7 kg) makanan pokok/beras.",
+          desc: "Wajib di bulan Ramadhan bagi setiap jiwa muslim yang memiliki kelebihan makanan pokok pada malam Idul Fitri. Besarannya 1 sha' (± 2.5 - 2.7 kg makanan pokok).",
         },
         {
-          title: "Zakat Maal",
-          desc: "Zakat harta berupa emas, perak, uang, hewan ternak, hasil pertanian, dan perniagaan. Wajib jika mencapai Nishab dan Haul (1 tahun Qamariyah).",
-        },
-        {
-          title: "Golongan Penerima (Asnaf)",
-          desc: "Fakir, Miskin, Amil, Muallaf, Riqab (Hamba sahaya), Gharim (Orang berhutang), Fisabilillah, Ibnu Sabil (Musafir dalam ketaatan).",
+          title: "8 Asnaf (Penerima Zakat)",
+          desc: "Fakir, Miskin, Amil, Muallaf, Riqab (memerdekakan budak), Gharim (yang terlilit hutang untuk maslahat), Fisabilillahi (Mujahid/kepentingan syi'ar Islam), Ibnu Sabil (Musafir kehabisan bekal).",
         },
       ],
-      reference: "Kitab Minhajut Thalibin",
+      reference: "Kitab Matan Abu Syuja'",
     },
     {
       id: "jenazah",
-      title: "Pengurusan Jenazah",
+      title: "Kitab Al-Janaiz",
       icon: <Droplet className="w-5 h-5" />,
       color: "bg-slate-50 text-slate-700",
       content: [
         {
-          title: "Hukum",
-          desc: "Fardhu Kifayah. Gugur kewajibannya jika sebagian Muslim telah melaksanakannya.",
+          title: "Kewajiban Terhadap Jenazah Muslim",
+          desc: "Hukumnya fardhu kifayah: Memandikan, Mengkafani, Menyolati, dan Menguburkan. Dikecualikan jenazah mati syahid yang gugur kewajiban mandi dan shalat.",
         },
         {
           title: "Memandikan Jenazah",
-          desc: "Syarat: Jenazah seorang muslim, ada tubuhnya (sekalipun sedikit), bukan mati syahid. Diutamakan mencampurkan kapur barus/daun bidara.",
+          desc: "Batas wajarnya minimal meratakan air ke seluruh badannya 1 kali. Kesempurnaannya membasuh tiga kali berturut-turut, diakhiri dengan campuran kapur barus.",
         },
         {
-          title: "Mengkafani",
-          desc: "Bagi laki-laki disunnahkan 3 lapis kain putih, bagi perempuan 5 lapis (kain basahan, baju kurung, kerudung, dan 2 lapis kain panjang).",
+          title: "Mengkafani Jenazah",
+          desc: "Laki-laki sunnah 3 lembar kain putih tanpa baju maupun sorban. Perempuan sunnah 5 lembar: kain basahan, baju kurung, khimar (kerudung), dan dua lembar kain bungkus.",
         },
         {
-          title: "Sholat Jenazah",
-          desc: "4 kali Takbir. Takbir 1: Al-Fatihah, Takbir 2: Shalawat Nabi, Takbir 3: Doa jenazah, Takbir 4: Doa penutup khusus, lalu Salam.",
+          title: "Shalat Jenazah",
+          desc: "Rukunnya: Niat, berdiri, 4 kali takbir. Takbir 1: Al-Fatihah. Takbir 2: Shalawat Nabi. Takbir 3: Doa untuk mayit. Takbir 4: Doa penutup, lalu salam.",
         },
         {
-          title: "Memakamkan",
-          desc: "Wajib dikuburkan di kedalaman yang mencegah bau tercium dan aman dari binatang buas. Kepala jenazah diletakkan di utara menghadap kiblat.",
+          title: "Pemakaman Jenazah",
+          desc: "Jenazah dimasukkan miring ke kanan dan wajah dihadapkan ke arah kiblat. Lubang kubur digali agar menahan bau keluarnya mayit dan mencegah digali binatang buas.",
         },
       ],
-      reference: "Kitab Fathul Mu'in",
+      reference: "Kitab Fathul Qorib",
     },
     {
       id: "haji_umrah",
-      title: "Haji & Umrah",
+      title: "Kitab Haji & Umrah",
       icon: <CheckCircle2 className="w-5 h-5" />,
       color: "bg-teal-50 text-teal-700",
       content: [
         {
-          title: "Syarat Haji",
-          desc: "Islam, Baligh, Berakal, Merdeka, dan Mampu (Istitha'ah) baik fisik maupun finansial.",
+          title: "Syarat Wajib Haji & Umrah",
+          desc: "1. Islam, 2. Baligh, 3. Berakal, 4. Merdeka, 5. Istitha'ah (mampu secara bekal, kendaraan, keamanan jalan, tubuh yang sehat).",
         },
         {
-          title: "Rukun Haji",
-          desc: "1. Ihram (Niat), 2. Wukuf di Arafah, 3. Thawaf Ifadhah, 4. Sa'i, 5. Tahallul (Bercukur/Menggunting rambut), 6. Tertib.",
+          title: "Rukun Haji (5 Rukun)",
+          desc: "1. Ihram beserta niatnya, 2. Wukuf di padang Arafah (tanggal 9 Dzulhijjah), 3. Thawaf Ifadhah, 4. Sa'i antara Shafa dan Marwah, 5. Mencukur rambut.",
+        },
+        {
+          title: "Wajib Haji",
+          desc: "1. Ihram dari Miqat, 2. Mabit (bermalam) di Muzdalifah, 3. Mabit di Mina, 4. Melempar Jumrah (Aqabah, Ula, Wustha), 5. Menjauhi larangan ihram, 6. Thawaf Wada'.",
         },
         {
           title: "Rukun Umrah",
-          desc: "Sama dengan Haji kecuali Wukuf di Arafah. (Ihram, Thawaf, Sa'i, Tahallul, Tertib).",
+          desc: "Sama seperti haji tetapi tanpa Wukuf di Arafah. Rukun Umrah: Ihram, Thawaf, Sa'i, Bercukur, dan Tertib.",
         },
         {
-          title: "Niat Ihram",
-          desc: "Niat Ihram Umrah: 'Labbaik Allahumma 'Umratan'. Niat Ihram Haji: 'Labbaik Allahumma Hajjan'. Wajib diucapkan dari Miqat.",
-        },
-        {
-          title: "Larangan Ihram",
-          desc: "Bagi pria memakai mukena/baju berjahit, menutup kepala. Umum: Memotong kuku/rambut, memakai wangi-wangian, berburu, menikah/menikahkan.",
+          title: "Benda Larangan Saat Ihram",
+          desc: "Laki-laki dilarang memakai pakaian berjahit dan tutup kepala. Perempuan dilarang menutup wajah dan sarung tangan. Semuanya dilarang memakai wangi-wangian, memotong rambut kuku, berburu, dan berjima'.",
         },
       ],
-      reference: "Kitab Al-Idhah fi Manasik Al-Hajj & Umrah",
+      reference: "Kitab Matan Abu Syuja'",
+    },
+    {
+      id: "muamalah",
+      title: "Kitab Al-Buyu' (Jual Beli)",
+      icon: <CheckCircle2 className="w-5 h-5" />,
+      color: "bg-sky-50 text-sky-700",
+      content: [
+        {
+          title: "Syarat Sah Jual Beli",
+          desc: "Terdapat penjual dan pembeli (keduanya baligh & berakal), ada barang yang diperjualbelikan (suci, bermanfaat, bisa diserahterimakan, milik sah), ada ucapan Ijab & Qabul.",
+        },
+        {
+          title: "Jual Beli yang Diharamkan",
+          desc: "Jual beli najis (anjing, khamr), jual beli sperma hewan pejantan, jual beli anak hewan yang masih dalam janin, jual beli barang curian, dan transaksi yang mengandung Riba dan Gharar (ketidakpastian).",
+        },
+        {
+          title: "Khiyar (Hak Memilih)",
+          desc: "Penjual dan pembeli berhak memilih melanjutkan atau membatalkan akad. Jenis Khiyar: Khiyar Majlis (selama belum berpisah), Khiyar Syarat (maksimal 3 hari), Khiyar Aib (jika ada cacat yang disembunyikan).",
+        },
+      ],
+      reference: "Kitab Fathul Mu'in & Matan Abu Syuja'",
+    },
+    {
+      id: "munakahat",
+      title: "Kitab Munakahat (Pernikahan)",
+      icon: <Star className="w-5 h-5" />,
+      color: "bg-pink-50 text-pink-700",
+      content: [
+        {
+          title: "Rukun Nikah",
+          desc: "1. Calon suami, 2. Calon istri, 3. Wali (dari pihak perempuan), 4. Dua orang saksi laki-laki yang adil, 5. Sighat Ijab & Qabul.",
+        },
+        {
+          title: "Mahram (Orang yang Haram Dinikahi)",
+          desc: "Nasab: Ibu, anak perempuan, saudara perempuan, keponakan, bibi. Persusuan: Ibu susu, dan saudara sepersusuan. Mushaharah (Pernikahan): Ibu mertua, anak tiri, menantu, istri bapak.",
+        },
+        {
+          title: "Mahar (Mas Kawin)",
+          desc: "Sesuatu yang wajib diberikan suami kepada istri dengan sebab akad nikah. Dianjurkan menyebutkan kadarnya saat akad, dan yang terbaik adalah yang tidak memberatkan.",
+        },
+        {
+          title: "Talak & Iddah",
+          desc: "Talak ada yang Raj'i (bisa rujuk) dan Ba'in (tidak bisa rujuk kecuali menikah baru atau ba'in kubra). Iddah wanita cerai (haid 3 quru'), wanita cerai mati (4 bulan 10 hari).",
+        },
+      ],
+      reference: "Kitab Fathul Mu'in",
     },
   ];
 
