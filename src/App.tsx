@@ -96,7 +96,7 @@ export default function App() {
   };
 
   // State: User profile parameters
-  const [userName, setUserName] = useState("Ahlan");
+  const [userName, setUserName] = useState("Habib Ismail Al Qadri");
   const [dailyGoalMinutes, setDailyGoalMinutes] = useState(15);
   const [geminiApiKey, setGeminiApiKey] = useState("");
 

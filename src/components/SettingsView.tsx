@@ -6,7 +6,7 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { 
   User, Bookmark, Shield, Trash, Bell, Check, 
-  HelpCircle, Sparkles, BookOpen, AlertTriangle, ArrowRight, HeartHandshake, Copy, Landmark
+  HelpCircle, Sparkles, BookOpen, AlertTriangle, ArrowRight, HeartHandshake, Copy, Landmark, Compass
 } from "lucide-react";
 import { Bookmark as BookmarkType, Note } from "../types";
 
@@ -39,7 +39,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   setGeminiApiKey,
   addToast
 }) => {
-  const [activeMenu, setActiveMenu] = useState<"profil" | "bookmarks" | "notes" | "support">("profil");
+  const [activeMenu, setActiveMenu] = useState<"profil" | "bookmarks" | "notes" | "support" | "about">("profil");
   const [editingName, setEditingName] = useState(userName);
   const [editingGeminiKey, setEditingGeminiKey] = useState(geminiApiKey);
 
@@ -115,7 +115,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           { id: "profil", label: "Profil & Target Harian", icon: <User className="w-4.5 h-4.5" /> },
           { id: "bookmarks", label: `Markah Bacaan (${bookmarks.length})`, icon: <Bookmark className="w-4.5 h-4.5" /> },
           { id: "notes", label: `Catatan Tadabbur (${notes.length})`, icon: <Shield className="w-4.5 h-4.5" /> },
-          { id: "support", label: "Dukungan / Gift", icon: <HeartHandshake className="w-4.5 h-4.5" /> }
+          { id: "support", label: "Dukungan / Gift", icon: <HeartHandshake className="w-4.5 h-4.5" /> },
+          { id: "about", label: "Tentang Aplikasi", icon: <HelpCircle className="w-4.5 h-4.5" /> }
         ].map((item) => {
           const isAct = activeMenu === item.id;
           return (
@@ -409,6 +410,49 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             <p className="text-xs text-center text-slate-400 font-medium px-4 leading-relaxed mt-2 italic">
               "Perumpamaan orang yang menginfakkan hartanya di jalan Allah seperti sebutir biji yang menumbuhkan tujuh tangkai, pada setiap tangkai ada seratus biji..." <br/><span className="font-bold block mt-1">(Al-Baqarah: 261)</span>
             </p>
+          </div>
+        )}
+        {/* VIEW 5: ABOUT APPLICATION */}
+        {activeMenu === "about" && (
+          <div className="flex flex-col gap-4">
+            <div>
+              <h3 className="font-serif font-bold text-[#0F4C3A] text-lg">Tentang Aplikasi</h3>
+              <p className="text-xs text-slate-400 font-semibold mt-0.5">
+                Fitur, Fungsi, dan Pengembang Quran Saku App.
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-4 mt-2">
+              <div className="bg-slate-50 border border-slate-100 rounded-2xl p-5 shadow-sm">
+                <h4 className="font-bold text-slate-800 text-sm mb-2">🧑‍💻 Developer</h4>
+                <p className="text-sm font-medium text-slate-600 leading-relaxed">
+                  Aplikasi ini dikembangkan oleh <span className="font-bold text-[#0F4C3A]">Habib Ismail Al Qadri</span>. 
+                  Dibangun dengan niat dakwah untuk memudahkan umat Islam dalam membaca, mempelajari, dan menadabburi ayat suci Al-Qur'an secara digital kapanpun dan di manapun.
+                </p>
+              </div>
+
+              <div className="bg-slate-50 border border-slate-100 rounded-2xl p-5 shadow-sm">
+                <h4 className="font-bold text-slate-800 text-sm mb-3">✨ Fitur & Fungsi Utama</h4>
+                <ul className="flex flex-col gap-3">
+                  <li className="flex items-start gap-2.5">
+                    <span className="w-5 h-5 rounded-md bg-[#0F4C3A]/10 text-[#0F4C3A] flex items-center justify-center flex-shrink-0 mt-0.5"><BookOpen className="w-3 h-3" /></span>
+                    <p className="text-sm font-medium text-slate-600"><span className="font-bold text-slate-700">Mushaf Digital:</span> Membaca Al-Qur'an 30 Juz lengkap dengan tajwid, terjemahan, dan audio Murottal per ayat.</p>
+                  </li>
+                  <li className="flex items-start gap-2.5">
+                    <span className="w-5 h-5 rounded-md bg-[#0F4C3A]/10 text-[#0F4C3A] flex items-center justify-center flex-shrink-0 mt-0.5"><Compass className="w-3 h-3" /></span>
+                    <p className="text-sm font-medium text-slate-600"><span className="font-bold text-slate-700">Arah Kiblat & Waktu Sholat:</span> Navigasi presisi Kiblat berdasarkan GPS lokal serta jadwal adzan akurat.</p>
+                  </li>
+                  <li className="flex items-start gap-2.5">
+                    <span className="w-5 h-5 rounded-md bg-[#0F4C3A]/10 text-[#0F4C3A] flex items-center justify-center flex-shrink-0 mt-0.5"><Sparkles className="w-3 h-3" /></span>
+                    <p className="text-sm font-medium text-slate-600"><span className="font-bold text-slate-700">Tanya Ustadz AI:</span> Bimbingan Islami berbasis AI dengan rujukan komprehensif ke ayat Al-Qur'an dan Hadits.</p>
+                  </li>
+                  <li className="flex items-start gap-2.5">
+                    <span className="w-5 h-5 rounded-md bg-[#0F4C3A]/10 text-[#0F4C3A] flex items-center justify-center flex-shrink-0 mt-0.5"><Bookmark className="w-3 h-3" /></span>
+                    <p className="text-sm font-medium text-slate-600"><span className="font-bold text-slate-700">Markah & Catatan:</span> Menandai progres tilawah dan merangkum hasil tadabbur langsung di dalam ayat.</p>
+                  </li>
+                </ul>
+              </div>
+            </div>
           </div>
         )}
       </div>
