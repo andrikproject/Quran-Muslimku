@@ -30,6 +30,7 @@ import {
   LibraryBig,
   LayoutGrid,
   ArrowLeft,
+  Bot,
 } from "lucide-react";
 
 // Components
@@ -51,6 +52,7 @@ import { HaditsView } from "./components/HaditsView";
 import { JurnalIbadahView } from "./components/JurnalIbadahView";
 import { DzikirPagiPetangView } from "./components/DzikirPagiPetangView";
 import { KalkulatorZakatView } from "./components/KalkulatorZakatView";
+import { TanyaUstadzView } from "./components/TanyaUstadzView";
 
 // Typings and Data
 import { Bookmark, Note, TilawahProgress } from "./types";
@@ -193,6 +195,7 @@ export default function App() {
     | "jurnal"
     | "dzikir"
     | "zakat"
+    | "ustadz"
   >("beranda");
   const [showSubMenu, setShowSubMenu] = useState(false);
 
@@ -766,6 +769,19 @@ export default function App() {
                         bg: "bg-[#FDF2F8] text-pink-700",
                         icon: <BookMarked className="w-5.5 h-5.5" />,
                       },
+                      {
+                        tag: "Cari",
+                        action: () => {
+                          setActiveTab("cari");
+                          addToast(
+                            "Pencarian",
+                            "Membuka fitur pencarian.",
+                            "info",
+                          );
+                        },
+                        bg: "bg-[#FFF6ED] text-orange-600",
+                        icon: <Search className="w-5.5 h-5.5 text-orange-600" />,
+                      },
                     ].map((itm, i) => (
                       <button
                         key={i}
@@ -993,7 +1009,6 @@ export default function App() {
           <CariView
             onSelectSurah={handleJumpToSurah}
             addToast={addToast}
-            geminiApiKey={geminiApiKey}
           />
         );
 
@@ -1053,6 +1068,15 @@ export default function App() {
 
       case "zakat":
         return <KalkulatorZakatView onBack={() => setActiveTab("beranda")} />;
+
+      case "ustadz":
+        return (
+          <TanyaUstadzView
+            onBack={() => setActiveTab("beranda")}
+            addToast={addToast}
+            geminiApiKey={geminiApiKey}
+          />
+        );
 
       case "profil":
         return (
@@ -1205,9 +1229,9 @@ export default function App() {
             icon: <BookOpen className="w-[22px] h-[22px]" strokeWidth={1.5} />,
           },
           {
-            id: "cari",
-            label: "Cari",
-            icon: <Search className="w-5.5 h-5.5" strokeWidth={1.5} />,
+            id: "ustadz",
+            label: "Tanya AI",
+            icon: <Bot className="w-6 h-6" strokeWidth={1.5} />,
             isCenter: true,
           },
           {
@@ -1227,7 +1251,7 @@ export default function App() {
             return (
               <button
                 key={item.id}
-                onClick={() => setActiveTab("cari")}
+                onClick={() => setActiveTab("ustadz")}
                 className="flex flex-col items-center justify-center flex-1 focus:outline-none cursor-pointer group pb-1"
               >
                 <div className="relative -top-6 w-14 h-14 rounded-full bg-[#0F4C3A] text-white flex items-center justify-center shadow-lg shadow-emerald-950/30 transition-transform active:scale-95 hover:scale-105 border-4 border-white">
