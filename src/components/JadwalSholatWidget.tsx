@@ -214,30 +214,18 @@ export const JadwalSholatWidget: React.FC<SholatWidgetProps> = ({ addToast }) =>
           "notification"
         );
         // Play sweet notification tone (synthesized or direct audiotone)
-        playAdhanTone();
+        playAdhanTone(targetSholat.name);
       }
     }
   }, [currentTime, schedule, notifiedPrayers, selectedCity]);
 
-  // Audio synthe-tone generator for adhan notification (safe without remote URLs)
-  const playAdhanTone = () => {
+  // Play audio file for adhan notification
+  const playAdhanTone = (prayerName: string) => {
     try {
-      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
-      if (!AudioCtx) return;
-      const ctx = new AudioCtx();
-      
-      const tones = [261.63, 329.63, 392.00, 523.25]; // C E G C chord
-      tones.forEach((freq, idx) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.frequency.setValueAtTime(freq, ctx.currentTime);
-        gain.gain.setValueAtTime(0, ctx.currentTime);
-        gain.gain.linearRampToValueAtTime(0.15, ctx.currentTime + 0.1);
-        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 2.0 + idx * 0.5);
-        osc.start(ctx.currentTime + idx * 0.3);
-        osc.stop(ctx.currentTime + 3.0 + idx * 0.5);
+      const audioPath = prayerName.toLowerCase() === 'subuh' ? '/Subuh.mp3' : '/Azan.mp3';
+      const audio = new Audio(audioPath);
+      audio.play().catch(e => {
+        console.warn("Audio playback blocked", e);
       });
     } catch (e) {
       console.warn("Audio Context blocked", e);
