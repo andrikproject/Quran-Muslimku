@@ -5,20 +5,42 @@
 import React, { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "motion/react";
-import { 
-  Heart, Search, Share2, Copy, Trash, RotateCw, 
-  Sparkles, Check, ChevronDown, HandHelping, Plus, AlertCircle,
-  Compass, Volume2, VolumeX, Smartphone, History, Eye, Info
+import {
+  Heart,
+  Search,
+  Share2,
+  Copy,
+  Trash,
+  RotateCw,
+  Sparkles,
+  Check,
+  ChevronDown,
+  HandHelping,
+  Plus,
+  AlertCircle,
+  Compass,
+  Volume2,
+  VolumeX,
+  Smartphone,
+  History,
+  Eye,
+  Info,
 } from "lucide-react";
 import { STATIC_DOA, ASMAUL_HUSNA } from "../data";
 import { DoaItem } from "../types";
 
 interface DoaHarianViewProps {
-  addToast: (title: string, body: string, type: "success" | "info" | "warning" | "notification") => void;
+  addToast: (
+    title: string,
+    body: string,
+    type: "success" | "info" | "warning" | "notification",
+  ) => void;
 }
 
 export const DoaHarianView: React.FC<DoaHarianViewProps> = ({ addToast }) => {
-  const [activeTab, setActiveTab] = useState<"doa" | "tasbih" | "asmaul" | "kiblat">("doa");
+  const [activeTab, setActiveTab] = useState<
+    "doa" | "tasbih" | "asmaul" | "kiblat"
+  >("doa");
 
   // Doa state
   const [doas, setDoas] = useState<DoaItem[]>(STATIC_DOA);
@@ -33,18 +55,22 @@ export const DoaHarianView: React.FC<DoaHarianViewProps> = ({ addToast }) => {
   const [dhikrTotalCompleted, setDhikrTotalCompleted] = useState(0);
   const [customDhikr, setCustomDhikr] = useState("");
   const [isCustomDhikrActive, setIsCustomDhikrActive] = useState(false);
-  
+
   // New tasbih feature variables
   const [isSoundOn, setIsSoundOn] = useState(true);
   const [isVibrateOn, setIsVibrateOn] = useState(true);
-  const [tasbihLogs, setTasbihLogs] = useState<{ phrase: string; count: number; date: string }[]>(() => {
+  const [tasbihLogs, setTasbihLogs] = useState<
+    { phrase: string; count: number; date: string }[]
+  >(() => {
     const raw = localStorage.getItem("myquran_tasbih_logs");
     return raw ? JSON.parse(raw) : [];
   });
 
   // Asmaul Husna state
   const [asmaulQuery, setAsmaulQuery] = useState("");
-  const [selectedAsma, setSelectedAsma] = useState<typeof ASMAUL_HUSNA[0] | null>(null);
+  const [selectedAsma, setSelectedAsma] = useState<
+    (typeof ASMAUL_HUSNA)[0] | null
+  >(null);
 
   // Kiblat state
   const [deviceHeading, setDeviceHeading] = useState(0);
@@ -62,7 +88,8 @@ export const DoaHarianView: React.FC<DoaHarianViewProps> = ({ addToast }) => {
   const triggerSound = (pitch = 440, duration = 0.08) => {
     if (!isSoundOn) return;
     try {
-      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      const AudioCtx =
+        window.AudioContext || (window as any).webkitAudioContext;
       if (!AudioCtx) return;
       const ctx = new AudioCtx();
       const osc = ctx.createOscillator();
@@ -83,7 +110,7 @@ export const DoaHarianView: React.FC<DoaHarianViewProps> = ({ addToast }) => {
   useEffect(() => {
     const handleOrientation = (e: DeviceOrientationEvent) => {
       // absolute heading or alpha depending on browser support
-      const heading = (e as any).webkitCompassHeading || (360 - (e.alpha || 0));
+      const heading = (e as any).webkitCompassHeading || 360 - (e.alpha || 0);
       if (typeof heading === "number") {
         setDeviceHeading(Math.round(heading));
         setSupportsSensor(true);
@@ -108,27 +135,38 @@ export const DoaHarianView: React.FC<DoaHarianViewProps> = ({ addToast }) => {
 
     if (nextCount > dhikrTarget) {
       // target reached
-      const timeString = new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
-      const completedItem = { phrase: dhikrPhrase, count: dhikrTarget, date: timeString };
-      
-      setTasbihLogs(prev => [completedItem, ...prev].slice(0, 10)); // keep last 10 logs
+      const timeString = new Date().toLocaleTimeString("id-ID", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+      const completedItem = {
+        phrase: dhikrPhrase,
+        count: dhikrTarget,
+        date: timeString,
+      };
+
+      setTasbihLogs((prev) => [completedItem, ...prev].slice(0, 10)); // keep last 10 logs
       setDhikrCount(1);
-      setDhikrTotalCompleted(prev => prev + 1);
+      setDhikrTotalCompleted((prev) => prev + 1);
       triggerSound(880, 0.4); // Congratulations high tone
-      
+
       addToast(
         "Dzikir Selesai! 🎉",
         `Alhamdulillah, Anda menyelesaikan ${dhikrTarget} kali dzikir: ${dhikrPhrase}`,
-        "success"
+        "success",
       );
     } else {
       setDhikrCount(nextCount);
       // Play a direct tactile click tone
       triggerSound(nextCount === dhikrTarget ? 660 : 440, 0.1);
-      
+
       if (nextCount === dhikrTarget) {
         triggerVibrate(150); // longer vibration at accomplishment
-        addToast("Putaran Selesai 📿", `Alhamdulillah, melampaui ke ${dhikrPhrase} target ${dhikrTarget} kali.`, "info");
+        addToast(
+          "Putaran Selesai 📿",
+          `Alhamdulillah, melampaui ke ${dhikrPhrase} target ${dhikrTarget} kali.`,
+          "info",
+        );
       }
     }
   };
@@ -136,12 +174,20 @@ export const DoaHarianView: React.FC<DoaHarianViewProps> = ({ addToast }) => {
   const handleTasbihReset = () => {
     setDhikrCount(0);
     triggerSound(220, 0.25);
-    addToast("Dzikir Direset", "Alat tasbih digital kembali diatur ke nol.", "info");
+    addToast(
+      "Dzikir Direset",
+      "Alat tasbih digital kembali diatur ke nol.",
+      "info",
+    );
   };
 
   const deleteSingleLog = (index: number) => {
-    setTasbihLogs(prev => prev.filter((_, i) => i !== index));
-    addToast("Catatan Dihapus", "Log tasbih lokal berhasil dibersihkan.", "warning");
+    setTasbihLogs((prev) => prev.filter((_, i) => i !== index));
+    addToast(
+      "Catatan Dihapus",
+      "Log tasbih lokal berhasil dibersihkan.",
+      "warning",
+    );
   };
 
   const categories = ["Semua", "Penting", "Harian", "Keluarga", "Ibadah"];
@@ -152,7 +198,8 @@ export const DoaHarianView: React.FC<DoaHarianViewProps> = ({ addToast }) => {
       doa.judul.toLowerCase().includes(query) ||
       doa.terjemah.toLowerCase().includes(query) ||
       doa.latin.toLowerCase().includes(query);
-    const matchesCategory = selectedCategory === "Semua" || doa.kategori === selectedCategory;
+    const matchesCategory =
+      selectedCategory === "Semua" || doa.kategori === selectedCategory;
     return matchesQuery && matchesCategory;
   });
 
@@ -169,17 +216,23 @@ export const DoaHarianView: React.FC<DoaHarianViewProps> = ({ addToast }) => {
   // copy helper
   const handleCopy = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
-    addToast("Berhasil Disalin", `Teks ${label} siap dibagikan ke sanak keluarga.`, "success");
+    addToast(
+      "Berhasil Disalin",
+      `Teks ${label} siap dibagikan ke sanak keluarga.`,
+      "success",
+    );
   };
 
   // Share helper
   const handleShare = (doa: DoaItem) => {
     const shareText = `*${doa.judul}*\n\n${doa.arab}\n\n_Latin:_ ${doa.latin}\n\n_Artinya:_ "${doa.terjemah}"\n\n(Dikutip dari: ${doa.sumber || "MyQuran Digital"})`;
     if (navigator.share) {
-      navigator.share({
-        title: doa.judul,
-        text: shareText
-      }).catch(() => {});
+      navigator
+        .share({
+          title: doa.judul,
+          text: shareText,
+        })
+        .catch(() => {});
     } else {
       handleCopy(shareText, "Pesan lengkap doa");
     }
@@ -187,7 +240,7 @@ export const DoaHarianView: React.FC<DoaHarianViewProps> = ({ addToast }) => {
 
   // Get active orientation target details
   const activeCompassHeading = supportsSensor ? deviceHeading : manualHeading;
-  
+
   // Indonesia Standard Kiblat Angle is ~295° relative to North
   const targetKiblatAngle = 295;
   const isAligned = Math.abs(activeCompassHeading - targetKiblatAngle) <= 6;
@@ -197,8 +250,16 @@ export const DoaHarianView: React.FC<DoaHarianViewProps> = ({ addToast }) => {
       {/* Tab Selectors Segment */}
       <div className="flex bg-slate-100 p-1 rounded-2xl overflow-x-auto scrollbar-none">
         {[
-          { tabId: "doa", name: "Doa Pilihan", icon: <HandHelping className="w-4 h-4" /> },
-          { tabId: "asmaul", name: "Asmaul Husna", icon: <Sparkles className="w-4 h-4" /> }
+          {
+            tabId: "doa",
+            name: "Doa Pilihan",
+            icon: <HandHelping className="w-4 h-4" />,
+          },
+          {
+            tabId: "asmaul",
+            name: "Asmaul Husna",
+            icon: <Sparkles className="w-4 h-4" />,
+          },
         ].map((tab) => {
           const isActive = activeTab === tab.tabId;
           return (
@@ -215,7 +276,9 @@ export const DoaHarianView: React.FC<DoaHarianViewProps> = ({ addToast }) => {
                   : "text-slate-500 hover:text-slate-800"
               }`}
             >
-              <span className="hidden xs:inline-block flex-shrink-0">{tab.icon}</span>
+              <span className="hidden xs:inline-block flex-shrink-0">
+                {tab.icon}
+              </span>
               {tab.name}
             </button>
           );
@@ -229,9 +292,12 @@ export const DoaHarianView: React.FC<DoaHarianViewProps> = ({ addToast }) => {
         <div className="flex flex-col gap-4">
           {/* Quick Header */}
           <div className="bg-slate-50 border border-slate-100 p-4.5 rounded-2xl">
-            <h3 className="font-serif font-bold text-slate-800 text-base">Kumpulan Doa Pilihan</h3>
+            <h3 className="font-serif font-bold text-slate-800 text-base">
+              Kumpulan Doa Pilihan
+            </h3>
             <p className="text-xs text-slate-500 mt-1">
-              Temukan tuntunan berserah diri kepada Allah Swt dalam keseharian Anda.
+              Temukan tuntunan berserah diri kepada Allah Swt dalam keseharian
+              Anda.
             </p>
           </div>
 
@@ -279,7 +345,9 @@ export const DoaHarianView: React.FC<DoaHarianViewProps> = ({ addToast }) => {
                   >
                     {/* Header trigger click area */}
                     <div
-                      onClick={() => setExpandedDoa(isExpanded ? null : doa.judul)}
+                      onClick={() =>
+                        setExpandedDoa(isExpanded ? null : doa.judul)
+                      }
                       className="p-4 flex justify-between items-center cursor-pointer hover:bg-slate-50/50 transition-colors"
                     >
                       <div className="flex gap-3 items-center min-w-0 pr-4">
@@ -321,11 +389,14 @@ export const DoaHarianView: React.FC<DoaHarianViewProps> = ({ addToast }) => {
                             {/* Source and share tools */}
                             <div className="flex justify-between items-center border-t border-slate-50 pt-3.5 mt-1">
                               <span className="text-[10px] font-bold text-slate-400 tracking-wider">
-                                SUMBER: {doa.sumber?.toUpperCase() || "HADITS PILIHAN"}
+                                SUMBER:{" "}
+                                {doa.sumber?.toUpperCase() || "HADITS PILIHAN"}
                               </span>
                               <div className="flex gap-2">
                                 <button
-                                  onClick={() => handleCopy(doa.arab, "Teks Arab")}
+                                  onClick={() =>
+                                    handleCopy(doa.arab, "Teks Arab")
+                                  }
                                   className="p-1 px-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-500 hover:text-slate-800 text-[10px] font-bold flex items-center gap-1 cursor-pointer transition-all"
                                 >
                                   <Copy className="w-3.5 h-3.5" />
@@ -350,7 +421,9 @@ export const DoaHarianView: React.FC<DoaHarianViewProps> = ({ addToast }) => {
             ) : (
               <div className="text-center py-10 text-slate-400">
                 <AlertCircle className="w-10 h-10 mx-auto text-slate-300 stroke-[1.5] mb-2" />
-                <p className="text-xs font-medium">Doa tidak ditemukan. Coba pencarian kata kunci lainnya.</p>
+                <p className="text-xs font-medium">
+                  Doa tidak ditemukan. Coba pencarian kata kunci lainnya.
+                </p>
               </div>
             )}
           </div>
@@ -363,25 +436,34 @@ export const DoaHarianView: React.FC<DoaHarianViewProps> = ({ addToast }) => {
           {/* Quick instructions and loop tracker details */}
           <div className="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl flex justify-between items-center flex-wrap gap-3">
             <div>
-              <h3 className="font-serif font-bold text-slate-850 text-sm">Kemajuan Tasbih</h3>
+              <h3 className="font-serif font-bold text-slate-850 text-sm">
+                Kemajuan Tasbih
+              </h3>
               <p className="text-[11px] text-slate-500 mt-0.5">
-                Putaran selesai hari ini: <strong className="text-emerald-700">{dhikrTotalCompleted} putaran</strong>
+                Putaran selesai hari ini:{" "}
+                <strong className="text-emerald-700">
+                  {dhikrTotalCompleted} putaran
+                </strong>
               </p>
             </div>
-            
+
             {/* Audio tactile settings toggler */}
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setIsSoundOn(!isSoundOn)}
                 title={isSoundOn ? "Matikan Bunyi" : "Nyalakan Bunyi"}
-                className={`p-1.5 rounded-xl border transition-colors cursor-pointer ${isSoundOn ? 'bg-emerald-50 text-emerald-800 border-emerald-100' : 'bg-slate-100 text-slate-400 border-slate-200'}`}
+                className={`p-1.5 rounded-xl border transition-colors cursor-pointer ${isSoundOn ? "bg-emerald-50 text-emerald-800 border-emerald-100" : "bg-slate-100 text-slate-400 border-slate-200"}`}
               >
-                {isSoundOn ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+                {isSoundOn ? (
+                  <Volume2 className="w-4 h-4" />
+                ) : (
+                  <VolumeX className="w-4 h-4" />
+                )}
               </button>
               <button
                 onClick={() => setIsVibrateOn(!isVibrateOn)}
                 title={isVibrateOn ? "Matikan Vibrasi" : "Nyalakan Vibrasi"}
-                className={`p-1.5 rounded-xl border transition-colors cursor-pointer ${isVibrateOn ? 'bg-emerald-50 text-emerald-800 border-emerald-100' : 'bg-slate-100 text-slate-400 border-slate-200'}`}
+                className={`p-1.5 rounded-xl border transition-colors cursor-pointer ${isVibrateOn ? "bg-emerald-50 text-emerald-800 border-emerald-100" : "bg-slate-100 text-slate-400 border-slate-200"}`}
               >
                 <Smartphone className="w-4 h-4 opacity-75" />
               </button>
@@ -396,7 +478,9 @@ export const DoaHarianView: React.FC<DoaHarianViewProps> = ({ addToast }) => {
 
           {/* Dzikr selections rows */}
           <div className="w-full flex flex-col gap-2.5">
-            <label className="text-[10px] font-bold text-slate-400 tracking-wider">PILIH BACAAN DZIKIR</label>
+            <label className="text-[10px] font-bold text-slate-400 tracking-wider">
+              PILIH BACAAN DZIKIR
+            </label>
             <div className="grid grid-cols-3 gap-2">
               {["Subhanallah", "Alhamdulillah", "Allahu Akbar"].map((p) => (
                 <button
@@ -405,7 +489,11 @@ export const DoaHarianView: React.FC<DoaHarianViewProps> = ({ addToast }) => {
                     setDhikrPhrase(p);
                     setIsCustomDhikrActive(false);
                     setDhikrCount(0);
-                    addToast("Kalimat Terpilih", `Memulai dzikir dengan lafal: ${p}`, "info");
+                    addToast(
+                      "Kalimat Terpilih",
+                      `Memulai dzikir dengan lafal: ${p}`,
+                      "info",
+                    );
                   }}
                   className={`py-2 px-1 rounded-xl text-xs font-bold transition-all border cursor-pointer ${
                     dhikrPhrase === p && !isCustomDhikrActive
@@ -421,7 +509,9 @@ export const DoaHarianView: React.FC<DoaHarianViewProps> = ({ addToast }) => {
             {/* Target cycles selects */}
             <div className="grid grid-cols-2 gap-3 mt-1.5">
               <div className="flex flex-col gap-1">
-                <label className="text-[9px] font-bold text-slate-400 tracking-wider">TARGET PUTARAN</label>
+                <label className="text-[9px] font-bold text-slate-400 tracking-wider">
+                  TARGET PUTARAN
+                </label>
                 <div className="flex gap-1 bg-slate-100 rounded-xl p-1">
                   {[33, 99].map((t) => (
                     <button
@@ -431,7 +521,9 @@ export const DoaHarianView: React.FC<DoaHarianViewProps> = ({ addToast }) => {
                         setDhikrCount(0);
                       }}
                       className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                        dhikrTarget === t ? "bg-white text-emerald-800 shadow-sm" : "text-slate-500"
+                        dhikrTarget === t
+                          ? "bg-white text-emerald-800 shadow-sm"
+                          : "text-slate-500"
                       }`}
                     >
                       {t} Kali
@@ -456,7 +548,11 @@ export const DoaHarianView: React.FC<DoaHarianViewProps> = ({ addToast }) => {
                       setDhikrPhrase(customDhikr);
                       setIsCustomDhikrActive(true);
                       setDhikrCount(0);
-                      addToast("Lafadz Kustom", `Mengaktifkan dzikir kalimat pilihan Anda.`, "success");
+                      addToast(
+                        "Lafadz Kustom",
+                        `Mengaktifkan dzikir kalimat pilihan Anda.`,
+                        "success",
+                      );
                     }}
                     className="p-2 bg-emerald-800 hover:bg-emerald-950 text-white rounded-xl cursor-pointer"
                   >
@@ -490,7 +586,9 @@ export const DoaHarianView: React.FC<DoaHarianViewProps> = ({ addToast }) => {
                 strokeLinecap="round"
                 style={{ cx: "50%", cy: "50%" }}
                 strokeDasharray={2 * Math.PI * 88}
-                strokeDashoffset={2 * Math.PI * 88 * (1 - dhikrCount / dhikrTarget)}
+                strokeDashoffset={
+                  2 * Math.PI * 88 * (1 - dhikrCount / dhikrTarget)
+                }
               />
             </svg>
 
@@ -513,23 +611,33 @@ export const DoaHarianView: React.FC<DoaHarianViewProps> = ({ addToast }) => {
           </div>
 
           <p className="text-[10px] sm:text-[11px] text-slate-400 font-bold tracking-wide text-center leading-normal">
-            KETUK BULATAN ALAT UNTUK MENGHITUNG<br />
-            {isVibrateOn && "• Getaran aktif •"} {isSoundOn && "• Nada klik bersuara •"}
+            KETUK BULATAN ALAT UNTUK MENGHITUNG
+            <br />
+            {isVibrateOn && "• Getaran aktif •"}{" "}
+            {isSoundOn && "• Nada klik bersuara •"}
           </p>
 
           {/* Dzikir completion history log (MyQuran dynamic standard) */}
           <div className="w-full bg-white border border-slate-100 rounded-3xl p-5 shadow-sm mt-2">
             <h4 className="text-xs font-bold text-slate-500 flex items-center gap-1.5 uppercase tracking-wider mb-3">
-              <History className="w-4 h-4 text-emerald-700" /> Riyawat Dzikir Terbaru
+              <History className="w-4 h-4 text-emerald-700" /> Riyawat Dzikir
+              Terbaru
             </h4>
-            
+
             {tasbihLogs.length > 0 ? (
               <div className="flex flex-col gap-2 max-h-48 overflow-y-auto pr-1">
                 {tasbihLogs.map((log, idx) => (
-                  <div key={idx} className="flex items-center justify-between bg-slate-50 border border-slate-100 p-2.5 rounded-xl text-xs">
+                  <div
+                    key={idx}
+                    className="flex items-center justify-between bg-slate-50 border border-slate-100 p-2.5 rounded-xl text-xs"
+                  >
                     <div>
-                      <span className="font-bold text-slate-700">{log.phrase}</span>
-                      <span className="text-slate-400 text-[10px] ml-2 font-medium">{log.date}</span>
+                      <span className="font-bold text-slate-700">
+                        {log.phrase}
+                      </span>
+                      <span className="text-slate-400 text-[10px] ml-2 font-medium">
+                        {log.date}
+                      </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-lg font-bold font-mono text-[11px]">
@@ -546,7 +654,9 @@ export const DoaHarianView: React.FC<DoaHarianViewProps> = ({ addToast }) => {
                 ))}
               </div>
             ) : (
-              <p className="text-xs text-slate-400 italic text-center py-4">Belum ada riwayat dzikir terselesaikan hari ini.</p>
+              <p className="text-xs text-slate-400 italic text-center py-4">
+                Belum ada riwayat dzikir terselesaikan hari ini.
+              </p>
             )}
           </div>
         </div>
@@ -557,9 +667,12 @@ export const DoaHarianView: React.FC<DoaHarianViewProps> = ({ addToast }) => {
         <div className="flex flex-col gap-4">
           <div className="bg-slate-50 border border-slate-100 p-4 rounded-2xl flex flex-col xs:flex-row xs:items-center justify-between gap-3">
             <div>
-              <h3 className="font-serif font-bold text-[#0F4C3A] text-base">Asmaul Husna</h3>
+              <h3 className="font-serif font-bold text-[#0F4C3A] text-base">
+                Asmaul Husna
+              </h3>
               <p className="text-xs text-slate-505 mt-1 text-slate-500">
-                Merenungi 99 nama-nama baik Allah Swt pembuka jalan kebaikan dan mukjizat kemuliaan.
+                Merenungi 99 nama-nama baik Allah Swt pembuka jalan kebaikan dan
+                mukjizat kemuliaan.
               </p>
             </div>
             <span className="self-start xs:self-center font-bold font-mono text-emerald-800 text-xs bg-emerald-100 px-3 py-1 rounded-full whitespace-nowrap">
@@ -602,7 +715,7 @@ export const DoaHarianView: React.FC<DoaHarianViewProps> = ({ addToast }) => {
                 <span className="text-[10px] font-semibold text-slate-400 tracking-tight leading-normal line-clamp-1">
                   {itm.arti}
                 </span>
-                
+
                 <span className="text-[9px] text-emerald-600 font-extrabold mt-1.5 flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
                   <Info className="w-3 h-3" /> Pelajari
                 </span>
@@ -622,9 +735,12 @@ export const DoaHarianView: React.FC<DoaHarianViewProps> = ({ addToast }) => {
       {activeTab === "kiblat" && (
         <div className="flex flex-col items-center gap-5">
           <div className="w-full bg-slate-50 border border-slate-100 p-4.5 rounded-2xl">
-            <h3 className="font-serif font-bold text-slate-800 text-sm">Kompas Arah Kiblat</h3>
+            <h3 className="font-serif font-bold text-slate-800 text-sm">
+              Kompas Arah Kiblat
+            </h3>
             <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-              Membantu menentukan jalur hadapan kiblat mengarah langsung ke Ka'bah di Makkah Al-Mukarramah (~295° WIB).
+              Membantu menentukan jalur hadapan kiblat mengarah langsung ke
+              Ka'bah di Makkah Al-Mukarramah (~295° WIB).
             </p>
           </div>
 
@@ -642,16 +758,26 @@ export const DoaHarianView: React.FC<DoaHarianViewProps> = ({ addToast }) => {
             >
               {/* Scale Tick Markers */}
               <div className="relative w-full h-full flex items-center justify-center font-bold text-[10px] text-slate-400">
-                <span className="absolute top-2 text-[#0F4C3A] font-extrabold">U</span>
+                <span className="absolute top-2 text-[#0F4C3A] font-extrabold">
+                  U
+                </span>
                 <span className="absolute right-2">T</span>
                 <span className="absolute bottom-2">S</span>
                 <span className="absolute left-2">B</span>
 
                 {/* Sub markers */}
-                <span className="absolute top-10 right-10 text-[8px] opacity-50">TL</span>
-                <span className="absolute bottom-10 right-10 text-[8px] opacity-50">TG</span>
-                <span className="absolute bottom-10 left-10 text-[8px] opacity-50">BD</span>
-                <span className="absolute top-10 left-10 text-[8px] opacity-50">BL</span>
+                <span className="absolute top-10 right-10 text-[8px] opacity-50">
+                  TL
+                </span>
+                <span className="absolute bottom-10 right-10 text-[8px] opacity-50">
+                  TG
+                </span>
+                <span className="absolute bottom-10 left-10 text-[8px] opacity-50">
+                  BD
+                </span>
+                <span className="absolute top-10 left-10 text-[8px] opacity-50">
+                  BL
+                </span>
 
                 {/* Compass Circle graphic details */}
                 <div className="w-44 h-44 rounded-full border-2 border-slate-200/55 flex items-center justify-center">
@@ -659,14 +785,16 @@ export const DoaHarianView: React.FC<DoaHarianViewProps> = ({ addToast }) => {
                 </div>
 
                 {/* Absolute Qibla Mark inside the rotating circle (at 295 degrees) */}
-                <div 
+                <div
                   className="absolute w-12 h-12 flex items-center justify-center"
                   style={{
                     transform: `rotate(${targetKiblatAngle}deg) translateY(-84px)`,
                   }}
                 >
                   <div className="relative flex flex-col items-center">
-                    <span className="text-[9px] font-extrabold text-amber-500 bg-[#0F4C3A] px-1.5 py-0.5 rounded-full shadow-sm">KIBLAT</span>
+                    <span className="text-[9px] font-extrabold text-amber-500 bg-[#0F4C3A] px-1.5 py-0.5 rounded-full shadow-sm">
+                      KIBLAT
+                    </span>
                     <span className="text-sm">🕋</span>
                   </div>
                 </div>
@@ -676,7 +804,9 @@ export const DoaHarianView: React.FC<DoaHarianViewProps> = ({ addToast }) => {
             {/* STATIC HEADING ARROW (Point straight up for where phone/user looks) */}
             <div className="absolute pointer-events-none flex flex-col items-center justify-center text-center">
               {/* glowing pointer arrow */}
-              <div className={`w-1 bg-gradient-to-t from-red-600 to-red-500 h-16 rounded-full shadow-lg ${isAligned ? "animate-pulse" : ""}`}></div>
+              <div
+                className={`w-1 bg-gradient-to-t from-red-600 to-red-500 h-16 rounded-full shadow-lg ${isAligned ? "animate-pulse" : ""}`}
+              ></div>
               <div className="w-4 h-4 mt-1 rounded-full border-4 border-slate-800 bg-white shadow z-10"></div>
             </div>
 
@@ -701,8 +831,13 @@ export const DoaHarianView: React.FC<DoaHarianViewProps> = ({ addToast }) => {
                   <span className="text-lg">✨</span>
                 </div>
                 <div className="text-left">
-                  <h4 className="text-xs font-bold text-emerald-800 uppercase tracking-wider">Arah Kiblat Tepat!</h4>
-                  <p className="text-[11px] text-emerald-600 mt-0.5">Segera bersiap mendaratkan sujud ibadah sholat menghadap Ka'bah.</p>
+                  <h4 className="text-xs font-bold text-emerald-800 uppercase tracking-wider">
+                    Arah Kiblat Tepat!
+                  </h4>
+                  <p className="text-[11px] text-emerald-600 mt-0.5">
+                    Segera bersiap mendaratkan sujud ibadah sholat menghadap
+                    Ka'bah.
+                  </p>
                 </div>
               </motion.div>
             ) : (
@@ -712,10 +847,9 @@ export const DoaHarianView: React.FC<DoaHarianViewProps> = ({ addToast }) => {
                 className="bg-slate-50 border border-slate-200/70 p-4 rounded-xl text-center max-w-sm"
               >
                 <p className="text-[11px] text-slate-500 leading-normal">
-                  {supportsSensor 
+                  {supportsSensor
                     ? "Putar perangkat gawai Anda perlahan sampai garis penunjuk merah mengarah pas ke tanda Ka'bah 🕋."
-                    : "Gunakan kontrol slider di bawah untuk mensimulasikan orientasi perputaran kompas visual secara interaktif:"
-                  }
+                    : "Gunakan kontrol slider di bawah untuk mensimulasikan orientasi perputaran kompas visual secara interaktif:"}
                 </p>
               </motion.div>
             )}
@@ -726,7 +860,9 @@ export const DoaHarianView: React.FC<DoaHarianViewProps> = ({ addToast }) => {
             <div className="w-full max-w-xs flex flex-col gap-1.5 mt-1">
               <div className="flex justify-between text-[10px] font-bold text-slate-400">
                 <span>PUTAR COMPASS MANUAL</span>
-                <span className="text-emerald-700 font-extrabold">SASARAN: 295°</span>
+                <span className="text-emerald-700 font-extrabold">
+                  SASARAN: 295°
+                </span>
               </div>
               <input
                 type="range"
@@ -754,71 +890,87 @@ export const DoaHarianView: React.FC<DoaHarianViewProps> = ({ addToast }) => {
       )}
 
       {/* ASMAUL HUSNA MODAL DETAILS DIALOG */}
-      {typeof document !== 'undefined' && createPortal(
-        <AnimatePresence>
-          {selectedAsma && (
-            <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-[90]">
-              <motion.div
-                initial={{ scale: 0.95, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.95, opacity: 0 }}
-                className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl flex flex-col p-6 relative"
-              >
-                {/* Close Button */}
-                <button
-                  onClick={() => setSelectedAsma(null)}
-                  className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 font-bold p-1 hover:bg-slate-100 rounded-lg text-sm cursor-pointer"
+      {typeof document !== "undefined" &&
+        createPortal(
+          <AnimatePresence>
+            {selectedAsma && (
+              <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-[90]">
+                <motion.div
+                  initial={{ scale: 0.95, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.95, opacity: 0 }}
+                  className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl flex flex-col p-6 relative"
                 >
-                  ✕
-                </button>
-
-              <div className="flex flex-col items-center text-center mt-2">
-                <span className="bg-amber-100 text-[#0F4C3A] font-bold text-xs px-3 py-1 rounded-full font-mono">
-                  Nama Allah Ke-{selectedAsma.no}
-                </span>
-
-                <h3 className="font-serif text-5xl font-bold text-[#0F4C3A] mt-6 select-all">
-                  {selectedAsma.arab}
-                </h3>
-                
-                <h4 className="font-extrabold text-slate-800 text-lg mt-4 font-sans tracking-wide">
-                  {selectedAsma.latin}
-                </h4>
-                
-                <p className="text-sm font-semibold text-slate-500 mt-1">
-                  Artinya: <span className="text-[#0F4C3A] font-extrabold font-serif italic">"{selectedAsma.arti}"</span>
-                </p>
-
-                <div className="w-full border-t border-slate-100 my-5 pt-4.5 text-left">
-                  <h5 className="text-[11px] font-bold text-slate-400 tracking-wider uppercase mb-1.5">Fadhilah & Pengamalan</h5>
-                  <p className="text-xs text-slate-600 leading-relaxed font-normal">
-                    Mengamalkan atau melantunkan dzikir penuh khusyuk lafadz <strong className="text-[#0F4C3A]">{selectedAsma.latin}</strong> secara istiqamah akan membawa ketenangan jiwa, perlindungan rohani, melapangkan rezeki berkah, serta mendekatkan makrifat batin kita ke jalan ketaatan kepada Allah Subhanahu wa Ta'ala.
-                  </p>
-                </div>
-
-                <div className="flex gap-2 w-full mt-2.5">
-                  <button
-                    onClick={() => {
-                      handleCopy(`${selectedAsma.latin} (${selectedAsma.arab}) - Artinya: ${selectedAsma.arti}`, "Nama Allah");
-                    }}
-                    className="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-all cursor-pointer shadow-sm"
-                  >
-                    Salin Nama
-                  </button>
+                  {/* Close Button */}
                   <button
                     onClick={() => setSelectedAsma(null)}
-                    className="flex-1 py-2.5 bg-[#0F4C3A] hover:bg-emerald-950 text-white font-bold text-xs rounded-xl transition-all cursor-pointer shadow"
+                    className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 font-bold p-1 hover:bg-slate-100 rounded-lg text-sm cursor-pointer"
                   >
-                    Tutup Detail
+                    ✕
                   </button>
-                </div>
+
+                  <div className="flex flex-col items-center text-center mt-2">
+                    <span className="bg-amber-100 text-[#0F4C3A] font-bold text-xs px-3 py-1 rounded-full font-mono">
+                      Nama Allah Ke-{selectedAsma.no}
+                    </span>
+
+                    <h3 className="font-serif text-5xl font-bold text-[#0F4C3A] mt-6 select-all">
+                      {selectedAsma.arab}
+                    </h3>
+
+                    <h4 className="font-extrabold text-slate-800 text-lg mt-4 font-sans tracking-wide">
+                      {selectedAsma.latin}
+                    </h4>
+
+                    <p className="text-sm font-semibold text-slate-500 mt-1">
+                      Artinya:{" "}
+                      <span className="text-[#0F4C3A] font-extrabold font-serif italic">
+                        "{selectedAsma.arti}"
+                      </span>
+                    </p>
+
+                    <div className="w-full border-t border-slate-100 my-5 pt-4.5 text-left">
+                      <h5 className="text-[11px] font-bold text-slate-400 tracking-wider uppercase mb-1.5">
+                        Fadhilah & Pengamalan
+                      </h5>
+                      <p className="text-xs text-slate-600 leading-relaxed font-normal">
+                        Mengamalkan atau melantunkan dzikir penuh khusyuk lafadz{" "}
+                        <strong className="text-[#0F4C3A]">
+                          {selectedAsma.latin}
+                        </strong>{" "}
+                        secara istiqamah akan membawa ketenangan jiwa,
+                        perlindungan rohani, melapangkan rezeki berkah, serta
+                        mendekatkan makrifat batin kita ke jalan ketaatan kepada
+                        Allah Subhanahu wa Ta'ala.
+                      </p>
+                    </div>
+
+                    <div className="flex gap-2 w-full mt-2.5">
+                      <button
+                        onClick={() => {
+                          handleCopy(
+                            `${selectedAsma.latin} (${selectedAsma.arab}) - Artinya: ${selectedAsma.arti}`,
+                            "Nama Allah",
+                          );
+                        }}
+                        className="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-all cursor-pointer shadow-sm"
+                      >
+                        Salin Nama
+                      </button>
+                      <button
+                        onClick={() => setSelectedAsma(null)}
+                        className="flex-1 py-2.5 bg-[#0F4C3A] hover:bg-emerald-950 text-white font-bold text-xs rounded-xl transition-all cursor-pointer shadow"
+                      >
+                        Tutup Detail
+                      </button>
+                    </div>
+                  </div>
+                </motion.div>
               </div>
-            </motion.div>
-          </div>
+            )}
+          </AnimatePresence>,
+          document.body,
         )}
-      </AnimatePresence>,
-      document.body
-    )}
     </div>
   );
 };

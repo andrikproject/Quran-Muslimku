@@ -25,7 +25,7 @@ export const Splash: React.FC<SplashProps> = ({ onFinish }) => {
       "Menghubungkan ke server...",
       "Menyiapkan mushaf Al-Qur'an...",
       "Mengunduh jadwal sholat terbaru...",
-      "Selamat datang di Quran Saku!"
+      "Selamat datang di Quran Saku!",
     ];
 
     let currentPhraseIdx = 0;
@@ -53,11 +53,11 @@ export const Splash: React.FC<SplashProps> = ({ onFinish }) => {
   return (
     <div className="absolute inset-0 w-full bg-[#FDFBF7] font-sans flex flex-col justify-between overflow-hidden z-50 rounded-[inherit]">
       {/* Background Image provided by user */}
-      <div 
+      <div
         className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: `url('/splashnya.png')` }}
       />
-      
+
       {/* Gradient overlay to ensure text is readable at the bottom */}
       <div className="absolute inset-0 z-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent pointer-events-none" />
 
@@ -65,9 +65,14 @@ export const Splash: React.FC<SplashProps> = ({ onFinish }) => {
         <motion.img
           initial={{ opacity: 0, y: 30, scale: 0.8 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 1.2, ease: "easeOut", type: "spring", bounce: 0.4 }}
-          src="/QuranSaku.png" 
-          alt="Quran Saku Logo" 
+          transition={{
+            duration: 1.2,
+            ease: "easeOut",
+            type: "spring",
+            bounce: 0.4,
+          }}
+          src="/QuranSaku.png"
+          alt="Quran Saku Logo"
           className="w-48 sm:w-56 h-auto drop-shadow-2xl mb-48 sm:mb-56"
         />
       </div>

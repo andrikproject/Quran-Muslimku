@@ -257,9 +257,9 @@ export const FikihView: React.FC<FikihViewProps> = ({ onBack }) => {
                       </p>
                       {guide.reference && (
                         <div className="mt-4 pt-4 border-t border-current/10 relative z-10">
-                          <p className="text-[11px] font-bold uppercase tracking-wider opacity-80 flex items-center gap-1.5">
-                            📚 Referensi:{" "}
-                            <span className="opacity-100">
+                          <p className="text-[11px] font-bold uppercase tracking-wider opacity-90 flex items-start sm:items-center gap-2">
+                            <span className="shrink-0">📚 Referensi:</span>
+                            <span className="opacity-100 flex-1 leading-snug break-words">
                               {guide.reference}
                             </span>
                           </p>

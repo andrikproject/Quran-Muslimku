@@ -5,13 +5,34 @@
 import React, { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "motion/react";
-import { get, set } from 'idb-keyval';
-import { 
-  BookOpen, Search, Clock, ArrowLeft, Play, Pause, Bookmark, 
-  BookmarkCheck, MessageSquare, BookOpenCheck, Volume2, VolumeX, 
-  Sparkles, Check, ChevronRight, HelpCircle, FileText, WifiOff
+import { get, set } from "idb-keyval";
+import {
+  BookOpen,
+  Search,
+  Clock,
+  ArrowLeft,
+  Play,
+  Pause,
+  Bookmark,
+  BookmarkCheck,
+  MessageSquare,
+  BookOpenCheck,
+  Volume2,
+  VolumeX,
+  Sparkles,
+  Check,
+  ChevronRight,
+  HelpCircle,
+  FileText,
+  WifiOff,
 } from "lucide-react";
-import { Surah, SurahDetail, Ayat, Bookmark as BookmarkType, Note } from "../types";
+import {
+  Surah,
+  SurahDetail,
+  Ayat,
+  Bookmark as BookmarkType,
+  Note,
+} from "../types";
 import { STATIC_SURAHS } from "../data";
 
 interface QuranReaderProps {
@@ -19,10 +40,24 @@ interface QuranReaderProps {
   addBookmark: (b: BookmarkType) => void;
   removeBookmark: (surahNo: number, ayatNo: number) => void;
   notes: Note[];
-  addNote: (surahNo: number, surahName: string, ayatNo: number, txt: string) => void;
+  addNote: (
+    surahNo: number,
+    surahName: string,
+    ayatNo: number,
+    txt: string,
+  ) => void;
   deleteNote: (id: string) => void;
-  updateTilawahProgress: (surahNo: number, surahName: string, ayatNo: number, totalAyat: number) => void;
-  addToast: (title: string, body: string, type: "success" | "info" | "warning" | "notification") => void;
+  updateTilawahProgress: (
+    surahNo: number,
+    surahName: string,
+    ayatNo: number,
+    totalAyat: number,
+  ) => void;
+  addToast: (
+    title: string,
+    body: string,
+    type: "success" | "info" | "warning" | "notification",
+  ) => void;
   initialSelectedSurah: number | null;
   initialSelectedAyat?: number | null;
   resetInitialSelectedSurah: () => void;
@@ -39,7 +74,7 @@ export const QuranReader: React.FC<QuranReaderProps> = ({
   addToast,
   initialSelectedSurah,
   initialSelectedAyat,
-  resetInitialSelectedSurah
+  resetInitialSelectedSurah,
 }) => {
   // Surahs list
   const [surahs, setSurahs] = useState<Surah[]>(STATIC_SURAHS);
@@ -47,7 +82,7 @@ export const QuranReader: React.FC<QuranReaderProps> = ({
   const [selectedSurah, setSelectedSurah] = useState<Surah | null>(null);
   const [surahDetail, setSurahDetail] = useState<SurahDetail | null>(null);
   const surahDetailRef = useRef<SurahDetail | null>(null);
-  
+
   useEffect(() => {
     surahDetailRef.current = surahDetail;
   }, [surahDetail]);
@@ -61,9 +96,16 @@ export const QuranReader: React.FC<QuranReaderProps> = ({
   const [playingAyatNo, setPlayingAyatNo] = useState<number | null>(null);
 
   // Modal active flags
-  const [activeTafsirAyat, setActiveTafsirAyat] = useState<{ ayatNo: number; teks: string } | null>(null);
+  const [activeTafsirAyat, setActiveTafsirAyat] = useState<{
+    ayatNo: number;
+    teks: string;
+  } | null>(null);
   const [isLoadingTafsir, setIsLoadingTafsir] = useState(false);
-  const [activeNoteForm, setActiveNoteForm] = useState<{ surahNo: number; surahName: string; ayatNo: number } | null>(null);
+  const [activeNoteForm, setActiveNoteForm] = useState<{
+    surahNo: number;
+    surahName: string;
+    ayatNo: number;
+  } | null>(null);
   const [noteInputText, setNoteInputText] = useState("");
 
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
@@ -71,11 +113,11 @@ export const QuranReader: React.FC<QuranReaderProps> = ({
   useEffect(() => {
     const handleOnline = () => setIsOffline(false);
     const handleOffline = () => setIsOffline(true);
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
     return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
     };
   }, []);
 
@@ -86,7 +128,7 @@ export const QuranReader: React.FC<QuranReaderProps> = ({
   useEffect(() => {
     const fetchSurahs = async () => {
       try {
-        const cachedSurahs = await get('surahs_list');
+        const cachedSurahs = await get("surahs_list");
         if (cachedSurahs) {
           setSurahs(cachedSurahs);
         }
@@ -104,10 +146,15 @@ export const QuranReader: React.FC<QuranReaderProps> = ({
               tempatTurun: s.revelation.id,
               arti: s.name.translation.id,
               deskripsi: s.tafsir.id,
-              audioFull: { "05": "https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/" + s.number + ".mp3" }
+              audioFull: {
+                "05":
+                  "https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/" +
+                  s.number +
+                  ".mp3",
+              },
             }));
             setSurahs(transformedData);
-            set('surahs_list', transformedData).catch(console.error);
+            set("surahs_list", transformedData).catch(console.error);
           }
         }
       } catch (err) {
@@ -119,7 +166,9 @@ export const QuranReader: React.FC<QuranReaderProps> = ({
   }, []);
 
   // Check if deep linked from Home (e.g., loaded with initialSelectedSurah)
-  const [pendingScrollAyat, setPendingScrollAyat] = useState<number | null>(null);
+  const [pendingScrollAyat, setPendingScrollAyat] = useState<number | null>(
+    null,
+  );
 
   useEffect(() => {
     if (initialSelectedSurah) {
@@ -161,14 +210,16 @@ export const QuranReader: React.FC<QuranReaderProps> = ({
     try {
       const cacheKey = `surah_detail_${surah.nomor}`;
       const cachedDetail = await get(cacheKey);
-      
+
       if (cachedDetail) {
         setSurahDetail(cachedDetail);
         setFullAudioUrl(cachedDetail.audioFull["05"]);
       }
 
       if (navigator.onLine || !cachedDetail) {
-        const response = await fetch(`https://api.quran.gading.dev/surah/${surah.nomor}`);
+        const response = await fetch(
+          `https://api.quran.gading.dev/surah/${surah.nomor}`,
+        );
         if (!response.ok) throw new Error();
         const payload = await response.json();
         if (payload.code === 200 && payload.data) {
@@ -181,15 +232,20 @@ export const QuranReader: React.FC<QuranReaderProps> = ({
             tempatTurun: s.revelation.id,
             arti: s.name.translation.id,
             deskripsi: s.tafsir.id,
-            audioFull: { "05": "https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/" + s.number + ".mp3" },
+            audioFull: {
+              "05":
+                "https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/" +
+                s.number +
+                ".mp3",
+            },
             ayat: s.verses.map((v: any) => ({
               nomorAyat: v.number.inSurah,
               teksArab: v.text.arab,
               teksLatin: v.text.transliteration?.en || "",
               teksIndonesia: v.translation.id,
               tafsir: v.tafsir?.id?.long || "Tafsir belum tersedia.",
-              audio: { "05": v.audio.primary }
-            }))
+              audio: { "05": v.audio.primary },
+            })),
           };
           setSurahDetail(detailData);
           setFullAudioUrl(detailData.audioFull["05"]);
@@ -197,8 +253,12 @@ export const QuranReader: React.FC<QuranReaderProps> = ({
         }
       }
     } catch {
-      // If API fails (e.g. CORS or offline), show an error toast 
-      addToast("Koneksi Error", `Gagal memuat Surat ${surah.namaLatin}. Gagal menghubungi server MyQuran API.`, "warning");
+      // If API fails (e.g. CORS or offline), show an error toast
+      addToast(
+        "Koneksi Error",
+        `Gagal memuat Surat ${surah.namaLatin}. Gagal menghubungi server MyQuran API.`,
+        "warning",
+      );
       setSelectedSurah(null); // Return back to list so user not stuck in a dummy view
     } finally {
       setIsLoadingDetail(false);
@@ -208,7 +268,11 @@ export const QuranReader: React.FC<QuranReaderProps> = ({
   // Play full Surah audio
   const toggleFullAudio = () => {
     if (!fullAudioUrl) {
-      addToast("Audio Tidak Tersedia", "Koneksi audio sedang bermasalah.", "warning");
+      addToast(
+        "Audio Tidak Tersedia",
+        "Koneksi audio sedang bermasalah.",
+        "warning",
+      );
       return;
     }
 
@@ -229,9 +293,16 @@ export const QuranReader: React.FC<QuranReaderProps> = ({
       audioRef.current.pause();
       setIsPlayingFull(false);
     } else {
-      audioRef.current.play()
+      audioRef.current
+        .play()
         .then(() => setIsPlayingFull(true))
-        .catch(() => addToast("Izin Audio", "Browser memerlukan interaksi fisik sebelum memutar audio.", "warning"));
+        .catch(() =>
+          addToast(
+            "Izin Audio",
+            "Browser memerlukan interaksi fisik sebelum memutar audio.",
+            "warning",
+          ),
+        );
     }
   };
 
@@ -254,19 +325,28 @@ export const QuranReader: React.FC<QuranReaderProps> = ({
       if (audioRef.current) {
         audioRef.current.pause();
       }
-      
+
       const newAudio = new Audio(audioUrl);
       newAudio.onended = () => {
         setPlayingAyatNo(null);
-        
+
         // Auto-play next verse if available
         const currentDetail = surahDetailRef.current;
         if (currentDetail && currentDetail.ayat) {
-          const currentIndex = currentDetail.ayat.findIndex((a) => a.nomorAyat === ayat.nomorAyat);
-          if (currentIndex !== -1 && currentIndex + 1 < currentDetail.ayat.length) {
+          const currentIndex = currentDetail.ayat.findIndex(
+            (a) => a.nomorAyat === ayat.nomorAyat,
+          );
+          if (
+            currentIndex !== -1 &&
+            currentIndex + 1 < currentDetail.ayat.length
+          ) {
             const nextAyat = currentDetail.ayat[currentIndex + 1];
-            addToast("Memutar Ayat Berikutnya", `Otomatis memutar ayat ${nextAyat.nomorAyat}`, "notification");
-            
+            addToast(
+              "Memutar Ayat Berikutnya",
+              `Otomatis memutar ayat ${nextAyat.nomorAyat}`,
+              "notification",
+            );
+
             // Smoothly scroll to the next verse component
             setTimeout(() => {
               toggleAyatAudio(nextAyat);
@@ -276,58 +356,71 @@ export const QuranReader: React.FC<QuranReaderProps> = ({
               }
             }, 650);
           } else {
-            addToast("Hatam / Selesai Surat 🎉", `Alhamdulillah, selesai mendengarkan Surat ${currentDetail.namaLatin}.`, "success");
+            addToast(
+              "Hatam / Selesai Surat 🎉",
+              `Alhamdulillah, selesai mendengarkan Surat ${currentDetail.namaLatin}.`,
+              "success",
+            );
           }
         }
       };
 
       audioRef.current = newAudio;
       setPlayingAyatNo(ayat.nomorAyat);
-      audioRef.current.play()
-        .catch(() => {
-          setPlayingAyatNo(null);
-          addToast("Gagal memutar audio ayat", "", "warning");
-        });
+      audioRef.current.play().catch(() => {
+        setPlayingAyatNo(null);
+        addToast("Gagal memutar audio ayat", "", "warning");
+      });
     }
   };
 
   // Handle Bookmarks
   const isBookmarked = (ayatNo: number) => {
     if (!selectedSurah) return false;
-    return bookmarks.some((b) => b.surahNo === selectedSurah.nomor && b.ayatNo === ayatNo);
+    return bookmarks.some(
+      (b) => b.surahNo === selectedSurah.nomor && b.ayatNo === ayatNo,
+    );
   };
 
   const handleBookmarkToggle = (ayatNo: number) => {
     if (!selectedSurah) return;
     if (isBookmarked(ayatNo)) {
       removeBookmark(selectedSurah.nomor, ayatNo);
-      addToast("Penanda Dihapus", `Menghapus QS ${selectedSurah.namaLatin}:${ayatNo} dari bookmark`, "info");
+      addToast(
+        "Penanda Dihapus",
+        `Menghapus QS ${selectedSurah.namaLatin}:${ayatNo} dari bookmark`,
+        "info",
+      );
     } else {
       addBookmark({
         surahNo: selectedSurah.nomor,
         surahName: selectedSurah.namaLatin,
         ayatNo,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
-      addToast("Penanda Ditambahkan", `QS ${selectedSurah.namaLatin}:${ayatNo} berhasil ditambahkan ke bookmark`, "success");
+      addToast(
+        "Penanda Ditambahkan",
+        `QS ${selectedSurah.namaLatin}:${ayatNo} berhasil ditambahkan ke bookmark`,
+        "success",
+      );
     }
   };
 
   // Read verse Tafsir from cached surah detail without refetching
   const handleTafsirClick = async (ayatNo: number) => {
     if (!selectedSurah || !surahDetail) return;
-    
-    const targetVerse = surahDetail.ayat.find(v => v.nomorAyat === ayatNo);
-    
+
+    const targetVerse = surahDetail.ayat.find((v) => v.nomorAyat === ayatNo);
+
     if (targetVerse && targetVerse.tafsir) {
       setActiveTafsirAyat({
         ayatNo,
-        teks: targetVerse.tafsir
+        teks: targetVerse.tafsir,
       });
     } else {
       setActiveTafsirAyat({
         ayatNo,
-        teks: "Tafsir ayat belum diunduh dengan sempurna. Coba muat ulang surah ini saat online."
+        teks: "Tafsir ayat belum diunduh dengan sempurna. Coba muat ulang surah ini saat online.",
       });
     }
   };
@@ -341,13 +434,13 @@ export const QuranReader: React.FC<QuranReaderProps> = ({
       activeNoteForm.surahNo,
       activeNoteForm.surahName,
       activeNoteForm.ayatNo,
-      noteInputText
+      noteInputText,
     );
 
     addToast(
       "Catatan Disimpan!",
       `Mencatatkan refleksi spiritual pada QS ${activeNoteForm.surahName}:${activeNoteForm.ayatNo}`,
-      "success"
+      "success",
     );
 
     setActiveNoteForm(null);
@@ -361,12 +454,12 @@ export const QuranReader: React.FC<QuranReaderProps> = ({
       selectedSurah.nomor,
       selectedSurah.namaLatin,
       ayat.nomorAyat,
-      selectedSurah.jumlahAyat
+      selectedSurah.jumlahAyat,
     );
     addToast(
       "Mencatat Tilawah ✅",
       `Progress diperbarui kemajuan tilawah: ${selectedSurah.namaLatin} Ayat ${ayat.nomorAyat}`,
-      "success"
+      "success",
     );
   };
 
@@ -386,7 +479,10 @@ export const QuranReader: React.FC<QuranReaderProps> = ({
       {isOffline && (
         <div className="bg-amber-50 border border-amber-200 text-amber-700 px-4 py-2.5 rounded-2xl flex items-center gap-3 text-sm font-semibold shadow-sm animate-in fade-in slide-in-from-top-4">
           <WifiOff className="w-5 h-5 flex-shrink-0" />
-          <span>Anda sedang offline. Menampilkan data dari cache memori perangkat. Fitur audio dan tafsir mungkin terbatas.</span>
+          <span>
+            Anda sedang offline. Menampilkan data dari cache memori perangkat.
+            Fitur audio dan tafsir mungkin terbatas.
+          </span>
         </div>
       )}
 
@@ -404,7 +500,8 @@ export const QuranReader: React.FC<QuranReaderProps> = ({
                 Bacalah dan Hayati Al-Qur'an
               </h2>
               <p className="text-xs text-teal-100/80 max-w-sm mt-1 leading-relaxed">
-                Pencarian instan surah, tafsir mendalam, penanda bacaan dan putar audio ayat mutawatir.
+                Pencarian instan surah, tafsir mendalam, penanda bacaan dan
+                putar audio ayat mutawatir.
               </p>
             </div>
           </div>
@@ -500,7 +597,11 @@ export const QuranReader: React.FC<QuranReaderProps> = ({
                 onClick={toggleFullAudio}
                 className="mt-5 px-6 py-2.5 bg-[#ECC17A] text-[#0F4C3A] hover:bg-amber-400 transition-colors rounded-full text-xs font-bold flex items-center gap-2 shadow-lg cursor-pointer"
               >
-                {isPlayingFull ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                {isPlayingFull ? (
+                  <Pause className="w-4 h-4" />
+                ) : (
+                  <Play className="w-4 h-4" />
+                )}
                 {isPlayingFull ? "Jeda Audio Surah" : "Dengarkan Audio Surah"}
               </button>
             </div>
@@ -522,7 +623,9 @@ export const QuranReader: React.FC<QuranReaderProps> = ({
           {isLoadingDetail ? (
             <div className="flex flex-col items-center justify-center py-20 gap-3 text-slate-400">
               <Clock className="w-10 h-10 animate-spin text-[#0F4C3A]" />
-              <p className="text-sm font-semibold">Mengunduh ayat suci Al-Qur'an...</p>
+              <p className="text-sm font-semibold">
+                Mengunduh ayat suci Al-Qur'an...
+              </p>
             </div>
           ) : (
             <div className="flex flex-col gap-4">
@@ -530,13 +633,17 @@ export const QuranReader: React.FC<QuranReaderProps> = ({
                 const isSaved = isBookmarked(ayat.nomorAyat);
                 const isPlaying = playingAyatNo === ayat.nomorAyat;
                 const ayatNotes = notes.filter(
-                  (n) => n.surahNo === selectedSurah.nomor && n.ayatNo === ayat.nomorAyat
+                  (n) =>
+                    n.surahNo === selectedSurah.nomor &&
+                    n.ayatNo === ayat.nomorAyat,
                 );
 
                 return (
                   <div
                     key={ayat.nomorAyat}
-                    ref={(el) => { itemRefs.current[ayat.nomorAyat] = el; }}
+                    ref={(el) => {
+                      itemRefs.current[ayat.nomorAyat] = el;
+                    }}
                     className="bg-white border border-slate-100 rounded-3xl p-6 shadow-sm hover:shadow-md transition-all flex flex-col gap-5 relative group"
                   >
                     {/* Verse actions navigation header bar */}
@@ -558,7 +665,11 @@ export const QuranReader: React.FC<QuranReaderProps> = ({
                           }`}
                           title="Dengarkan Ayat"
                         >
-                          {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
+                          {isPlaying ? (
+                            <Pause className="w-3.5 h-3.5" />
+                          ) : (
+                            <Play className="w-3.5 h-3.5" />
+                          )}
                         </button>
 
                         {/* Bookmark checkbox toggle */}
@@ -584,7 +695,7 @@ export const QuranReader: React.FC<QuranReaderProps> = ({
                             setActiveNoteForm({
                               surahNo: selectedSurah.nomor,
                               surahName: selectedSurah.namaLatin,
-                              ayatNo: ayat.nomorAyat
+                              ayatNo: ayat.nomorAyat,
                             })
                           }
                           className="p-2 bg-slate-50 border border-slate-100 text-slate-600 hover:bg-slate-100 cursor-pointer rounded-xl transition-colors"
@@ -636,14 +747,21 @@ export const QuranReader: React.FC<QuranReaderProps> = ({
                           CATATAN REFLEKSI ANDA:
                         </span>
                         {ayatNotes.map((note) => (
-                          <div key={note.id} className="text-xs text-slate-700 flex gap-2 justify-between items-start">
+                          <div
+                            key={note.id}
+                            className="text-xs text-slate-700 flex gap-2 justify-between items-start"
+                          >
                             <p className="leading-relaxed font-medium bg-white p-2.5 rounded-xl border border-slate-100 flex-1">
                               {note.text}
                             </p>
                             <button
                               onClick={() => {
                                 deleteNote(note.id);
-                                addToast("Catatan Dihapus", "Menghapus catatan refleksi.", "info");
+                                addToast(
+                                  "Catatan Dihapus",
+                                  "Menghapus catatan refleksi.",
+                                  "info",
+                                );
                               }}
                               className="text-xs font-bold text-red-500 hover:text-red-700 hover:bg-red-50 p-1.5 cursor-pointer rounded-lg bg-white border border-red-100"
                             >
@@ -662,110 +780,117 @@ export const QuranReader: React.FC<QuranReaderProps> = ({
       )}
 
       {/* Global Interactive Modal: Note Creator form */}
-      {typeof document !== 'undefined' && createPortal(
-        <AnimatePresence>
-          {activeNoteForm && (
-            <div className="fixed inset-0 bg-black/65 backdrop-blur-sm flex items-center justify-center p-4 z-[90]">
-              <motion.div
-                initial={{ scale: 0.95, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.95, opacity: 0 }}
-                className="bg-white rounded-3xl w-full max-w-md p-6 overflow-hidden shadow-2xl flex flex-col gap-4"
-              >
-                <div>
-                  <h3 className="text-lg font-serif font-bold text-[#0F4C3A]">
-                    Tulis Catatan / Tadabbur
-                  </h3>
-                  <p className="text-xs text-slate-400 font-medium mt-1">
-                    Mencatatkan refleksi spiritual untuk Surat {activeNoteForm.surahName} Ayat {activeNoteForm.ayatNo}
-                  </p>
-                </div>
-
-                <form onSubmit={handleNoteSubmit} className="flex flex-col gap-4">
-                  <textarea
-                    value={noteInputText}
-                    onChange={(e) => setNoteInputText(e.target.value)}
-                    placeholder="Ketik refleksi spiritual, nasehat, atau pelajaran tadabbur yang Anda dapatkan dari ayat ini di sini..."
-                    rows={4}
-                    required
-                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#0F4C3A]/20 leading-relaxed"
-                  ></textarea>
-
-                  <div className="flex gap-2 justify-end">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setActiveNoteForm(null);
-                        setNoteInputText("");
-                      }}
-                      className="px-4 py-2 bg-slate-100 hover:bg-slate-200 cursor-pointer text-slate-600 rounded-xl text-xs font-bold transition-all"
-                    >
-                      Batal
-                    </button>
-                    <button
-                      type="submit"
-                      className="px-4 py-2 bg-[#0F4C3A] hover:bg-emerald-900 cursor-pointer text-white rounded-xl text-xs font-bold transition-all shadow"
-                    >
-                      Simpan Catatan
-                    </button>
-                  </div>
-                </form>
-              </motion.div>
-            </div>
-          )}
-        </AnimatePresence>,
-        document.body
-      )}
-
-      {/* Global Interactive Modal: Detailed Tafsir view */}
-      {typeof document !== 'undefined' && createPortal(
-        <AnimatePresence>
-          {activeTafsirAyat && (
-            <div className="fixed inset-0 bg-black/65 backdrop-blur-sm flex items-center justify-center p-4 z-[90]">
-              <motion.div
-                initial={{ scale: 0.95, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.95, opacity: 0 }}
-                className="bg-white rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[85vh]"
-              >
-                {/* Header */}
-                <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+      {typeof document !== "undefined" &&
+        createPortal(
+          <AnimatePresence>
+            {activeNoteForm && (
+              <div className="fixed inset-0 bg-black/65 backdrop-blur-sm flex items-center justify-center p-4 z-[90]">
+                <motion.div
+                  initial={{ scale: 0.95, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.95, opacity: 0 }}
+                  className="bg-white rounded-3xl w-full max-w-md p-6 overflow-hidden shadow-2xl flex flex-col gap-4"
+                >
                   <div>
                     <h3 className="text-lg font-serif font-bold text-[#0F4C3A]">
-                      Tafsir Al-Qur'an Digital
+                      Tulis Catatan / Tadabbur
                     </h3>
-                    <p className="text-xs text-slate-500 font-semibold mt-0.5">
-                      Surat {selectedSurah?.namaLatin} • Ayat {activeTafsirAyat.ayatNo}
+                    <p className="text-xs text-slate-400 font-medium mt-1">
+                      Mencatatkan refleksi spiritual untuk Surat{" "}
+                      {activeNoteForm.surahName} Ayat {activeNoteForm.ayatNo}
                     </p>
                   </div>
-                  <button
-                    onClick={() => setActiveTafsirAyat(null)}
-                    className="text-slate-400 hover:text-slate-600 font-bold p-1 hover:bg-slate-50 rounded-lg text-sm cursor-pointer"
-                  >
-                    ✕
-                  </button>
-                </div>
 
-                {/* Scrollable text area */}
-                <div className="flex-1 overflow-y-auto p-6 leading-relaxed text-sm text-slate-700 whitespace-pre-wrap select-text">
-                  {activeTafsirAyat.teks}
-                </div>
-
-                {/* Footer */}
-                <div className="p-4 border-t border-slate-100 bg-slate-50 flex justify-end">
-                  <button
-                    onClick={() => setActiveTafsirAyat(null)}
-                    className="px-5 py-2 bg-[#0F4C3A] hover:bg-emerald-900 text-white rounded-xl text-xs font-bold cursor-pointer transition-colors"
+                  <form
+                    onSubmit={handleNoteSubmit}
+                    className="flex flex-col gap-4"
                   >
-                    Tutup Tafsir
-                  </button>
-                </div>
-              </motion.div>
-            </div>
-          )}
-        </AnimatePresence>,
-        document.body
-      )}
+                    <textarea
+                      value={noteInputText}
+                      onChange={(e) => setNoteInputText(e.target.value)}
+                      placeholder="Ketik refleksi spiritual, nasehat, atau pelajaran tadabbur yang Anda dapatkan dari ayat ini di sini..."
+                      rows={4}
+                      required
+                      className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#0F4C3A]/20 leading-relaxed"
+                    ></textarea>
+
+                    <div className="flex gap-2 justify-end">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setActiveNoteForm(null);
+                          setNoteInputText("");
+                        }}
+                        className="px-4 py-2 bg-slate-100 hover:bg-slate-200 cursor-pointer text-slate-600 rounded-xl text-xs font-bold transition-all"
+                      >
+                        Batal
+                      </button>
+                      <button
+                        type="submit"
+                        className="px-4 py-2 bg-[#0F4C3A] hover:bg-emerald-900 cursor-pointer text-white rounded-xl text-xs font-bold transition-all shadow"
+                      >
+                        Simpan Catatan
+                      </button>
+                    </div>
+                  </form>
+                </motion.div>
+              </div>
+            )}
+          </AnimatePresence>,
+          document.body,
+        )}
+
+      {/* Global Interactive Modal: Detailed Tafsir view */}
+      {typeof document !== "undefined" &&
+        createPortal(
+          <AnimatePresence>
+            {activeTafsirAyat && (
+              <div className="fixed inset-0 bg-black/65 backdrop-blur-sm flex items-center justify-center p-4 z-[90]">
+                <motion.div
+                  initial={{ scale: 0.95, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.95, opacity: 0 }}
+                  className="bg-white rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[85vh]"
+                >
+                  {/* Header */}
+                  <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                    <div>
+                      <h3 className="text-lg font-serif font-bold text-[#0F4C3A]">
+                        Tafsir Al-Qur'an Digital
+                      </h3>
+                      <p className="text-xs text-slate-500 font-semibold mt-0.5">
+                        Surat {selectedSurah?.namaLatin} • Ayat{" "}
+                        {activeTafsirAyat.ayatNo}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => setActiveTafsirAyat(null)}
+                      className="text-slate-400 hover:text-slate-600 font-bold p-1 hover:bg-slate-50 rounded-lg text-sm cursor-pointer"
+                    >
+                      ✕
+                    </button>
+                  </div>
+
+                  {/* Scrollable text area */}
+                  <div className="flex-1 overflow-y-auto p-6 leading-relaxed text-sm text-slate-700 whitespace-pre-wrap select-text">
+                    {activeTafsirAyat.teks}
+                  </div>
+
+                  {/* Footer */}
+                  <div className="p-4 border-t border-slate-100 bg-slate-50 flex justify-end">
+                    <button
+                      onClick={() => setActiveTafsirAyat(null)}
+                      className="px-5 py-2 bg-[#0F4C3A] hover:bg-emerald-900 text-white rounded-xl text-xs font-bold cursor-pointer transition-colors"
+                    >
+                      Tutup Tafsir
+                    </button>
+                  </div>
+                </motion.div>
+              </div>
+            )}
+          </AnimatePresence>,
+          document.body,
+        )}
     </div>
   );
 };

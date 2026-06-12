@@ -14,7 +14,10 @@ interface ToastContainerProps {
   removeToast: (id: string) => void;
 }
 
-export const ToastContainer: React.FC<ToastContainerProps> = ({ toasts, removeToast }) => {
+export const ToastContainer: React.FC<ToastContainerProps> = ({
+  toasts,
+  removeToast,
+}) => {
   return (
     <div className="fixed top-4 right-4 left-4 sm:left-auto sm:w-96 z-50 flex flex-col gap-2 pointer-events-none">
       <AnimatePresence>
@@ -23,7 +26,9 @@ export const ToastContainer: React.FC<ToastContainerProps> = ({ toasts, removeTo
             success: <Check className="w-5 h-5 text-emerald-600" />,
             info: <Info className="w-5 h-5 text-blue-600" />,
             warning: <AlertTriangle className="w-5 h-5 text-amber-600" />,
-            notification: <Bell className="w-5 h-5 text-teal-600 animate-bounce" />,
+            notification: (
+              <Bell className="w-5 h-5 text-teal-600 animate-bounce" />
+            ),
           };
 
           const bgMap = {
@@ -45,8 +50,12 @@ export const ToastContainer: React.FC<ToastContainerProps> = ({ toasts, removeTo
                 {iconMap[toast.type]}
               </div>
               <div className="flex-1 min-w-0">
-                <h4 className="text-sm font-semibold text-slate-800">{toast.title}</h4>
-                <p className="text-xs text-slate-600 mt-0.5 leading-relaxed">{toast.body}</p>
+                <h4 className="text-sm font-semibold text-slate-800">
+                  {toast.title}
+                </h4>
+                <p className="text-xs text-slate-600 mt-0.5 leading-relaxed">
+                  {toast.body}
+                </p>
               </div>
               <button
                 onClick={() => removeToast(toast.id)}

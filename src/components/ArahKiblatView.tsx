@@ -3,17 +3,24 @@ import { motion, AnimatePresence } from "motion/react";
 import { Compass, AlertTriangle, MapPin, ArrowLeft } from "lucide-react";
 
 interface ArahKiblatViewProps {
-  addToast: (title: string, body: string, type: "success" | "info" | "warning" | "notification") => void;
+  addToast: (
+    title: string,
+    body: string,
+    type: "success" | "info" | "warning" | "notification",
+  ) => void;
   onBack?: () => void;
 }
 
-export const ArahKiblatView: React.FC<ArahKiblatViewProps> = ({ addToast, onBack }) => {
+export const ArahKiblatView: React.FC<ArahKiblatViewProps> = ({
+  addToast,
+  onBack,
+}) => {
   const [deviceHeading, setDeviceHeading] = useState(0);
   const [manualHeading, setManualHeading] = useState(135);
   const [supportsSensor, setSupportsSensor] = useState(false);
   const [isSoundOn] = useState(true);
   const [isVibrateOn] = useState(true);
-  
+
   const triggerVibrate = (ms: number) => {
     if (isVibrateOn && typeof navigator !== "undefined" && navigator.vibrate) {
       navigator.vibrate(ms);
@@ -23,7 +30,8 @@ export const ArahKiblatView: React.FC<ArahKiblatViewProps> = ({ addToast, onBack
   const triggerSound = (pitch = 440, duration = 0.08) => {
     if (!isSoundOn) return;
     try {
-      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      const AudioCtx =
+        window.AudioContext || (window as any).webkitAudioContext;
       if (!AudioCtx) return;
       const ctx = new AudioCtx();
       const osc = ctx.createOscillator();
@@ -42,7 +50,7 @@ export const ArahKiblatView: React.FC<ArahKiblatViewProps> = ({ addToast, onBack
 
   useEffect(() => {
     const handleOrientation = (e: DeviceOrientationEvent) => {
-      const heading = (e as any).webkitCompassHeading || (360 - (e.alpha || 0));
+      const heading = (e as any).webkitCompassHeading || 360 - (e.alpha || 0);
       if (typeof heading === "number" && !isNaN(heading)) {
         setDeviceHeading(Math.round(heading));
         if (!supportsSensor) setSupportsSensor(true);
@@ -50,13 +58,21 @@ export const ArahKiblatView: React.FC<ArahKiblatViewProps> = ({ addToast, onBack
     };
 
     if (window.DeviceOrientationEvent) {
-       // Request permission for iOS 13+ if possible (in a real app this is usually triggered by a button)
-       window.addEventListener("deviceorientationabsolute", handleOrientation as any, true);
-       window.addEventListener("deviceorientation", handleOrientation, true);
+      // Request permission for iOS 13+ if possible (in a real app this is usually triggered by a button)
+      window.addEventListener(
+        "deviceorientationabsolute",
+        handleOrientation as any,
+        true,
+      );
+      window.addEventListener("deviceorientation", handleOrientation, true);
     }
-    
+
     return () => {
-      window.removeEventListener("deviceorientationabsolute", handleOrientation as any, true);
+      window.removeEventListener(
+        "deviceorientationabsolute",
+        handleOrientation as any,
+        true,
+      );
       window.removeEventListener("deviceorientation", handleOrientation, true);
     };
   }, [supportsSensor]);
@@ -74,7 +90,9 @@ export const ArahKiblatView: React.FC<ArahKiblatViewProps> = ({ addToast, onBack
       const meccaLng = (39.8262 * PI) / 180;
 
       const y = Math.sin(meccaLng - lngRad);
-      const x = Math.cos(latRad) * Math.tan(meccaLat) - Math.sin(latRad) * Math.cos(meccaLng - lngRad);
+      const x =
+        Math.cos(latRad) * Math.tan(meccaLat) -
+        Math.sin(latRad) * Math.cos(meccaLng - lngRad);
       let angle = Math.atan2(y, x) * (180 / PI);
       return (angle + 360) % 360;
     };
@@ -89,17 +107,23 @@ export const ArahKiblatView: React.FC<ArahKiblatViewProps> = ({ addToast, onBack
 
           try {
             // Optional: Get locality name
-            const r = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=id`);
+            const r = await fetch(
+              `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=id`,
+            );
             if (r.ok) {
               const data = await r.json();
-              const loc = data.city || data.locality || data.principalSubdivision;
-              if (loc) setGpsLocation(loc.replace(/Kabupaten|Kota|Kab\./gi, "").trim());
+              const loc =
+                data.city || data.locality || data.principalSubdivision;
+              if (loc)
+                setGpsLocation(
+                  loc.replace(/Kabupaten|Kota|Kab\./gi, "").trim(),
+                );
             }
-          } catch(e) {}
+          } catch (e) {}
         },
         (error) => {
           // Ignore, fallback to 295
-        }
+        },
       );
     }
   }, []);
@@ -111,31 +135,33 @@ export const ArahKiblatView: React.FC<ArahKiblatViewProps> = ({ addToast, onBack
     <div className="flex flex-col h-full bg-[#FDFBF7] relative max-w-2xl mx-auto w-full pb-20">
       <div className="sticky top-0 bg-[#FDFBF7]/90 backdrop-blur-xl border-b border-slate-200/60 z-20 px-5 py-4 flex items-center gap-4">
         {onBack && (
-          <button onClick={onBack} className="p-2 bg-white border border-slate-200 hover:bg-slate-50 hover:scale-105 rounded-full cursor-pointer transition-all shadow-sm">
+          <button
+            onClick={onBack}
+            className="p-2 bg-white border border-slate-200 hover:bg-slate-50 hover:scale-105 rounded-full cursor-pointer transition-all shadow-sm"
+          >
             <ArrowLeft className="w-5 h-5 text-[#0F4C3A]" />
           </button>
         )}
         <div>
-          <h3 className="font-bold text-[#0F4C3A] text-lg leading-tight">Arah Kiblat</h3>
-          <p className="text-[11px] font-bold text-emerald-700/70 uppercase tracking-widest mt-0.5">Kompas Terintegrasi</p>
+          <h3 className="font-bold text-[#0F4C3A] text-lg leading-tight">
+            Arah Kiblat
+          </h3>
+          <p className="text-[11px] font-bold text-emerald-700/70 uppercase tracking-widest mt-0.5">
+            Kompas Terintegrasi
+          </p>
         </div>
       </div>
 
       <div className="flex flex-col gap-6 items-center px-4 py-8 w-full max-w-md mx-auto">
-        <div className="flex flex-col items-center mb-2">
-         <span className="text-[10px] font-extrabold text-slate-400 tracking-widest block uppercase mb-1">
-          NAVIGASI
-        </span>
-        <h3 className="font-serif font-bold text-[#0F4C3A] text-2xl">Arah Kiblat</h3>
-        <p className="text-xs text-slate-500 font-semibold mt-1 text-center">Petunjuk arah menghadap Ka'bah saat beribadah.</p>
-      </div>
-
-      <div className="bg-white border w-full border-slate-100 p-8 pt-10 rounded-[40px] shadow-sm flex flex-col items-center justify-center gap-8 relative overflow-hidden">
-          
+        <div className="bg-white border w-full border-slate-100 p-8 pt-10 rounded-[40px] shadow-sm flex flex-col items-center justify-center gap-8 relative overflow-hidden">
           <div className="w-full bg-slate-50 border border-slate-100 p-4.5 rounded-2xl text-center">
-            <h3 className="font-serif font-bold text-slate-800 text-sm flex items-center justify-center gap-1.5"><MapPin className="w-3.5 h-3.5 text-emerald-600"/> {gpsLocation ? `Kiblat di ${gpsLocation}` : "Kompas Kiblat"}</h3>
+            <h3 className="font-serif font-bold text-slate-800 text-sm flex items-center justify-center gap-1.5">
+              <MapPin className="w-3.5 h-3.5 text-emerald-600" />{" "}
+              {gpsLocation ? `Kiblat di ${gpsLocation}` : "Kompas Kiblat"}
+            </h3>
             <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-               Target kiblat di lokasi Anda berkisar pada sudut ~{targetKiblatAngle}°.
+              Target kiblat di lokasi Anda berkisar pada sudut ~
+              {targetKiblatAngle}°.
             </p>
           </div>
 
@@ -149,28 +175,40 @@ export const ArahKiblatView: React.FC<ArahKiblatViewProps> = ({ addToast, onBack
               className="absolute w-full h-full p-6 flex items-center justify-center"
             >
               <div className="relative w-full h-full flex items-center justify-center font-bold text-[10px] text-slate-400">
-                <span className="absolute top-2 text-[#0F4C3A] font-extrabold">U</span>
+                <span className="absolute top-2 text-[#0F4C3A] font-extrabold">
+                  U
+                </span>
                 <span className="absolute right-2">T</span>
                 <span className="absolute bottom-2">S</span>
                 <span className="absolute left-2">B</span>
 
-                <span className="absolute top-10 right-10 text-[8px] opacity-50">TL</span>
-                <span className="absolute bottom-10 right-10 text-[8px] opacity-50">TG</span>
-                <span className="absolute bottom-10 left-10 text-[8px] opacity-50">BD</span>
-                <span className="absolute top-10 left-10 text-[8px] opacity-50">BL</span>
+                <span className="absolute top-10 right-10 text-[8px] opacity-50">
+                  TL
+                </span>
+                <span className="absolute bottom-10 right-10 text-[8px] opacity-50">
+                  TG
+                </span>
+                <span className="absolute bottom-10 left-10 text-[8px] opacity-50">
+                  BD
+                </span>
+                <span className="absolute top-10 left-10 text-[8px] opacity-50">
+                  BL
+                </span>
 
                 <div className="w-44 h-44 rounded-full border-2 border-slate-200/55 flex items-center justify-center">
                   <div className="w-36 h-36 rounded-full border border-slate-100 bg-white/20"></div>
                 </div>
 
-                <div 
+                <div
                   className="absolute w-12 h-12 flex items-center justify-center"
                   style={{
                     transform: `rotate(${targetKiblatAngle}deg) translateY(-84px)`,
                   }}
                 >
                   <div className="relative flex flex-col items-center">
-                    <span className="text-[9px] font-extrabold text-amber-500 bg-[#0F4C3A] px-1.5 py-0.5 rounded-full shadow-sm">KIBLAT</span>
+                    <span className="text-[9px] font-extrabold text-amber-500 bg-[#0F4C3A] px-1.5 py-0.5 rounded-full shadow-sm">
+                      KIBLAT
+                    </span>
                     <span className="text-sm">🕋</span>
                   </div>
                 </div>
@@ -178,7 +216,9 @@ export const ArahKiblatView: React.FC<ArahKiblatViewProps> = ({ addToast, onBack
             </motion.div>
 
             <div className="absolute pointer-events-none flex flex-col items-center justify-center text-center">
-              <div className={`w-1 bg-gradient-to-t from-red-600 to-red-500 h-16 rounded-full shadow-lg ${isAligned ? "animate-pulse" : ""}`}></div>
+              <div
+                className={`w-1 bg-gradient-to-t from-red-600 to-red-500 h-16 rounded-full shadow-lg ${isAligned ? "animate-pulse" : ""}`}
+              ></div>
               <div className="w-4 h-4 mt-1 rounded-full border-4 border-slate-800 bg-white shadow z-10"></div>
             </div>
 
@@ -201,8 +241,12 @@ export const ArahKiblatView: React.FC<ArahKiblatViewProps> = ({ addToast, onBack
                   <span className="text-lg">✨</span>
                 </div>
                 <div className="text-left">
-                  <h4 className="text-xs font-bold text-emerald-800 uppercase tracking-wider">Arah Kiblat Tepat!</h4>
-                  <p className="text-[11px] text-emerald-600 mt-0.5">Siap mendaratkan sujud ibadah menghadap Ka'bah.</p>
+                  <h4 className="text-xs font-bold text-emerald-800 uppercase tracking-wider">
+                    Arah Kiblat Tepat!
+                  </h4>
+                  <p className="text-[11px] text-emerald-600 mt-0.5">
+                    Siap mendaratkan sujud ibadah menghadap Ka'bah.
+                  </p>
                 </div>
               </motion.div>
             ) : (
@@ -212,10 +256,9 @@ export const ArahKiblatView: React.FC<ArahKiblatViewProps> = ({ addToast, onBack
                 className="bg-slate-50 border border-slate-200/70 p-4 rounded-xl text-center w-full"
               >
                 <p className="text-[11px] text-slate-500 leading-normal">
-                  {supportsSensor 
+                  {supportsSensor
                     ? "Putar perangkat perlahan sampai garis menunjuk ke arah ikon Ka'bah 🕋."
-                    : "Gunakan kontrol slider di bawah untuk mensimulasikan perputaran kompas interaktif:"
-                  }
+                    : "Gunakan kontrol slider di bawah untuk mensimulasikan perputaran kompas interaktif:"}
                 </p>
               </motion.div>
             )}
@@ -225,7 +268,9 @@ export const ArahKiblatView: React.FC<ArahKiblatViewProps> = ({ addToast, onBack
             <div className="w-full flex flex-col gap-1.5 mt-1 border-t border-slate-100 pt-6 px-2">
               <div className="flex justify-between text-[10px] font-bold text-slate-400">
                 <span>SIMULASI KOMPAS MANUAL</span>
-                <span className="text-emerald-700 font-extrabold">SASARAN: {targetKiblatAngle}°</span>
+                <span className="text-emerald-700 font-extrabold">
+                  SASARAN: {targetKiblatAngle}°
+                </span>
               </div>
               <input
                 type="range"
@@ -249,8 +294,7 @@ export const ArahKiblatView: React.FC<ArahKiblatViewProps> = ({ addToast, onBack
               </div>
             </div>
           )}
-
-      </div>
+        </div>
       </div>
     </div>
   );
