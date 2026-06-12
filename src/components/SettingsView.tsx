@@ -440,15 +440,15 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                   </li>
                   <li className="flex items-start gap-2.5">
                     <span className="w-5 h-5 rounded-md bg-[#0F4C3A]/10 text-[#0F4C3A] flex items-center justify-center flex-shrink-0 mt-0.5"><Compass className="w-3 h-3" /></span>
-                    <p className="text-sm font-medium text-slate-600"><span className="font-bold text-slate-700">Arah Kiblat & Waktu Sholat:</span> Navigasi presisi Kiblat berdasarkan GPS lokal serta jadwal adzan akurat.</p>
+                    <p className="text-sm font-medium text-slate-600"><span className="font-bold text-slate-700">Arah Kiblat & Waktu Sholat:</span> Navigasi presisi Kiblat berdasarkan GPS lokal serta jadwal adzan akurat secara otomatis.</p>
                   </li>
                   <li className="flex items-start gap-2.5">
-                    <span className="w-5 h-5 rounded-md bg-[#0F4C3A]/10 text-[#0F4C3A] flex items-center justify-center flex-shrink-0 mt-0.5"><Sparkles className="w-3 h-3" /></span>
-                    <p className="text-sm font-medium text-slate-600"><span className="font-bold text-slate-700">Tanya Ustadz AI:</span> Bimbingan Islami berbasis AI dengan rujukan komprehensif ke ayat Al-Qur'an dan Hadits.</p>
+                    <span className="w-5 h-5 rounded-md bg-amber-100 text-amber-600 flex items-center justify-center flex-shrink-0 mt-0.5"><Sparkles className="w-3 h-3" /></span>
+                    <p className="text-sm font-medium text-slate-600"><span className="font-bold text-amber-600">Tanya Ustadz AI (Terbaru):</span> Bimbingan Islami interaktif berbasis AI dengan rujukan komprehensif ke ayat Al-Qur'an dan Hadits real-time.</p>
                   </li>
                   <li className="flex items-start gap-2.5">
                     <span className="w-5 h-5 rounded-md bg-[#0F4C3A]/10 text-[#0F4C3A] flex items-center justify-center flex-shrink-0 mt-0.5"><Bookmark className="w-3 h-3" /></span>
-                    <p className="text-sm font-medium text-slate-600"><span className="font-bold text-slate-700">Markah & Catatan:</span> Menandai progres tilawah dan merangkum hasil tadabbur langsung di dalam ayat.</p>
+                    <p className="text-sm font-medium text-slate-600"><span className="font-bold text-slate-700">Markah & Catatan:</span> Menandai progres tilawah dan merangkum hasil tadabbur dengan sinkronisasi lokal instan.</p>
                   </li>
                 </ul>
               </div>

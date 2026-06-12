@@ -284,10 +284,12 @@ export const JadwalSholatWidget: React.FC<SholatWidgetProps> = ({ addToast }) =>
   const getGPSLocation = (silent: boolean = false) => {
     if (!navigator.geolocation) {
       if (!silent) addToast("Tidak Didukung", "Fitur GPS tidak didukung browser Anda.", "warning");
+      setIsLoading(false);
       return;
     }
 
     if (!silent) addToast("Mencari Lokasi GPS...", "Mengakses koordinat satelit peranti Anda...", "info");
+    setIsLoading(true);
 
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
@@ -295,7 +297,6 @@ export const JadwalSholatWidget: React.FC<SholatWidgetProps> = ({ addToast }) =>
           const lat = pos.coords.latitude;
           const lon = pos.coords.longitude;
           
-          // fetch accurate locality/city from bigdatacloud open api for display name
           let displayName = "Lokasi Saat Ini";
           try {
             const r = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=id`);
@@ -305,25 +306,23 @@ export const JadwalSholatWidget: React.FC<SholatWidgetProps> = ({ addToast }) =>
             }
           } catch (e) {}
           
-          // Call Aladhan API for accurate coordinates-based prayer times
           const now = new Date();
           const yr = now.getFullYear();
           const mo = now.getMonth() + 1;
           const dy = now.getDate();
           
-          const aladhanRes = await fetch(`https://api.aladhan.com/v1/timings/${dy}-${mo}-${yr}?latitude=${lat}&longitude=${lon}&method=11`); // method 11 is Majelis Ulama Indonesia
+          const aladhanRes = await fetch(`https://api.aladhan.com/v1/timings/${dy}-${mo}-${yr}?latitude=${lat}&longitude=${lon}&method=11`);
           if (!aladhanRes.ok) throw new Error("Gagal mengambil jadwal berdasar koordinat");
           const asData = await aladhanRes.json();
           
           if (asData.code === 200 && asData.data && asData.data.timings) {
             const timings = asData.data.timings;
-            // Adapt Aladhan to our PrayerSchedule format
             const coordSchedule: PrayerSchedule = {
               tanggal: `${String(dy).padStart(2, "0")}/${String(mo).padStart(2, "0")}/${yr}`,
               imsak: timings.Imsak,
               subuh: timings.Fajr,
               terbit: timings.Sunrise,
-              dhuha: timings.Sunrise, // Aladhan doesn't give dhuha natively, use sunrise
+              dhuha: timings.Sunrise,
               dzuhur: timings.Dhuhr,
               ashar: timings.Asr,
               maghrib: timings.Maghrib,
@@ -331,13 +330,12 @@ export const JadwalSholatWidget: React.FC<SholatWidgetProps> = ({ addToast }) =>
               date: `${yr}-${String(mo).padStart(2, "0")}-${String(dy).padStart(2, "0")}`
             };
             
-            // Store the special auto-located coordinate city format
             const dynamicCity: SholatCity = { id: "COORD", lokasi: displayName };
             
-            // We set the schedule internally and avoid triggering `fetchSchedule` (which would reset to myquran defaults if id="COORD")
             setSelectedCity(dynamicCity);
             setSchedule(coordSchedule);
             localStorage.setItem("qd_has_located", "1");
+            setIsLoading(false);
             
             if (!silent) addToast("GPS Terkunci!", `Jadwal sholat akurat sesuai koordinat GPS (${displayName}).`, "success");
           } else {
@@ -345,13 +343,20 @@ export const JadwalSholatWidget: React.FC<SholatWidgetProps> = ({ addToast }) =>
           }
         } catch (err) {
           if (!silent) addToast("Jadwal Koordinat Gagal", "Gagal memproses posisi. Menggunakan default.", "warning");
-          // Fallback to Jakarta via MyQuran
-          setSelectedCity({ id: "1301", lokasi: "KOTA JAKARTA (GPS)" });
+          setSelectedCity({ id: "1301", lokasi: "KOTA JAKARTA" });
           localStorage.setItem("qd_has_located", "1");
+          setIsLoading(false);
         }
       },
       (err) => {
         if (!silent) addToast("GPS Gagal", "Harap izinkan hak akses atau tulis nama kota secara manual.", "warning");
+        if (selectedCity.id !== "COORD") {
+          fetchSchedule(selectedCity.id);
+        } else {
+          setSelectedCity({ id: "1301", lokasi: "KOTA JAKARTA" });
+          localStorage.setItem("qd_has_located", "1");
+          setIsLoading(false);
+        }
       }
     );
   };
@@ -413,23 +418,23 @@ export const JadwalSholatWidget: React.FC<SholatWidgetProps> = ({ addToast }) =>
     <div className="bg-white rounded-3xl p-6 shadow-md border border-slate-100 flex flex-col gap-6">
       {/* Header section: Selected Location, Live countdown */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-1 min-w-0">
           <div className="p-3 bg-emerald-50 rounded-2xl text-emerald-800">
             <MapPin className="w-6 h-6" />
           </div>
-          <div>
-            <div className="flex items-center gap-1.5/2">
-              <span className="text-xs font-bold text-slate-400 tracking-wider">WILAYAH</span>
-            </div>
-            <h3 className="text-lg font-bold text-slate-800 flex items-center gap-1">
-              {selectedCity.lokasi}
+          <div className="flex-1 min-w-0 pr-2">
+            <span className="text-xs font-bold text-slate-400 tracking-wider mb-0.5 block">WILAYAH</span>
+            <div className="flex flex-row items-end flex-wrap gap-x-3 gap-y-1">
+              <h3 className="text-[17px] sm:text-lg font-bold text-slate-800 leading-snug break-words">
+                {selectedCity.lokasi}
+              </h3>
               <button
                 onClick={() => setShowSearchModal(true)}
-                className="text-xs text-emerald-600 hover:text-emerald-800 underline font-medium ml-2 cursor-pointer focus:outline-none"
+                className="text-xs text-emerald-600 hover:text-emerald-800 underline font-semibold pb-[3px] cursor-pointer focus:outline-none flex-shrink-0"
               >
                 Ganti Kota
               </button>
-            </h3>
+            </div>
           </div>
         </div>
 
@@ -528,7 +533,7 @@ export const JadwalSholatWidget: React.FC<SholatWidgetProps> = ({ addToast }) =>
         </div>
         <div className="flex flex-col xs:flex-row gap-2 w-full xs:w-auto justify-center">
           <button
-            onClick={getGPSLocation}
+            onClick={() => getGPSLocation(false)}
             className="px-4 py-2 bg-white border border-slate-200 hover:bg-slate-50 cursor-pointer rounded-xl text-slate-600 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors w-full xs:w-auto"
           >
             <Map className="w-4 h-4 text-emerald-700" />

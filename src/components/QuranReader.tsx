@@ -536,7 +536,7 @@ export const QuranReader: React.FC<QuranReaderProps> = ({
                 return (
                   <div
                     key={ayat.nomorAyat}
-                    ref={(el) => (itemRefs.current[ayat.nomorAyat] = el)}
+                    ref={(el) => { itemRefs.current[ayat.nomorAyat] = el; }}
                     className="bg-white border border-slate-100 rounded-3xl p-6 shadow-sm hover:shadow-md transition-all flex flex-col gap-5 relative group"
                   >
                     {/* Verse actions navigation header bar */}

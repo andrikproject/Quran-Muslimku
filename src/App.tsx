@@ -36,7 +36,34 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<"beranda" | "quran" | "cari" | "doa" | "profil" | "tasbih" | "kiblat" | "kalender" | "tafsir" | "hadits" | "fikih">("beranda");
   const [showSubMenu, setShowSubMenu] = useState(false);
 
-  // Handle Android Physical Back Button
+  // Sync state to History API for Android/Browser Back Button Support
+  useEffect(() => {
+    // Listen for back/forward navigation
+    const handlePopState = (e: PopStateEvent) => {
+      if (e.state) {
+        setActiveTab(e.state.tab || "beranda");
+        setShowSubMenu(e.state.sub || false);
+      }
+    };
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
+
+  // Update history state when tabs or submenus change
+  useEffect(() => {
+    const currentState = window.history.state;
+    // If the state is different from what's currently in history, push a new state
+    if (!currentState || currentState.tab !== activeTab || currentState.sub !== showSubMenu) {
+      // If it's the very first load and we're just syncing defaults, replace instead of push
+      if (!currentState && activeTab === "beranda" && !showSubMenu) {
+        window.history.replaceState({ tab: activeTab, sub: showSubMenu }, "", `#${activeTab}`);
+      } else {
+        window.history.pushState({ tab: activeTab, sub: showSubMenu }, "", `#${activeTab}${showSubMenu ? '-menu' : ''}`);
+      }
+    }
+  }, [activeTab, showSubMenu]);
+
+  // Handle Android Physical Back Button for Capacitor (fallback)
   useEffect(() => {
     const handleBackButton = async () => {
       if (showSubMenu) {
@@ -53,7 +80,7 @@ export default function App() {
     return () => {
       backListener.then(listener => listener.remove());
     };
-  }, [activeTab]);
+  }, [activeTab, showSubMenu]);
 
   // Notifications/Toasts System
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
@@ -659,7 +686,7 @@ export default function App() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.98 }}
             transition={{ duration: 0.4, ease: [0.25, 0.8, 0.25, 1] }}
-            className="w-full h-full"
+            className="w-full h-full pb-32"
           >
             {renderTabContent()}
           </motion.div>
