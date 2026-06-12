@@ -60,8 +60,50 @@ export const ArahKiblatView: React.FC<ArahKiblatViewProps> = ({ addToast }) => {
     };
   }, [supportsSensor]);
 
+  const [targetKiblatAngle, setTargetKiblatAngle] = useState(295); // Default to Jakarta
+  const [gpsLocation, setGpsLocation] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Dynamic Qibla Calculator using Haversine-based formula
+    const getQiblaAngle = (lat: number, lng: number) => {
+      const PI = Math.PI;
+      const latRad = (lat * PI) / 180;
+      const lngRad = (lng * PI) / 180;
+      const meccaLat = (21.4225 * PI) / 180;
+      const meccaLng = (39.8262 * PI) / 180;
+
+      const y = Math.sin(meccaLng - lngRad);
+      const x = Math.cos(latRad) * Math.tan(meccaLat) - Math.sin(latRad) * Math.cos(meccaLng - lngRad);
+      let angle = Math.atan2(y, x) * (180 / PI);
+      return (angle + 360) % 360;
+    };
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          const qibla = getQiblaAngle(lat, lng);
+          setTargetKiblatAngle(Math.round(qibla));
+
+          try {
+            // Optional: Get locality name
+            const r = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=id`);
+            if (r.ok) {
+              const data = await r.json();
+              const loc = data.city || data.locality || data.principalSubdivision;
+              if (loc) setGpsLocation(loc.replace(/Kabupaten|Kota|Kab\./gi, "").trim());
+            }
+          } catch(e) {}
+        },
+        (error) => {
+          // Ignore, fallback to 295
+        }
+      );
+    }
+  }, []);
+
   const activeCompassHeading = supportsSensor ? deviceHeading : manualHeading;
-  const targetKiblatAngle = 295;
   const isAligned = Math.abs(activeCompassHeading - targetKiblatAngle) <= 6;
 
   return (
@@ -77,9 +119,9 @@ export const ArahKiblatView: React.FC<ArahKiblatViewProps> = ({ addToast }) => {
       <div className="bg-white border w-full border-slate-100 p-8 pt-10 rounded-[40px] shadow-sm flex flex-col items-center justify-center gap-8 relative overflow-hidden">
           
           <div className="w-full bg-slate-50 border border-slate-100 p-4.5 rounded-2xl text-center">
-            <h3 className="font-serif font-bold text-slate-800 text-sm">Kompas Kiblat</h3>
+            <h3 className="font-serif font-bold text-slate-800 text-sm flex items-center justify-center gap-1.5"><MapPin className="w-3.5 h-3.5 text-emerald-600"/> {gpsLocation ? `Kiblat di ${gpsLocation}` : "Kompas Kiblat"}</h3>
             <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-               Target kiblat di Indonesia berkisar pada sudut ~295° WIB.
+               Target kiblat di lokasi Anda berkisar pada sudut ~{targetKiblatAngle}°.
             </p>
           </div>
 
@@ -169,7 +211,7 @@ export const ArahKiblatView: React.FC<ArahKiblatViewProps> = ({ addToast }) => {
             <div className="w-full flex flex-col gap-1.5 mt-1 border-t border-slate-100 pt-6 px-2">
               <div className="flex justify-between text-[10px] font-bold text-slate-400">
                 <span>SIMULASI KOMPAS MANUAL</span>
-                <span className="text-emerald-700 font-extrabold">SASARAN: 295°</span>
+                <span className="text-emerald-700 font-extrabold">SASARAN: {targetKiblatAngle}°</span>
               </div>
               <input
                 type="range"

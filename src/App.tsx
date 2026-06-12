@@ -8,7 +8,7 @@ import {
   Home, BookOpen, Search, Heart, User, Bell, ChevronRight, 
   BookMarked, HelpCircle, FileText, Calendar, Clock, Sparkles, 
   Share2, Play, Volume2, History, RotateCcw, PenTool, HandHeart,
-  Compass
+  Compass, Scroll, LibraryBig, LayoutGrid, ArrowLeft
 } from "lucide-react";
 
 // Components
@@ -23,6 +23,9 @@ import { InstallPrompt } from "./components/InstallPrompt";
 import { TasbihView } from "./components/TasbihView";
 import { ArahKiblatView } from "./components/ArahKiblatView";
 import { KalenderView } from "./components/KalenderView";
+import { TafsirView } from "./components/TafsirView";
+import { FikihView } from "./components/FikihView";
+import { HaditsView } from "./components/HaditsView";
 
 // Typings and Data
 import { Bookmark, Note, TilawahProgress } from "./types";
@@ -30,12 +33,15 @@ import { App as CapacitorApp } from "@capacitor/app";
 
 export default function App() {
   const [showSplash, setShowSplash] = useState(true);
-  const [activeTab, setActiveTab] = useState<"beranda" | "quran" | "cari" | "doa" | "profil" | "tasbih" | "kiblat" | "kalender">("beranda");
+  const [activeTab, setActiveTab] = useState<"beranda" | "quran" | "cari" | "doa" | "profil" | "tasbih" | "kiblat" | "kalender" | "tafsir" | "hadits" | "fikih">("beranda");
+  const [showSubMenu, setShowSubMenu] = useState(false);
 
   // Handle Android Physical Back Button
   useEffect(() => {
     const handleBackButton = async () => {
-      if (activeTab !== "beranda") {
+      if (showSubMenu) {
+        setShowSubMenu(false);
+      } else if (activeTab !== "beranda") {
         setActiveTab("beranda");
       } else {
         await CapacitorApp.exitApp();
@@ -96,6 +102,7 @@ export default function App() {
 
   // Jump from Home / search directly into Specific Surah details
   const [deepLinkSurah, setDeepLinkSurah] = useState<number | null>(null);
+  const [deepLinkAyat, setDeepLinkAyat] = useState<number | null>(null);
 
   // Load persistence from client localStorage
   useEffect(() => {
@@ -192,8 +199,9 @@ export default function App() {
   };
 
   // Jump page reader
-  const handleJumpToSurah = (surahNo: number) => {
+  const handleJumpToSurah = (surahNo: number, ayatNo?: number) => {
     setDeepLinkSurah(surahNo);
+    if (ayatNo) setDeepLinkAyat(ayatNo);
     setActiveTab("quran");
   };
 
@@ -284,43 +292,85 @@ export default function App() {
             </div>
 
             {/* Main menu 8-grid grid listed under the screenshot */}
-            <div className="bg-white border border-slate-100 rounded-3xl p-5 shadow-sm">
-              <div className="grid grid-cols-4 gap-y-5 gap-x-4">
-                {[
-                  { tag: "Al-Qur'an", action: () => setActiveTab("quran"), bg: "bg-[#EDF4F1] text-[#0F4C3A]", icon: <BookOpen className="w-5.5 h-5.5" /> },
-                  { tag: "Terakhir Baca", action: () => handleJumpToSurah(tilawahProgress.currentSurah), bg: "bg-[#FDF7E7] text-amber-700", icon: <Clock className="w-5.5 h-5.5" /> },
-                  { tag: "Arah Kiblat", action: () => { setActiveTab("kiblat"); addToast("Arah Kiblat", "Membuka navigator kiblat.", "info"); }, bg: "bg-[#EDF6F5] text-teal-700", icon: <Compass className="w-5.5 h-5.5" /> },
-                  { tag: "Kalender", action: () => { setActiveTab("kalender"); addToast("Kalender Hijriah", "Membuka penanggalan Islam.", "info"); }, bg: "bg-[#F7F2EC] text-amber-900", icon: <Calendar className="w-5.5 h-5.5" /> },
-                  { tag: "Tafsir", action: () => setActiveTab("quran"), bg: "bg-[#F3EEF8] text-purple-700", icon: <FileText className="w-5.5 h-5.5" /> },
-                  { tag: "Doa Harian", action: () => setActiveTab("doa"), bg: "bg-[#FDF2EB] text-orange-700", icon: <HandHeart className="w-5.5 h-5.5" /> },
-                  { tag: "Jadwal Sholat", action: () => {
-                    const el = document.getElementById("jadwal-sholat-widget-container");
-                    if (el) {
-                      el.scrollIntoView({ behavior: "smooth", block: "center" });
-                      addToast("Jadwal Sholat", "Menampilkan panel jadwal sholat.", "info");
-                    }
-                  }, bg: "bg-[#EEF6FA] text-sky-700", icon: <Calendar className="w-5.5 h-5.5" /> },
-                  { tag: "Tasbih", action: () => {
-                    setActiveTab("tasbih");
-                    addToast("Tasbih Digital", "Membuka fitur Tasbih Digital.", "info");
-                  }, bg: "bg-[#EDF5F1] text-emerald-700", icon: <RotateCcw className="w-5.5 h-5.5" /> }
-                ].map((itm, i) => (
-                  <button
-                    key={i}
-                    onClick={itm.action}
-                    className="flex flex-col items-center text-center gap-2 cursor-pointer focus:outline-none"
+            <div className="bg-white border border-slate-100 rounded-3xl p-5 shadow-sm overflow-hidden relative min-h-[220px]">
+              <AnimatePresence mode="wait">
+                {!showSubMenu ? (
+                  <motion.div
+                    key="main-menu"
+                    initial={{ x: -20, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    exit={{ x: -20, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="grid grid-cols-4 sm:grid-cols-5 gap-y-5 gap-x-2 sm:gap-x-4"
                   >
-                    <div className="w-12 h-12 sm:w-13 sm:h-13 rounded-full bg-[#FAF6EE] border border-[#F2ECE4]/60 shadow-xs flex items-center justify-center hover:scale-105 active:scale-95 transition-transform">
-                      <div className={`p-1 ${itm.bg.split(' ')[1]}`}>
-                        {itm.icon}
-                      </div>
-                    </div>
-                    <span className="text-[10px] sm:text-[11px] font-bold text-slate-600 leading-normal line-clamp-1 w-full mt-0.5">
-                      {itm.tag}
-                    </span>
-                  </button>
-                ))}
-              </div>
+                    {[
+                      { tag: "Al-Qur'an", action: () => setActiveTab("quran"), bg: "bg-[#EDF4F1] text-[#0F4C3A]", icon: <BookOpen className="w-5.5 h-5.5" /> },
+                      { tag: "Terakhir Baca", action: () => handleJumpToSurah(tilawahProgress.currentSurah, tilawahProgress.currentAyat), bg: "bg-[#FDF7E7] text-amber-700", icon: <Clock className="w-5.5 h-5.5" /> },
+                      { tag: "Arah Kiblat", action: () => { setActiveTab("kiblat"); addToast("Arah Kiblat", "Membuka navigator kiblat.", "info"); }, bg: "bg-[#EDF6F5] text-teal-700", icon: <Compass className="w-5.5 h-5.5" /> },
+                      { tag: "Kalender", action: () => { setActiveTab("kalender"); addToast("Kalender Hijriah", "Membuka penanggalan Islam.", "info"); }, bg: "bg-[#F7F2EC] text-amber-900", icon: <Calendar className="w-5.5 h-5.5" /> },
+                      { tag: "Tafsir", action: () => setActiveTab("tafsir"), bg: "bg-[#F3EEF8] text-purple-700", icon: <FileText className="w-5.5 h-5.5" /> },
+                      { tag: "Doa Harian", action: () => setActiveTab("doa"), bg: "bg-[#FDF2EB] text-orange-700", icon: <HandHeart className="w-5.5 h-5.5" /> },
+                      { tag: "Jadwal Sholat", action: () => {
+                        const el = document.getElementById("jadwal-sholat-widget-container");
+                        if (el) {
+                          el.scrollIntoView({ behavior: "smooth", block: "center" });
+                          addToast("Jadwal Sholat", "Menampilkan panel jadwal sholat.", "info");
+                        }
+                      }, bg: "bg-[#EEF6FA] text-sky-700", icon: <Calendar className="w-5.5 h-5.5" /> },
+                      { tag: "Lainnya", action: () => setShowSubMenu(true), bg: "bg-[#F5F5F5] text-slate-700", icon: <LayoutGrid className="w-5.5 h-5.5" /> },
+                    ].map((itm, i) => (
+                      <button
+                        key={i}
+                        onClick={itm.action}
+                        className="flex flex-col items-center text-center gap-2 cursor-pointer focus:outline-none"
+                      >
+                        <div className="w-12 h-12 sm:w-13 sm:h-13 rounded-full bg-[#FAF6EE] border border-[#F2ECE4]/60 shadow-xs flex items-center justify-center hover:scale-105 active:scale-95 transition-transform">
+                          <div className={`p-1 ${itm.bg.split(' ')[1]}`}>
+                            {itm.icon}
+                          </div>
+                        </div>
+                        <span className="text-[10px] sm:text-[11px] font-bold text-slate-600 leading-normal line-clamp-1 w-full mt-0.5">
+                          {itm.tag}
+                        </span>
+                      </button>
+                    ))}
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="sub-menu"
+                    initial={{ x: 20, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    exit={{ x: 20, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="grid grid-cols-4 sm:grid-cols-5 gap-y-5 gap-x-2 sm:gap-x-4"
+                  >
+                    {[
+                      { tag: "Kembali", action: () => setShowSubMenu(false), bg: "bg-[#F5F5F5] text-slate-500", icon: <ArrowLeft className="w-5.5 h-5.5" /> },
+                      { tag: "Tasbih", action: () => {
+                        setActiveTab("tasbih");
+                        addToast("Tasbih Digital", "Membuka fitur Tasbih Digital.", "info");
+                      }, bg: "bg-[#EDF5F1] text-emerald-700", icon: <RotateCcw className="w-5.5 h-5.5" /> },
+                      { tag: "Hadits", action: () => { setActiveTab("hadits"); addToast("Kumpulan Hadits", "Membuka perpustakaan hadits.", "info"); }, bg: "bg-[#F0F7FF] text-blue-700", icon: <Scroll className="w-5.5 h-5.5" /> },
+                      { tag: "Fikih", action: () => { setActiveTab("fikih"); addToast("Fikih", "Membuka panduan beribadah.", "info"); }, bg: "bg-[#FDF2F8] text-pink-700", icon: <LibraryBig className="w-5.5 h-5.5" /> }
+                    ].map((itm, i) => (
+                      <button
+                        key={i}
+                        onClick={itm.action}
+                        className="flex flex-col items-center text-center gap-2 cursor-pointer focus:outline-none"
+                      >
+                        <div className="w-12 h-12 sm:w-13 sm:h-13 rounded-full bg-[#FAF6EE] border border-[#F2ECE4]/60 shadow-xs flex items-center justify-center hover:scale-105 active:scale-95 transition-transform">
+                          <div className={`p-1 ${itm.bg.split(' ')[1]}`}>
+                            {itm.icon}
+                          </div>
+                        </div>
+                        <span className="text-[10px] sm:text-[11px] font-bold text-slate-600 leading-normal line-clamp-1 w-full mt-0.5">
+                          {itm.tag}
+                        </span>
+                      </button>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
             {/* Target Membaca Harian */}
@@ -365,7 +415,7 @@ export default function App() {
               <div className="flex justify-between items-center px-1">
                 <h4 className="text-xs sm:text-sm font-bold text-slate-855 tracking-wide">Progress Tilawah</h4>
                 <button
-                  onClick={() => handleJumpToSurah(tilawahProgress.currentSurah)}
+                  onClick={() => handleJumpToSurah(tilawahProgress.currentSurah, tilawahProgress.currentAyat)}
                   className="text-xs font-bold text-[#0F4C3A] hover:underline flex items-center gap-0.5 cursor-pointer"
                 >
                   Lihat Semua
@@ -474,7 +524,11 @@ export default function App() {
             updateTilawahProgress={handleUpdateTilawahProgress}
             addToast={addToast}
             initialSelectedSurah={deepLinkSurah}
-            resetInitialSelectedSurah={() => setDeepLinkSurah(null)}
+            initialSelectedAyat={deepLinkAyat}
+            resetInitialSelectedSurah={() => {
+              setDeepLinkSurah(null);
+              setDeepLinkAyat(null);
+            }}
           />
         );
 
@@ -492,6 +546,15 @@ export default function App() {
 
       case "kalender":
         return <KalenderView addToast={addToast} />;
+
+      case "tafsir":
+        return <TafsirView addToast={addToast} onBack={() => setActiveTab("beranda")} />;
+
+      case "hadits":
+        return <HaditsView addToast={addToast} onBack={() => setActiveTab("beranda")} />;
+
+      case "fikih":
+        return <FikihView onBack={() => setActiveTab("beranda")} />;
 
       case "profil":
         return (

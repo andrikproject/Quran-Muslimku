@@ -24,6 +24,7 @@ interface QuranReaderProps {
   updateTilawahProgress: (surahNo: number, surahName: string, ayatNo: number, totalAyat: number) => void;
   addToast: (title: string, body: string, type: "success" | "info" | "warning" | "notification") => void;
   initialSelectedSurah: number | null;
+  initialSelectedAyat?: number | null;
   resetInitialSelectedSurah: () => void;
 }
 
@@ -37,6 +38,7 @@ export const QuranReader: React.FC<QuranReaderProps> = ({
   updateTilawahProgress,
   addToast,
   initialSelectedSurah,
+  initialSelectedAyat,
   resetInitialSelectedSurah
 }) => {
   // Surahs list
@@ -117,15 +119,30 @@ export const QuranReader: React.FC<QuranReaderProps> = ({
   }, []);
 
   // Check if deep linked from Home (e.g., loaded with initialSelectedSurah)
+  const [pendingScrollAyat, setPendingScrollAyat] = useState<number | null>(null);
+
   useEffect(() => {
     if (initialSelectedSurah) {
       const match = surahs.find((s) => s.nomor === initialSelectedSurah);
       if (match) {
+        if (initialSelectedAyat) setPendingScrollAyat(initialSelectedAyat);
         selectSurahHandler(match);
       }
       resetInitialSelectedSurah();
     }
-  }, [initialSelectedSurah, surahs]);
+  }, [initialSelectedSurah, initialSelectedAyat, surahs]);
+
+  useEffect(() => {
+    if (surahDetail && pendingScrollAyat) {
+      const ayatEl = itemRefs.current[pendingScrollAyat];
+      if (ayatEl) {
+        setTimeout(() => {
+          ayatEl.scrollIntoView({ behavior: "smooth", block: "center" });
+        }, 300);
+        setPendingScrollAyat(null);
+      }
+    }
+  }, [surahDetail, pendingScrollAyat]);
 
   // Cleanup audio player when Surah changes
   useEffect(() => {
