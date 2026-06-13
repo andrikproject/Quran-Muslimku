@@ -1,5 +1,5 @@
 /**
- * @author Habib Ismail Al Qadri
+ * @author Andrik Rizki Rohmadani
  * @app Quran - Muslimku
  */
 import React, { useState, useEffect, useMemo } from "react";

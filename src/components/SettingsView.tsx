@@ -1,5 +1,5 @@
 /**
- * @author Habib Ismail Al Qadri
+ * @author Andrik Rizki Rohmadani
  * @app Quran - Muslimku
  */
 import React, { useState } from "react";
@@ -563,7 +563,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                   7335435332
                 </span>
                 <span className="text-sm font-bold text-[#0F4C3A] tracking-wide uppercase">
-                  A.N. Habib Ismail Al Qadri
+                  A.N. Andrik Rizki Rohmadani
                 </span>
               </div>
 
@@ -617,7 +617,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                 <p className="text-sm font-medium text-slate-600 leading-relaxed pl-1 relative z-10">
                   Aplikasi ini dikembangkan oleh{" "}
                   <span className="font-bold text-[#0F4C3A]">
-                    Habib Ismail Al Qadri
+                    Andrik Rizki Rohmadani
                   </span>
                   . Dibangun dengan niat dakwah untuk memudahkan umat Islam
                   dalam membaca, mempelajari, dan menadabburi ayat suci

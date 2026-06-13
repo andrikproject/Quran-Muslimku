@@ -1,5 +1,5 @@
 /**
- * @author Habib Ismail Al Qadri
+ * @author Andrik Rizki Rohmadani
  * @app Quran - Muslimku
  */
 import React, { useState, useEffect, useMemo } from "react";
@@ -325,7 +325,7 @@ export default function App() {
 
   // State: User profile parameters
   const [userName, setUserName] = useState(
-    () => localStorage.getItem("qs_username") || "Habib Ismail Al Qadri",
+    () => localStorage.getItem("qs_username") || "Andrik Rizki Rohmadani",
   );
   const [dailyGoalMinutes, setDailyGoalMinutes] = useState(
     () => Number(localStorage.getItem("qs_goal")) || 15,
