@@ -2,5 +2,7 @@
 	"appId": "com.ahlanhabib.quransaku",
 	"appName": "Quran - Muslimku",
 	"webDir": "dist",
-	"packageClassList": []
+	"packageClassList": [
+		"AppPlugin"
+	]
 }
