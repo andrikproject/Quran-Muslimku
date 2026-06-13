@@ -38,7 +38,7 @@ export const TanyaUstadzView: React.FC<TanyaUstadzViewProps> = ({
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       sender: "ai",
-      text: "Assalamu'alaikum! Saya adalah Asisten AI 'Tanya Ustadz AI' di Quran Saku Anda. Silakan tanyakan apa saja tentang kandungan ayat, nasehat spiritual, tafsir makna, maupun petunjuk doa yang ingin Anda ketahui.",
+      text: "Assalamu'alaikum! Saya adalah Asisten AI 'Tanya Ustadz AI' di Quran - Muslimku Anda. Silakan tanyakan apa saja tentang kandungan ayat, nasehat spiritual, tafsir makna, maupun petunjuk doa yang ingin Anda ketahui.",
       timestamp: new Date(),
     },
   ]);
@@ -75,7 +75,7 @@ export const TanyaUstadzView: React.FC<TanyaUstadzViewProps> = ({
 
       if (geminiApiKey && geminiApiKey.trim() !== "") {
         const sysInstruct =
-          "Anda adalah asisten AI 'Tanya Ustadz AI' di dalam aplikasi 'Quran Saku'. Anda adalah seorang Ulama Mufassir yang sangat berpengetahuan tentang Al-Qur'an, asbabun nuzul, serta ilmu Hadits. Tugas Anda adalah: memberikan jawaban Islami secara komprehensif yang WAJIB merujuk pada ayat-ayat suci Al-Qur'an dan juga menyertakan riwayat Hadits yang selaras (Kutubus Sittah) dalam menjawab isu umat. Di setiap jawaban yang melibatkan saran, doa, atau dalil, berikan kutipan bahasa Arab, terjemahan Indonesia, serta referensi letaknya (contoh: QS. Al-Baqarah: 120 atau HR. Bukhari). Formatlah teks menggunakan Markdown dengan rapi.";
+          "Anda adalah asisten AI 'Tanya Ustadz AI' di dalam aplikasi 'Quran - Muslimku'. Anda adalah seorang Ulama Mufassir yang sangat berpengetahuan tentang Al-Qur'an, asbabun nuzul, serta ilmu Hadits. Tugas Anda adalah: memberikan jawaban Islami secara komprehensif yang WAJIB merujuk pada ayat-ayat suci Al-Qur'an dan juga menyertakan riwayat Hadits yang selaras (Kutubus Sittah) dalam menjawab isu umat. Di setiap jawaban yang melibatkan saran, doa, atau dalil, berikan kutipan bahasa Arab, terjemahan Indonesia, serta referensi letaknya (contoh: QS. Al-Baqarah: 120 atau HR. Bukhari). Formatlah teks menggunakan Markdown dengan rapi.";
 
         const qp = `Pertanyaan Pengguna:\n${textToSend}\n\nTolong jawab pertanyaan ini dengan hikmah, berikan referensi spesifik dari Al-Qur'an maupun sabda Rasulullah (Hadits) yang relevan secara tegas beserta porsi teks asli dan maknanya agar menguatkan keimanan.`;
 
@@ -185,7 +185,7 @@ export const TanyaUstadzView: React.FC<TanyaUstadzViewProps> = ({
     
     exportContainer.innerHTML = `
       <div style="text-align: center; margin-bottom: 25px; border-bottom: 2px solid rgba(15, 76, 58, 0.1); padding-bottom: 15px;">
-        <h1 style="margin: 0; font-size: 24px; font-weight: bold; color: #0F4C3A; font-family: serif;">Tanya Ustadz AI - Quran Saku</h1>
+        <h1 style="margin: 0; font-size: 24px; font-weight: bold; color: #0F4C3A; font-family: serif;">Tanya Ustadz AI - Quran - Muslimku</h1>
         <p style="margin: 5px 0 0; font-size: 12px; color: #64748b;">Diterbitkan otomatis pada: ${timestamp.toLocaleString()}</p>
       </div>
       <div style="font-size: 14px; line-height: 1.6; color: #334155; white-space: pre-wrap;">
@@ -350,7 +350,7 @@ export const TanyaUstadzView: React.FC<TanyaUstadzViewProps> = ({
                           if (navigator.share) {
                             try {
                               await navigator.share({
-                                title: "Tanya Ustadz AI - Quran Saku",
+                                title: "Tanya Ustadz AI - Quran - Muslimku",
                                 text: msg.text,
                               });
                             } catch (e) {

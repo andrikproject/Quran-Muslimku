@@ -1,5 +1,5 @@
 {
-  "name": "Quran Saku",
+  "name": "Quran - Muslimku",
   "description": "Aplikasi Al-Qur'an dan Jadwal Sholat dengan UI premium, data terlengkap, dan pengingat harian.",
   "requestFramePermissions": [
     "geolocation"

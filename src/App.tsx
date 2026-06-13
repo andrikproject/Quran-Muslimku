@@ -1,6 +1,6 @@
 /**
  * @author Habib Ismail Al Qadri
- * @app Quran Saku
+ * @app Quran - Muslimku
  */
 import React, { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "motion/react";
@@ -490,7 +490,7 @@ export default function App() {
   const ayatOfTheDay = todaysAyats[currentSlideIndex];
 
   const shareAyatOfTheDay = () => {
-    const text = `*Ayat Hari Ini (QS ${ayatOfTheDay.surahName}:${ayatOfTheDay.verseId})*\n\n${ayatOfTheDay.arab}\n\n"${ayatOfTheDay.indonesian}"\n\n- Dibagikan via Quran Saku App -`;
+    const text = `*Ayat Hari Ini (QS ${ayatOfTheDay.surahName}:${ayatOfTheDay.verseId})*\n\n${ayatOfTheDay.arab}\n\n"${ayatOfTheDay.indonesian}"\n\n- Dibagikan via Quran - Muslimku App -`;
     navigator.clipboard.writeText(text);
     addToast(
       "Teks Disalin",

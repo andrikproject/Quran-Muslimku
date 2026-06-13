@@ -1,6 +1,6 @@
 /**
  * @author Habib Ismail Al Qadri
- * @app Quran Saku
+ * @app Quran - Muslimku
  */
 import React, { useEffect, useState } from "react";
 import { motion } from "motion/react";
@@ -25,7 +25,7 @@ export const Splash: React.FC<SplashProps> = ({ onFinish }) => {
       "Menghubungkan ke server...",
       "Menyiapkan mushaf Al-Qur'an...",
       "Mengunduh jadwal sholat terbaru...",
-      "Selamat datang di Quran Saku!",
+      "Selamat datang di Quran - Muslimku!",
     ];
 
     let currentPhraseIdx = 0;
@@ -71,8 +71,8 @@ export const Splash: React.FC<SplashProps> = ({ onFinish }) => {
             type: "spring",
             bounce: 0.4,
           }}
-          src="/QuranSaku.png"
-          alt="Quran Saku Logo"
+          src="/QuranMuslimku.png"
+          alt="Quran - Muslimku Logo"
           className="w-48 sm:w-56 h-auto drop-shadow-2xl mb-48 sm:mb-56"
         />
       </div>

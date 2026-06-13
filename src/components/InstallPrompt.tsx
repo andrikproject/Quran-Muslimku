@@ -75,7 +75,7 @@ export function InstallPrompt() {
 
             <div className="flex-1 min-w-0 pr-4">
               <h4 className="text-sm font-bold text-slate-800">
-                Install Quran Saku
+                Install Quran - Muslimku
               </h4>
               <p className="text-xs text-slate-500 mt-1 leading-relaxed">
                 Tambahkan aplikasi ke layar beranda untuk akses offline dan

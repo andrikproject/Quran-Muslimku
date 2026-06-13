@@ -1,6 +1,6 @@
 /**
  * @author Habib Ismail Al Qadri
- * @app Quran Saku
+ * @app Quran - Muslimku
  */
 import {StrictMode} from 'react';
 import {createRoot} from 'react-dom/client';

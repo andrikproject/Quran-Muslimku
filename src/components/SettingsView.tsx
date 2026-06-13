@@ -1,6 +1,6 @@
 /**
  * @author Habib Ismail Al Qadri
- * @app Quran Saku
+ * @app Quran - Muslimku
  */
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
@@ -80,7 +80,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   const clearAllAppletState = () => {
     if (
       confirm(
-        "Apakah Anda yakin ingin menghapus semua data penanda buku, catatan tadabbur, dan info tilawah di dalam Quran Saku?",
+        "Apakah Anda yakin ingin menghapus semua data penanda buku, catatan tadabbur, dan info tilawah di dalam Quran - Muslimku?",
       )
     ) {
       localStorage.clear();
@@ -539,7 +539,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                 Dukungan & Gift
               </h3>
               <p className="text-[13px] text-slate-500 font-medium mt-1">
-                Salurkan dukungan Anda untuk pengembangan Quran Saku App dan
+                Salurkan dukungan Anda untuk pengembangan Quran - Muslimku App dan
                 dakwah Islam.
               </p>
             </div>
@@ -601,7 +601,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                 Tentang Aplikasi
               </h3>
               <p className="text-[13px] text-slate-500 font-medium mt-1">
-                Fitur, Fungsi, dan Pengembang Quran Saku App.
+                Fitur, Fungsi, dan Pengembang Quran - Muslimku App.
               </p>
             </div>
 

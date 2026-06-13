@@ -1,6 +1,6 @@
 /**
  * @author Habib Ismail Al Qadri
- * @app Quran Saku
+ * @app Quran - Muslimku
  */
 import React, { useState, useEffect, useRef } from "react";
 import ReactMarkdown from "react-markdown";

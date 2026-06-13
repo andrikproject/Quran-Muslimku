@@ -11,22 +11,22 @@ export default defineConfig(() => {
       tailwindcss(),
       VitePWA({
         registerType: 'autoUpdate',
-        includeAssets: ['favicon.ico', 'QuranSaku.png', 'malam.png', 'pagi.png', 'siang.png', 'sore.png', 'splashnya.png'],
+        includeAssets: ['favicon.ico', 'QuranMuslimku.png', 'malam.png', 'pagi.png', 'siang.png', 'sore.png', 'splashnya.png'],
         manifest: {
-          name: 'Quran Saku',
-          short_name: 'QuranSaku',
+          name: 'Quran - Muslimku',
+          short_name: 'QuranMuslimku',
           description: 'Aplikasi Al-Qur\'an Digital',
           theme_color: '#FDFBF7',
           background_color: '#FDFBF7',
           display: 'standalone',
           icons: [
             {
-              src: 'QuranSaku.png',
+              src: 'QuranMuslimku.png',
               sizes: '192x192',
               type: 'image/png'
             },
             {
-              src: 'QuranSaku.png',
+              src: 'QuranMuslimku.png',
               sizes: '512x512',
               type: 'image/png'
             }
