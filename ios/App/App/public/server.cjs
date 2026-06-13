@@ -188,12 +188,19 @@ async function startServer() {
   });
   app.post("/api/ask-ai", async (req, res) => {
     try {
-      const { prompt, verseText, context } = req.body;
-      const client = getGeminiClient();
+      const { prompt, verseText, context, apiKey } = req.body;
+      let client = getGeminiClient();
+      if (apiKey && apiKey.trim() !== "") {
+        try {
+          client = new import_genai.GoogleGenAI({ apiKey: apiKey.trim() });
+        } catch (e) {
+          console.error("Failed to initialize Google Gen AI with custom key", e);
+        }
+      }
       if (!client) {
         return res.status(403).json({
           status: false,
-          message: "Gemini API Key belum ditentukan. Harap tambahkan API Key di tab Secrets pada AI Studio.",
+          message: "Gemini API Key belum ditentukan. Harap tambahkan API Key secara mandiri melalui menu Pengaturan Profil.",
           isConfigured: false
         });
       }
@@ -205,14 +212,13 @@ ${verseText ? `Ayat Al-Qur'an Yang Sedang Dibahas:
 Pertanyaan Pengguna:
 ${prompt}
 
-Berikan tanggapan yang bijak, mendalam, dan membimbing dalam format Bahasa Indonesia yang indah.
-Sebutkan referensi ayat jika relevan, gunakan kutipan yang bermakna, dan tulislah secara sopan, penuh kebaikan dan hikmah spiritual.
+Tolong jawab pertanyaan ini dengan hikmah, berikan referensi spesifik dari Al-Qur'an maupun sabda Rasulullah (Hadits) yang relevan secara tegas beserta porsi teks asli dan maknanya agar menguatkan keimanan. Pastikan mencantumkan nama Surah dan nomor ayat (misal: QS. Al-Baqarah: 255) atau perawi Hadits (misal: HR. Bukhari).
 `;
       const response = await client.models.generateContent({
         model: "gemini-2.5-flash",
         contents: queryPrompt,
         config: {
-          systemInstruction: "Anda adalah asisten AI 'Tanya Al-Qur'an' di dalam aplikasi 'Quran Saku' yang bijaksana, santun, ramah, dan berpengetahuan luas tentang Al-Qur'an, Tafsir, Doa, dan kehidupan spiritual Islami. Bantu pengguna menemukan ketenangan batin, hikmah ayat-ayat suci, dan penjelasan yang mendalam."
+          systemInstruction: "Anda adalah asisten AI 'Tanya Ustadz AI' di dalam aplikasi 'Quran - Muslimku'. Anda adalah seorang Ulama Mufassir yang sangat berpengetahuan tentang Al-Qur'an, asbabun nuzul, serta ilmu Hadits. Tugas Anda adalah: memberikan jawaban Islami secara komprehensif yang WAJIB merujuk pada ayat-ayat suci Al-Qur'an dan juga menyertakan riwayat Hadits yang selaras (Kutubus Sittah) dalam menjawab isu umat. Di setiap jawaban yang melibatkan saran, doa, atau dalil, berikan kutipan bahasa Arab, terjemahan Indonesia, serta referensi letaknya (contoh: QS. Al-Baqarah: 120 atau HR. Bukhari). Formatlah teks menggunakan Markdown dengan rapi."
         }
       });
       res.json({
@@ -222,7 +228,11 @@ Sebutkan referensi ayat jika relevan, gunakan kutipan yang bermakna, dan tulisla
       });
     } catch (error) {
       console.error("AI Error:", error);
-      res.status(500).json({ status: false, message: error.message });
+      let errorMsg = error.message;
+      if (errorMsg?.includes("high demand") || errorMsg?.includes("503")) {
+        errorMsg = "Server Google Gemini saat ini sedang sibuk dan mengalami permintaan tinggi (503). Mohon coba beberapa saat lagi.";
+      }
+      res.status(500).json({ status: false, message: errorMsg });
     }
   });
   app.get("/api/health", (req, res) => {
@@ -242,7 +252,7 @@ Sebutkan referensi ayat jika relevan, gunakan kutipan yang bermakna, dan tulisla
     });
   }
   app.listen(PORT, "0.0.0.0", () => {
-    console.log(`[Quran Saku] Fullstack server running on http://0.0.0.0:${PORT}`);
+    console.log(`[Quran - Muslimku] Fullstack server running on http://0.0.0.0:${PORT}`);
   });
 }
 startServer();
